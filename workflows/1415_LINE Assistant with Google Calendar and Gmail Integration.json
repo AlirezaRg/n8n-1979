@@ -1,0 +1,352 @@
+{
+  "active": false,
+  "name": "LINE Assistant with Google Calendar and Gmail Integration",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "9e1e1c11-f406-47de-8f65-9669cf078d3d",
+      "name": "AI Agent",
+      "notes": "This agent node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.7,
+      "position": [
+        -1140,
+        120
+      ],
+      "parameters": {
+        "text": "={{ $json.body.events[0].message.text }}",
+        "options": {
+          "systemMessage": "=You are a helpful assistant.\n\nHere is the current date {{ $now }}"
+        },
+        "promptType": "define"
+      }
+    },
+    {
+      "id": "fa722820-8804-47da-bb21-02c0d2b5d665",
+      "name": "Window Buffer Memory",
+      "notes": "This memoryBufferWindow node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.3,
+      "position": [
+        -1020,
+        580
+      ],
+      "parameters": {
+        "sessionKey": "YOUR_CREDENTIAL_HERE",
+        "sessionIdType": "customKey"
+      }
+    },
+    {
+      "id": "5149b91a-5934-4037-a444-dfdb93d0cd16",
+      "name": "OpenAI Chat Model",
+      "notes": "This lmChatOpenAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -1180,
+        580
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "211a120d-d65f-4708-adc2-66dc8f4a40d6",
+      "name": "Wikipedia",
+      "notes": "This toolWikipedia node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -360,
+        380
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "0e03137d-0300-47a4-bbd8-03c87c93d6e2",
+      "name": "OpenAI",
+      "notes": "This openAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.7,
+      "position": [
+        -780,
+        120
+      ],
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "options": {},
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Your task is to extract and condense the answer into an easily readable format. Don't provide a link or details such as \"???????????\" or \"?????????????????????.\""
+            },
+            {
+              "content": "={{ $json.output }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "8c6e96bc-aa9d-44d1-b7ce-6bb85b175cf1",
+      "name": "Switch Between Text and Others",
+      "notes": "This switch node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1820,
+        640
+      ],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $('Line Receiving').item.json.body.events[0].message.type }}",
+                    "rightValue": "text"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      }
+    },
+    {
+      "id": "721a5e5e-3a9a-435e-9302-03ca7cf64fb7",
+      "name": "Line Receiving",
+      "webhookId": "********-****-****-****-************",
+      "notes": "This webhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -2320,
+        560
+      ],
+      "parameters": {
+        "path": "linechatbotagent",
+        "options": {},
+        "httpMethod": "POST"
+      }
+    },
+    {
+      "id": "2b47f8f1-a501-4204-9221-c838edfceae7",
+      "name": "Error Handling from AI Response",
+      "notes": "This switch node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -220,
+        100
+      ],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "leftValue": "={{ $json.message.content }}",
+                    "rightValue": "={{ $json.output }}"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      }
+    },
+    {
+      "id": "99218c08-5ec7-44b9-a795-e98f1ec4aab3",
+      "name": "Text Cleansing",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "********-****-****-****-************",
+              "name": "message.content",
+              "type": "string",
+              "value": "={{ $json.message.content.replaceAll(\"\\n\",\"\\\\n\").replaceAll(\"\\n\",\"\").removeMarkdown().removeTags().replaceAll('\"',\"\") }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "39476f44-9dc7-4c72-a857-9e79f85ccd72",
+      "name": "Line Answering (Error Case)",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        760,
+        680
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n \"replyToken\": \"{{ $('Line Receiving').item.json.body.events[0].replyToken }}\",\n \"messages\": [\n {\n \"type\": \"text\",\n \"text\": \"?????????????????????????????\"\n }\n ]}",
+        "sendBody": true,
+        "jsonHeaders": "{\n\"Authorization\": \"Bearer ****************************************\",\n\"Content-Type\": \"application/json\"\n}",
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "specifyHeaders": "json"
+      }
+    },
+    {
+      "id": "a7f8837d-c21b-457d-ad8b-b0b69e3c1ba7",
+      "name": "Line Answering (Ordinary Case)",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        600,
+        120
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n \"replyToken\": \"{{ $('Line Receiving').item.json.body.events[0].replyToken }}\",\n \"messages\": [\n {\n \"type\": \"text\",\n \"text\": \"{{ $json.message.content }}\"\n }\n ]}",
+        "sendBody": true,
+        "jsonHeaders": "{\n\"Authorization\": \"Bearer ****************************************\",\n\"Content-Type\": \"application/json\"\n}",
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "specifyHeaders": "json"
+      }
+    },
+    {
+      "id": "3280f331-0130-41c2-a581-14feccf76514",
+      "name": "Google Calendar Create",
+      "notes": "This googleCalendarTool node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.2,
+      "position": [
+        -640,
+        400
+      ],
+      "parameters": {
+        "end": "= {{ $fromAI(\"createenddate\",\"end date and time to create event\") }}",
+        "start": "= {{ $fromAI(\"createstartdate\",\"start date and time to create event\") }}",
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": "***********@gmail.com",
+          "cachedResultName": "***********@gmail.com"
+        },
+        "additionalFields": {
+          "summary": "={{ $fromAI(\"event_name\",\"Name of an Event\") }}"
+        }
+      },
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "0PzHsuCKdTBU5E2Q",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "id": "7701895f-9781-41b9-aa80-8440e4e9cbd3",
+      "name": "Google Calendar Read",
+      "notes": "This googleCalendarTool node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.2,
+      "position": [
+        -880,
+        580
+      ],
+      "parameters": {
+        "limit": 5,
+        "options": {
+          "timeMax": "={{ $fromAI(\"enddate\",\"end date user mentioned about\") }}",
+          "timeMin": "={{ $fromAI(\"startdate\",\"start date user mentioned about\") }}"
+        },
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": "***********@gmail.com",
+          "cachedResultName": "***********@gmail.com"
+        },
+        "operation": "getAll"
+      },
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "0PzHsuCKdTBU5E2Q",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "id": "881daa7f-cf9a-4d1f-8235-55d206925ac0",
+      "name": "Gmail Read",
+      "webhookId": "********-****-****-****-************",
+      "notes": "This gmailTool node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        -700,
+        560
+      ],
+      "parameters": {
+        "limit": 5,
+        "filters": {
+          "receivedAfter": "={{ $fromAI(\"receiveddate\",\"the date email received\") }}"
+        },
+        "operation": "getAll"
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y4RWMfx2YG0VDaFJ",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,99 @@
+{
+  "active": false,
+  "name": "Production Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-d25e535c",
+      "name": "On clicking 'execute'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-8b3a03f5",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "responseFormat": "string"
+      }
+    },
+    {
+      "id": "node-f85cc5e9",
+      "name": "HTML Extract",
+      "type": "n8n-nodes-base.htmlExtract",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "options": {},
+        "extractionValues": {
+          "values": [
+            {
+              "key": "item",
+              "cssSelector": "h2",
+              "returnArray": true,
+              "returnValue": "html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-5ede6a55",
+      "name": "HTML Extract1",
+      "type": "n8n-nodes-base.htmlExtract",
+      "typeVersion": 1,
+      "position": [
+        850,
+        300
+      ],
+      "parameters": {
+        "options": {},
+        "dataPropertyName": "item",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "title",
+              "cssSelector": "a"
+            },
+            {
+              "key": "url",
+              "attribute": "href",
+              "cssSelector": "a",
+              "returnValue": "attribute"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "error-1307c3cc",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

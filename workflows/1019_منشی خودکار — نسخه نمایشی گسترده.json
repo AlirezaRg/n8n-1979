@@ -1,0 +1,1673 @@
+{
+  "active": false,
+  "name": "منشی خودکار — نسخه نمایشی گسترده",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "09598726-7682-4376-9d7f-534a5da865de",
+      "name": "Customer request",
+      "webhookId": "21c9bf07-f4b6-4d6e-89ea-70c690a52e52",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -1312,
+        512
+      ],
+      "parameters": {
+        "formTitle": "درخواست خدمات",
+        "formDescription": "فرم درخواست خدمات",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Service",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "طراحی سایت"
+                  },
+                  {
+                    "option": "ساخت اتوماسیون"
+                  },
+                  {
+                    "option": "مشاوره"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Details",
+              "fieldType": "textarea"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "00a910d2-4120-4239-ade0-844be4837012",
+      "name": "Your settings",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1088,
+        512
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ownerEmail",
+              "name": "ownerEmail",
+              "value": "alirezarogni@gmail.com",
+              "type": "string"
+            },
+            {
+              "id": "portfolioUrl",
+              "name": "portfolioUrl",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "bookingUrl",
+              "name": "bookingUrl",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "signature",
+              "name": "signature",
+              "value": "با احترام، تیم خدمات",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "bfcc2274-68ee-40d8-b663-be40302e22f2",
+      "name": "Normalize request",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -864,
+        512
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "name",
+              "name": "name",
+              "value": "={{ String($json.Name || '').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "email",
+              "name": "email",
+              "value": "={{ String($json.Email || '').trim().toLowerCase() }}",
+              "type": "string"
+            },
+            {
+              "id": "service",
+              "name": "service",
+              "value": "={{ $json.Service }}",
+              "type": "string"
+            },
+            {
+              "id": "details",
+              "name": "details",
+              "value": "={{ $json.Details || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "receivedAt",
+              "name": "receivedAt",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "ownerEmail",
+              "name": "ownerEmail",
+              "value": "={{ $json.ownerEmail }}",
+              "type": "string"
+            },
+            {
+              "id": "portfolioUrl",
+              "name": "portfolioUrl",
+              "value": "={{ $json.portfolioUrl }}",
+              "type": "string"
+            },
+            {
+              "id": "bookingUrl",
+              "name": "bookingUrl",
+              "value": "={{ $json.bookingUrl }}",
+              "type": "string"
+            },
+            {
+              "id": "signature",
+              "name": "signature",
+              "value": "={{ $json.signature }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "f066c06c-df45-4be8-b2fa-6f36951a6e8f",
+      "name": "Website request?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -432,
+        512
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "service-check",
+              "leftValue": "={{ $json.service }}",
+              "rightValue": "طراحی سایت",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "731f5cc0-180f-4478-8732-6d2d54de520a",
+      "name": "Automation request?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -208,
+        752
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "service-check",
+              "leftValue": "={{ $json.service }}",
+              "rightValue": "ساخت اتوماسیون",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "c85cf348-1067-4d8a-bd20-5c55aeedd3ba",
+      "name": "Create request ID",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -656,
+        512
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "requestId",
+              "name": "requestId",
+              "value": "={{ $execution.id + '-' + $itemIndex }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "a8ad9895-a3bc-4843-b20c-2e044c6e16bd",
+      "name": "Website greeting",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        80,
+        112
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "greeting",
+              "name": "greeting",
+              "value": "={{ 'سلام ' + $json.name + '، درخواست شما دریافت شد.' }}",
+              "type": "string"
+            },
+            {
+              "id": "subject",
+              "name": "subject",
+              "value": "راهنمای طراحی سایت",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "73c785d7-7123-4fcb-b96e-116c7f7587f8",
+      "name": "Website resources",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        320,
+        112
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "resources",
+              "name": "resources",
+              "value": "={{ 'نمونه‌کارها: ' + $json.portfolioUrl }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "5d5bbece-6c94-4a4a-bf40-e6483983213d",
+      "name": "Website questions",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        112
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "questions",
+              "name": "questions",
+              "value": "لطفاً تعداد صفحات، امکانات موردنیاز و زمان مدنظرتان را در پاسخ بنویسید.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "3d897b89-0152-4ac6-9d13-b4b1b1adbd7d",
+      "name": "Website reply",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        800,
+        112
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "message",
+              "name": "message",
+              "value": "={{ [$json.greeting, $json.resources, $json.questions, $json.signature].join('\\n\\n') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "458a4ab3-d201-4324-b2fe-eb432e7932c2",
+      "name": "Send Website email",
+      "webhookId": "11fa76c1-662f-4e50-b696-0cc43cd1aa45",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        800,
+        304
+      ],
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.message }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y4RWMfx2YG0VDaFJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "id": "23c3a8e4-3e88-4252-b861-907e02123137",
+      "name": "Website delivery record",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        304
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "name",
+              "name": "name",
+              "value": "={{ $('Website reply').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "email",
+              "name": "email",
+              "value": "={{ $('Website reply').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "service",
+              "name": "service",
+              "value": "={{ $('Website reply').item.json.service }}",
+              "type": "string"
+            },
+            {
+              "id": "details",
+              "name": "details",
+              "value": "={{ $('Website reply').item.json.details }}",
+              "type": "string"
+            },
+            {
+              "id": "receivedAt",
+              "name": "receivedAt",
+              "value": "={{ $('Website reply').item.json.receivedAt }}",
+              "type": "string"
+            },
+            {
+              "id": "ownerEmail",
+              "name": "ownerEmail",
+              "value": "={{ $('Website reply').item.json.ownerEmail }}",
+              "type": "string"
+            },
+            {
+              "id": "requestId",
+              "name": "requestId",
+              "value": "={{ $('Website reply').item.json.requestId }}",
+              "type": "string"
+            },
+            {
+              "id": "deliveryStatus",
+              "name": "deliveryStatus",
+              "value": "sent",
+              "type": "string"
+            },
+            {
+              "id": "messageId",
+              "name": "messageId",
+              "value": "={{ $json.id || '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "7b6b875a-ca7d-4a7b-b6f1-f69ca280ffa5",
+      "name": "Website save to Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        320,
+        304
+      ],
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Z3LxmHGbvHOya6xwUSYeyy3ByAtMiXIeNwelizRGs0I",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Requests",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json.name }}",
+            "email": "={{ $json.email }}",
+            "service": "={{ $json.service }}",
+            "details": "={{ $json.details }}",
+            "receivedAt": "={{ $json.receivedAt }}",
+            "requestId": "={{ $json.requestId }}",
+            "deliveryStatus": "={{ $json.deliveryStatus }}",
+            "messageId": "={{ $json.messageId }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "service",
+              "displayName": "service",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "details",
+              "displayName": "details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "receivedAt",
+              "displayName": "receivedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "requestId",
+              "displayName": "requestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "deliveryStatus",
+              "displayName": "deliveryStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "messageId",
+              "displayName": "messageId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "LXIVLIr0wD38Xaty",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "e66cadef-04dc-4654-9f9b-d7d025609157",
+      "name": "Website notify owner",
+      "webhookId": "740d010a-93bc-4ba7-812a-5510b344ee53",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        80,
+        304
+      ],
+      "parameters": {
+        "sendTo": "={{ $('Website delivery record').item.json.ownerEmail }}",
+        "subject": "={{ 'درخواست جدید: ' + $('Website delivery record').item.json.service }}",
+        "emailType": "text",
+        "message": "={{ 'نام: ' + $('Website delivery record').item.json.name + '\\nایمیل: ' + $('Website delivery record').item.json.email + '\\nتوضیحات: ' + $('Website delivery record').item.json.details + '\\nوضعیت: ایمیل پاسخ ارسال شد\\nشناسه: ' + $('Website delivery record').item.json.requestId }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y4RWMfx2YG0VDaFJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "id": "3776fffa-d702-4c3b-826b-d95e8ff33225",
+      "name": "Website section",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "content": "## طراحی سایت\nآماده‌سازی پاسخ ← ارسال ایمیل ← ثبت نتیجه ← اطلاع‌رسانی",
+        "height": 430,
+        "width": 1020,
+        "color": 4
+      }
+    },
+    {
+      "id": "bbfecd2c-fa54-4543-9268-d912b3ddcd19",
+      "name": "Automation greeting",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        80,
+        528
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "greeting",
+              "name": "greeting",
+              "value": "={{ 'سلام ' + $json.name + '، درخواست شما دریافت شد.' }}",
+              "type": "string"
+            },
+            {
+              "id": "subject",
+              "name": "subject",
+              "value": "بررسی درخواست اتوماسیون",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "07fc9fbf-0049-4d57-b4f6-e7acefb34e7b",
+      "name": "Automation resources",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        320,
+        528
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "resources",
+              "name": "resources",
+              "value": "مراحل بررسی: شناخت کار فعلی، انتخاب ابزارها و پیشنهاد مسیر اجرا.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "3596b338-6d31-44c5-9fee-5c1a45d0acc9",
+      "name": "Automation questions",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        528
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "questions",
+              "name": "questions",
+              "value": "چه کاری را می‌خواهید خودکار کنید؟ از چه ابزارهایی استفاده می‌کنید؟ روزانه چند بار انجام می‌شود؟",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "0ecb6176-e913-43e4-ae3f-d5cbce3b7b7e",
+      "name": "Automation reply",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        800,
+        528
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "message",
+              "name": "message",
+              "value": "={{ [$json.greeting, $json.resources, $json.questions, $json.signature].join('\\n\\n') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "7d11d3ba-cc10-4961-b3ec-41be5837b736",
+      "name": "Send Automation email",
+      "webhookId": "e3d12cbb-04b2-49d4-aac6-019892804633",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        800,
+        720
+      ],
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.message }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y4RWMfx2YG0VDaFJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "id": "0838ca33-5090-4a0b-bb0c-26031955b79c",
+      "name": "Automation delivery record",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        720
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "name",
+              "name": "name",
+              "value": "={{ $('Automation reply').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "email",
+              "name": "email",
+              "value": "={{ $('Automation reply').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "service",
+              "name": "service",
+              "value": "={{ $('Automation reply').item.json.service }}",
+              "type": "string"
+            },
+            {
+              "id": "details",
+              "name": "details",
+              "value": "={{ $('Automation reply').item.json.details }}",
+              "type": "string"
+            },
+            {
+              "id": "receivedAt",
+              "name": "receivedAt",
+              "value": "={{ $('Automation reply').item.json.receivedAt }}",
+              "type": "string"
+            },
+            {
+              "id": "ownerEmail",
+              "name": "ownerEmail",
+              "value": "={{ $('Automation reply').item.json.ownerEmail }}",
+              "type": "string"
+            },
+            {
+              "id": "requestId",
+              "name": "requestId",
+              "value": "={{ $('Automation reply').item.json.requestId }}",
+              "type": "string"
+            },
+            {
+              "id": "deliveryStatus",
+              "name": "deliveryStatus",
+              "value": "sent",
+              "type": "string"
+            },
+            {
+              "id": "messageId",
+              "name": "messageId",
+              "value": "={{ $json.id || '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "e9650f0d-a0a2-4599-bf9d-91d4c88d5f5f",
+      "name": "Automation save to Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        320,
+        720
+      ],
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "value": "1Z3LxmHGbvHOya6xwUSYeyy3ByAtMiXIeNwelizRGs0I",
+          "__rl": true,
+          "mode": "id"
+        },
+        "sheetName": {
+          "value": "Requests",
+          "__rl": true,
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json.name }}",
+            "email": "={{ $json.email }}",
+            "service": "={{ $json.service }}",
+            "details": "={{ $json.details }}",
+            "receivedAt": "={{ $json.receivedAt }}",
+            "requestId": "={{ $json.requestId }}",
+            "deliveryStatus": "={{ $json.deliveryStatus }}",
+            "messageId": "={{ $json.messageId }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "service",
+              "displayName": "service",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "details",
+              "displayName": "details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "receivedAt",
+              "displayName": "receivedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "requestId",
+              "displayName": "requestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "deliveryStatus",
+              "displayName": "deliveryStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "messageId",
+              "displayName": "messageId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "LXIVLIr0wD38Xaty",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "5783afd4-f19f-4179-8d2a-1c9d1d62e44a",
+      "name": "Automation notify owner",
+      "webhookId": "d08e7bb9-0366-401c-934b-21458f9f8231",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        80,
+        720
+      ],
+      "parameters": {
+        "sendTo": "={{ $('Automation delivery record').item.json.ownerEmail }}",
+        "subject": "={{ 'درخواست جدید: ' + $('Automation delivery record').item.json.service }}",
+        "emailType": "text",
+        "message": "={{ 'نام: ' + $('Automation delivery record').item.json.name + '\\nایمیل: ' + $('Automation delivery record').item.json.email + '\\nتوضیحات: ' + $('Automation delivery record').item.json.details + '\\nوضعیت: ایمیل پاسخ ارسال شد\\nشناسه: ' + $('Automation delivery record').item.json.requestId }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y4RWMfx2YG0VDaFJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "id": "05840506-d79a-4f29-83c7-091e642d0de5",
+      "name": "Automation section",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        432
+      ],
+      "parameters": {
+        "content": "## ساخت اتوماسیون\nآماده‌سازی پاسخ ← ارسال ایمیل ← ثبت نتیجه ← اطلاع‌رسانی",
+        "height": 430,
+        "width": 1020,
+        "color": 5
+      }
+    },
+    {
+      "id": "b6686e91-9955-4cc6-8271-262a14d67c5b",
+      "name": "Consultation greeting",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        80,
+        944
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "greeting",
+              "name": "greeting",
+              "value": "={{ 'سلام ' + $json.name + '، درخواست شما دریافت شد.' }}",
+              "type": "string"
+            },
+            {
+              "id": "subject",
+              "name": "subject",
+              "value": "رزرو جلسه مشاوره",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "ff73c6dc-3fa5-4049-a1c7-36ad4a4a1070",
+      "name": "Consultation resources",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        320,
+        944
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "resources",
+              "name": "resources",
+              "value": "={{ 'لینک رزرو جلسه: ' + $json.bookingUrl }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "1a2c1f17-e82e-4c28-bfc7-b8eaef4916cb",
+      "name": "Consultation questions",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        944
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "questions",
+              "name": "questions",
+              "value": "لطفاً قبل از جلسه موضوع مشاوره و هدف اصلی‌تان را بنویسید.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "a083ea74-f2ec-4270-b3b5-a9b7b119635e",
+      "name": "Consultation reply",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        800,
+        944
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "message",
+              "name": "message",
+              "value": "={{ [$json.greeting, $json.resources, $json.questions, $json.signature].join('\\n\\n') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "d87b351f-f92b-4a3e-8d3d-7c245ef8ff03",
+      "name": "Send Consultation email",
+      "webhookId": "752c9d32-cde5-45ef-b2fb-65d77caf1a8f",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        800,
+        1136
+      ],
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.message }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y4RWMfx2YG0VDaFJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "id": "333484ab-24f9-4194-bc22-79ded1bdd0e5",
+      "name": "Consultation delivery record",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        1136
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "name",
+              "name": "name",
+              "value": "={{ $('Consultation reply').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "email",
+              "name": "email",
+              "value": "={{ $('Consultation reply').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "service",
+              "name": "service",
+              "value": "={{ $('Consultation reply').item.json.service }}",
+              "type": "string"
+            },
+            {
+              "id": "details",
+              "name": "details",
+              "value": "={{ $('Consultation reply').item.json.details }}",
+              "type": "string"
+            },
+            {
+              "id": "receivedAt",
+              "name": "receivedAt",
+              "value": "={{ $('Consultation reply').item.json.receivedAt }}",
+              "type": "string"
+            },
+            {
+              "id": "ownerEmail",
+              "name": "ownerEmail",
+              "value": "={{ $('Consultation reply').item.json.ownerEmail }}",
+              "type": "string"
+            },
+            {
+              "id": "requestId",
+              "name": "requestId",
+              "value": "={{ $('Consultation reply').item.json.requestId }}",
+              "type": "string"
+            },
+            {
+              "id": "deliveryStatus",
+              "name": "deliveryStatus",
+              "value": "sent",
+              "type": "string"
+            },
+            {
+              "id": "messageId",
+              "name": "messageId",
+              "value": "={{ $json.id || '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "5972f69d-f183-4346-97e8-003347b2d16c",
+      "name": "Consultation save to Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        320,
+        1136
+      ],
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "value": "1Z3LxmHGbvHOya6xwUSYeyy3ByAtMiXIeNwelizRGs0I",
+          "__rl": true,
+          "mode": "id"
+        },
+        "sheetName": {
+          "value": "Requests",
+          "__rl": true,
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json.name }}",
+            "email": "={{ $json.email }}",
+            "service": "={{ $json.service }}",
+            "details": "={{ $json.details }}",
+            "receivedAt": "={{ $json.receivedAt }}",
+            "requestId": "={{ $json.requestId }}",
+            "deliveryStatus": "={{ $json.deliveryStatus }}",
+            "messageId": "={{ $json.messageId }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "service",
+              "displayName": "service",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "details",
+              "displayName": "details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "receivedAt",
+              "displayName": "receivedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "requestId",
+              "displayName": "requestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "deliveryStatus",
+              "displayName": "deliveryStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "messageId",
+              "displayName": "messageId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "LXIVLIr0wD38Xaty",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "d5014f6d-9a4f-49c4-96f9-cc244d0e2d95",
+      "name": "Consultation notify owner",
+      "webhookId": "1b323785-5b41-435f-b7bc-82e3a69eff2b",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        80,
+        1136
+      ],
+      "parameters": {
+        "sendTo": "={{ $('Consultation delivery record').item.json.ownerEmail }}",
+        "subject": "={{ 'درخواست جدید: ' + $('Consultation delivery record').item.json.service }}",
+        "emailType": "text",
+        "message": "={{ 'نام: ' + $('Consultation delivery record').item.json.name + '\\nایمیل: ' + $('Consultation delivery record').item.json.email + '\\nتوضیحات: ' + $('Consultation delivery record').item.json.details + '\\nوضعیت: ایمیل پاسخ ارسال شد\\nشناسه: ' + $('Consultation delivery record').item.json.requestId }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y4RWMfx2YG0VDaFJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "id": "e3a951eb-49b1-4add-a8d0-bde2818ffe95",
+      "name": "Consultation section",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        848
+      ],
+      "parameters": {
+        "content": "## مشاوره\nآماده‌سازی پاسخ ← ارسال ایمیل ← ثبت نتیجه ← اطلاع‌رسانی",
+        "height": 430,
+        "width": 1020,
+        "color": 3
+      }
+    },
+    {
+      "id": "b4ecc9fa-4224-4ef2-af9b-a434c6096856",
+      "name": "Setup guide",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1344,
+        272
+      ],
+      "parameters": {
+        "content": "## دریافت و پردازش درخواست\nدر Your settings ایمیل، لینک‌ها و امضا را تنظیم کنید.\nشش نود Gmail و سه نود Sheets را به حساب‌ها متصل کنید.\nستون‌های تب Requests:\nname, email, service, details, receivedAt, requestId, deliveryStatus, messageId",
+        "height": 430,
+        "width": 800,
+        "color": 2
+      }
+    }
+  ],
+  "connections": {
+    "Customer request": {
+      "main": [
+        [
+          {
+            "node": "Your settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Your settings": {
+      "main": [
+        [
+          {
+            "node": "Normalize request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize request": {
+      "main": [
+        [
+          {
+            "node": "Create request ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create request ID": {
+      "main": [
+        [
+          {
+            "node": "Website request?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Website greeting": {
+      "main": [
+        [
+          {
+            "node": "Website resources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Website resources": {
+      "main": [
+        [
+          {
+            "node": "Website questions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Website questions": {
+      "main": [
+        [
+          {
+            "node": "Website reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Website reply": {
+      "main": [
+        [
+          {
+            "node": "Send Website email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Website email": {
+      "main": [
+        [
+          {
+            "node": "Website delivery record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Website delivery record": {
+      "main": [
+        [
+          {
+            "node": "Website save to Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Website save to Sheets": {
+      "main": [
+        [
+          {
+            "node": "Website notify owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Automation greeting": {
+      "main": [
+        [
+          {
+            "node": "Automation resources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Automation resources": {
+      "main": [
+        [
+          {
+            "node": "Automation questions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Automation questions": {
+      "main": [
+        [
+          {
+            "node": "Automation reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Automation reply": {
+      "main": [
+        [
+          {
+            "node": "Send Automation email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Automation email": {
+      "main": [
+        [
+          {
+            "node": "Automation delivery record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Automation delivery record": {
+      "main": [
+        [
+          {
+            "node": "Automation save to Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Automation save to Sheets": {
+      "main": [
+        [
+          {
+            "node": "Automation notify owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultation greeting": {
+      "main": [
+        [
+          {
+            "node": "Consultation resources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultation resources": {
+      "main": [
+        [
+          {
+            "node": "Consultation questions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultation questions": {
+      "main": [
+        [
+          {
+            "node": "Consultation reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultation reply": {
+      "main": [
+        [
+          {
+            "node": "Send Consultation email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Consultation email": {
+      "main": [
+        [
+          {
+            "node": "Consultation delivery record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultation delivery record": {
+      "main": [
+        [
+          {
+            "node": "Consultation save to Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultation save to Sheets": {
+      "main": [
+        [
+          {
+            "node": "Consultation notify owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Website request?": {
+      "main": [
+        [
+          {
+            "node": "Website greeting",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Automation request?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Automation request?": {
+      "main": [
+        [
+          {
+            "node": "Automation greeting",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Consultation greeting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

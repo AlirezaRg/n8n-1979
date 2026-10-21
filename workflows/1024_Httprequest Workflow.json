@@ -1,0 +1,134 @@
+{
+  "active": false,
+  "name": "Httprequest Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "2654751b-aa66-40ce-b8a0-79063aa710ad",
+      "name": "Generate OAuth Token",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        820,
+        460
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "requestMethod": "POST",
+        "bodyParametersUi": {
+          "parameter": [
+            {
+              "name": "grant_type",
+              "value": "client_credentials"
+            },
+            {
+              "name": "client_id",
+              "value": "{{client_id}}"
+            },
+            {
+              "name": "client_secret",
+              "value": "{{client_secret}}"
+            },
+            {
+              "name": "resource",
+              "value": "{{ $env.API_BASE_URL }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "6f713c65-8fbd-4d05-bbef-9b4a1f6248e9",
+      "name": "Fetch SharePoint List",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        460
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}'YourListTitle')/items",
+        "options": {},
+        "headerParametersUi": {
+          "parameter": [
+            {
+              "name": "Accept",
+              "value": "application/json;odata=nometadata"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json;odata=verbose"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer {{Token}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "d11e9e92-2468-485c-87f5-6de7da7f9589",
+      "name": "Schedule Trigger",
+      "notes": "This scheduleTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        380,
+        460
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      }
+    },
+    {
+      "id": "8539f52c-2218-4a47-9678-3e3e8e9fd4c8",
+      "name": "setTenant",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        600,
+        460
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "399d42f3-41e0-4043-9a57-85771bf5cd07",
+              "name": "tenant_id",
+              "type": "string",
+              "value": ""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "5a4fa41c-0726-4528-99a3-b5e0c47c1960",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        580,
+        220
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 458,
+        "height": 404,
+        "content": "## Never expose or hard code below values \n**tenant_id,client_id,client_secret** \n\nAlways save these either in secure vault like hashicorp or GCP Secret Manager."
+      }
+    }
+  ],
+  "connections": {}
+}

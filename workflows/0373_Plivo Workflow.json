@@ -1,0 +1,76 @@
+{
+  "active": false,
+  "name": "Plivo Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "db5476d7-841d-4336-9805-ab1860ad47ab",
+      "name": "Plivo",
+      "notes": "This plivo node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.plivo",
+      "typeVersion": 1,
+      "position": [
+        1030,
+        400
+      ],
+      "parameters": {
+        "message": "=Hey! The temperature outside is {{$node[\"OpenWeatherMap\"].json[\"main\"][\"temp\"]}}�C."
+      },
+      "credentials": {
+        "plivoApi": "Plivo API Credentials"
+      }
+    },
+    {
+      "id": "f207226a-75dc-40ab-8ee3-ef3e65b0f8c4",
+      "name": "OpenWeatherMap",
+      "notes": "This openWeatherMap node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.openWeatherMap",
+      "typeVersion": 1,
+      "position": [
+        830,
+        400
+      ],
+      "parameters": {
+        "cityName": "berlin"
+      },
+      "credentials": {
+        "openWeatherMapApi": "owm"
+      }
+    },
+    {
+      "id": "7c4a3eae-2219-4190-93ee-0421ca3e5612",
+      "name": "Cron",
+      "notes": "This cron node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        630,
+        400
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 9
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "error-b31b8a91",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,253 @@
+{
+  "active": false,
+  "name": "Orlen",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "f43f0530-7091-4a88-9333-507ff8c16ec4",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "1bb0161e-1a38-4533-909c-a9e9425d7536",
+      "name": "Current date",
+      "notes": "This function node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1160,
+        960
+      ],
+      "parameters": {
+        "functionCode": "var today = new Date();\nvar year = today.getFullYear();\nvar month = today.getMonth() + 1;\nvar day = today.getDate();\n\nif(month < 10) {\n  month = \"0\" + month;\n}\n\nitems[0].json.year = year;\nitems[0].json.month = month;\nitems[0].json.day = day;\n\nreturn items;"
+      }
+    },
+    {
+      "id": "78cd2038-7309-4626-84d2-53a69468661b",
+      "name": "Every 23:45",
+      "notes": "This cron node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        960,
+        960
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 23,
+              "minute": 45
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "7f818f24-7fa9-4203-93aa-72ad69aadfe0",
+      "name": "Get Year folder",
+      "notes": "This googleDrive node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        960
+      ],
+      "parameters": {
+        "options": {
+          "fields": [
+            "id"
+          ]
+        },
+        "operation": "list",
+        "queryFilters": {
+          "name": [
+            {
+              "value": "={{$json[\"year\"]}}",
+              "operation": "is"
+            }
+          ],
+          "mimeType": [
+            {
+              "mimeType": "application/vnd.google-apps.folder"
+            }
+          ]
+        },
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "{{ $credentials.googleDriveOAuth2Api.id }}",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "id": "4f13c5eb-daa4-4128-9d40-2152886635a7",
+      "name": "Get Month folder",
+      "notes": "This googleDrive node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        960
+      ],
+      "parameters": {
+        "options": {
+          "fields": [
+            "id"
+          ]
+        },
+        "operation": "list",
+        "queryString": "='{{$json[\"id\"]}}' in parents and name = '{{$node[\"Current date\"].json[\"month\"]}}'",
+        "authentication": "{{ $credentials.oAuth2 }}",
+        "useQueryString": true
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "{{ $credentials.googleDriveOAuth2Api.id }}",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "id": "4131cf58-3557-4c96-a74c-7c44e0cd6142",
+      "name": "Orlen Invoice",
+      "notes": "This gmail node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 1,
+      "position": [
+        1760,
+        960
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "getAll",
+        "returnAll": true,
+        "additionalFields": {
+          "q": "from:(orlenpay@orlen.pl) has:attachment is:unread",
+          "format": "resolved"
+        }
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "{{ $credentials.gmailOAuth2.id }}",
+          "name": "dbarwikowski Gmail account"
+        }
+      }
+    },
+    {
+      "id": "994830f7-3442-4cac-a540-6e1956e16c45",
+      "name": "Upload Invoice to Google Drive",
+      "notes": "This googleDrive node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 1,
+      "position": [
+        1960,
+        960
+      ],
+      "parameters": {
+        "name": "=Orlen {{$binary.attachment_0.directory}}.{{$binary.attachment_0.fileExtension}}",
+        "options": {},
+        "parents": [
+          "={{$node[\"Get Month folder\"].json[\"id\"]}}"
+        ],
+        "binaryData": true,
+        "resolveData": true,
+        "authentication": "{{ $credentials.oAuth2 }}",
+        "binaryPropertyName": "attachment_0"
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "{{ $credentials.googleDriveOAuth2Api.id }}",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "id": "f1d5054b-a93f-4f39-a286-30100b7eec5b",
+      "name": "Mark as Read",
+      "notes": "This gmail node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 1,
+      "position": [
+        2160,
+        960
+      ],
+      "parameters": {
+        "labelIds": [
+          "UNREAD"
+        ],
+        "resource": "messageLabel",
+        "messageId": "={{$node[\"Orlen Invoice\"].json[\"id\"]}}",
+        "operation": "remove"
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "{{ $credentials.gmailOAuth2.id }}",
+          "name": "dbarwikowski Gmail account"
+        }
+      }
+    },
+    {
+      "id": "14c863bd-ee46-43b4-9954-59603d8fd0e9",
+      "name": "Merge",
+      "notes": "This merge node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 1,
+      "position": [
+        2280,
+        960
+      ],
+      "parameters": {
+        "mode": "mergeByIndex"
+      }
+    },
+    {
+      "id": "95fd287a-2a87-4a8d-955c-4df7c1ce8772",
+      "name": "Slack",
+      "notes": "This slack node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        860,
+        540
+      ],
+      "parameters": {
+        "text": "=Kapitanie!\nDodano fakture {{$node[\"Orlen Invoice\"].binary.attachment_0.directory}} do Firma/{{$node[\"Current date\"].json[\"year\"]}}/{{$node[\"Current date\"].json[\"month\"]}}",
+        "channel": "n8n",
+        "attachments": [],
+        "otherOptions": {},
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "{{ $credentials.slackOAuth2Api.id }}",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "id": "error-719478e8",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,52 @@
+{
+  "active": false,
+  "name": "Get details of a forum in Disqus",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "0149fee3-90e2-43b5-968e-d6f1a47eff21",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "cc7cf87b-f292-473e-a561-a466b4736e7f",
+      "name": "Disqus",
+      "notes": "This disqus node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.disqus",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "id": "hackernoon",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "disqusApi": ""
+      }
+    },
+    {
+      "id": "error-0b1e43c8",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

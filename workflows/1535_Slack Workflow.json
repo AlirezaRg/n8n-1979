@@ -1,0 +1,60 @@
+{
+  "active": false,
+  "name": "Slack Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "7880a941-fcf9-43af-98e8-a0a28594c0c7",
+      "name": "Slack",
+      "notes": "This slack node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "text": "=?? What?!\n*This execution{{$node[\"Error Trigger\"].json[\"workflow\"][\"name\"]}} went wrong*\\nWhy don't you go take a look {{$node[\"Error Trigger\"].json[\"execution\"][\"url\"]}}",
+        "channel": "",
+        "attachments": [],
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "a089f0e1-ce9a-4b65-8d75-29cabda31bc6",
+      "name": "Error Trigger",
+      "notes": "This errorTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "executeOnce": false,
+      "alwaysOutputData": true,
+      "retryOnFail": false,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "error-c55efd02",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

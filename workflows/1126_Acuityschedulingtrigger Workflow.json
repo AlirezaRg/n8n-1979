@@ -1,0 +1,40 @@
+{
+  "active": false,
+  "name": "Acuityschedulingtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "236343bd-67e5-4b4e-9d41-bb7e01a9c13c",
+      "name": "Acuity Scheduling Trigger",
+      "webhookId": "b326732d-9473-469f-a421-dd823d26b945",
+      "notes": "This acuitySchedulingTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.acuitySchedulingTrigger",
+      "typeVersion": 1,
+      "position": [
+        880,
+        400
+      ],
+      "parameters": {
+        "event": "appointment.scheduled"
+      },
+      "credentials": {
+        "acuitySchedulingApi": "acuity_creds"
+      }
+    },
+    {
+      "id": "error-950aeeca",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

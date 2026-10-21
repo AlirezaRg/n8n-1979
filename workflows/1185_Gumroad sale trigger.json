@@ -1,0 +1,239 @@
+{
+  "active": false,
+  "name": "Gumroad sale trigger",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "789f1dec-d2d2-4e09-9530-719d354d259c",
+      "name": "Assign to group",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        140,
+        -280
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "authentication": "{{ $credentials.predefinedCredentialType }}",
+        "nodeCredentialType": "YOUR_CREDENTIAL_HERE"
+      },
+      "credentials": {
+        "mailerLiteApi": {
+          "id": "i9V49FSxbwJhAGfI",
+          "name": "Mailer Lite account"
+        }
+      }
+    },
+    {
+      "id": "53c0df02-5571-485c-91ce-6be2f62fd6d6",
+      "name": "Gumroad Sale Trigger",
+      "webhookId": "06a01b99-cbf1-4694-8502-94ac51670ba4",
+      "notes": "This gumroadTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gumroadTrigger",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        -280
+      ],
+      "parameters": {
+        "resource": "sale"
+      },
+      "credentials": {
+        "gumroadApi": {
+          "id": "wgjGSvLjsRBJImsQ",
+          "name": "Gumroad account"
+        }
+      }
+    },
+    {
+      "id": "ee782134-e2d4-4f8b-a9d9-a09a919577ab",
+      "name": "append row in CRM",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        480,
+        -280
+      ],
+      "parameters": {
+        "columns": {
+          "value": {
+            "date": "={{ $('Gumroad Sale Trigger').item.json.sale_timestamp }}",
+            "email": "={{ $('Gumroad Sale Trigger').item.json.email }}",
+            "country": "={{ $('Gumroad Sale Trigger').item.json.ip_country }}",
+            "product name": "={{ $('Gumroad Sale Trigger').item.json.product_name }}"
+          },
+          "schema": [
+            {
+              "id": "date",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "date",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "product name",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "product name",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "email",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "country",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "country",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {},
+        "operation": "append",
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Sheet1"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1XYMstoZ4j3O5T-UYz21ky7P5bkUtzYXQGYCQTRVWCI4",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Gumroad sales CRM"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "LXIVLIr0wD38Xaty",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "98ff519b-3065-4c6b-bdeb-2d9095e3f52a",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -680,
+        -540
+      ],
+      "parameters": {
+        "width": 460,
+        "height": 460,
+        "content": "## Trigger on a new Gumroad sale\n### Requirements\n- A [Gumroad]() account\n- A product listed. We used ours [here]({{ $env.WEBHOOK_URL }}\n- Head to Settings > Advanced, and create a new application\n\n### Set up\n- Paste your access token on this Gumroad sale trigger"
+      }
+    },
+    {
+      "id": "f5ccfe9f-c56c-4394-bebf-1f7438a0dcdf",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -140,
+        -660
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 480,
+        "height": 580,
+        "content": "## Connection to [MailerLite]({{ $env.WEBHOOK_URL }} newsletter \n### Requirements\n- A [Mailerlite]({{ $env.WEBHOOK_URL }} account\n- A subscriber group created\n- Generate a new API from the Integrations menu\n\n### Set up\n- You will first need to create the subscriber with a simple Mailer lite node\n- In the second node call the endpoint to [assign that same subscriber to the group]({{ $env.WEBHOOK_URL }} you created manually on Mailerlite. For example, we named the group \"Gumroad\"\n- To get the group id, we ran a node that calls the [\"list groups\" endpoint]({{ $env.WEBHOOK_URL }} and we appended it to the url.\n"
+      }
+    },
+    {
+      "id": "e4cea86a-494f-4c3c-9743-3e8eca461a04",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        420,
+        -460
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 480,
+        "height": 380,
+        "content": "## Load into CRM\n### Requirements\n- Set up your api and credentials for Google Sheets. You can find the n8n docs [here]({{ $env.WEBHOOK_URL }}\n- Append the row to your table with your desired data collected previously"
+      }
+    },
+    {
+      "id": "e81b7ae0-510e-454e-82ff-6d42bde9e81a",
+      "name": "add subscriber to MailerLite",
+      "notes": "This mailerLite node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.mailerLite",
+      "typeVersion": 2,
+      "position": [
+        -60,
+        -280
+      ],
+      "parameters": {
+        "email": "={{ $json.email }}",
+        "additionalFields": {
+          "customFieldsUi": {
+            "customFieldsValues": [
+              {
+                "value": "={{ $json.ip_country }}",
+                "fieldId": "country"
+              }
+            ]
+          }
+        }
+      },
+      "credentials": {
+        "mailerLiteApi": {
+          "id": "i9V49FSxbwJhAGfI",
+          "name": "Mailer Lite account"
+        }
+      }
+    },
+    {
+      "id": "9cc00d13-81d9-4584-9066-4b00b2ff7a47",
+      "name": "Sticky Note3",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        -60
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 520,
+        "height": 180,
+        "content": "## Why assign the subscriber to a group? \nIn [MailerLite]({{ $env.WEBHOOK_URL }} you can set up an automation that when a new subscriber is added into a group, a new email sequence begins, which allows you to send multiple emails to this user at a specific frequency.\n\nThis is a very powerful feature to funnel users to engage with your products or services."
+      }
+    }
+  ],
+  "connections": {}
+}

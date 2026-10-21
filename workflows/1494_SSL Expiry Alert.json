@@ -1,0 +1,313 @@
+{
+  "active": false,
+  "name": "SSL Expiry Alert",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "260b66a2-0841-4dc7-9666-acbc9317fd91",
+      "name": "URLs to Monitor",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1120,
+        -120
+      ],
+      "parameters": {
+        "columns": {
+          "value": {
+            "URL": "{{ $env.BASE_URL }}",
+            "KnownExpiryDate": "={{ $json.result.valid_till }}"
+          },
+          "schema": [
+            {
+              "id": "Website ",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "required": false,
+              "displayName": "Website ",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "URL",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "URL",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "KnownExpiryDate",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "KnownExpiryDate",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": true,
+              "required": false,
+              "displayName": "row_number",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "URL"
+          ]
+        },
+        "options": {},
+        "operation": "update",
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "URLs to Check"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "{{ $env.WEBHOOK_URL }}"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "I7vwmkFVGPrI7Os1",
+          "name": "Vishal - Google Sheets"
+        }
+      }
+    },
+    {
+      "id": "a2922f1b-9d29-4b66-9560-44207f3e14d2",
+      "name": "Weekly Trigger",
+      "notes": "This scheduleTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        160,
+        140
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "005564e9-5ecb-4ee9-aca0-69a660656b09",
+      "name": "Fetch URLs",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        420,
+        140
+      ],
+      "parameters": {
+        "options": {},
+        "sheetName": {
+          "__rl": true,
+          "mode": "url",
+          "value": "{{ $env.WEBHOOK_URL }}"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "{{ $env.WEBHOOK_URL }}"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "I7vwmkFVGPrI7Os1",
+          "name": "Vishal - Google Sheets"
+        }
+      }
+    },
+    {
+      "id": "943c561c-ca89-461c-a6fb-c3011baaf81a",
+      "name": "Check SSL",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        680,
+        140
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "911fa691-decf-4572-a46e-d8644d3b2a35",
+      "name": "Expiry Alert",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        220
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "ee6e2ce8-569a-4f1f-91b5-2c55f605a16b",
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              },
+              "leftValue": "={{ $json.result.days_left }}",
+              "rightValue": 7
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "8b59ebbb-0a87-40c2-be79-cc38431ebdbd",
+      "name": "Send Alert Email",
+      "webhookId": "cd6b6b20-e619-4526-aa69-64754e3d9035",
+      "notes": "This gmail node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1440,
+        240
+      ],
+      "parameters": {
+        "sendTo": "phanineeraj@quantana.com",
+        "message": "=SSL Expiry - {{ $json.result.days_left }} Days Left - {{ $json.result.host }}",
+        "options": {
+          "appendAttribution": false
+        },
+        "subject": "=SSL Expiry - {{ $json.result.days_left }} Days Left - {{ $json.result.host }}",
+        "emailType": "text"
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "brYm5tKb5se1DyUw",
+          "name": "Sabila Gmail"
+        }
+      }
+    },
+    {
+      "id": "32eebd68-f0e6-467c-bf65-f2d513a60666",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        100,
+        0
+      ],
+      "parameters": {
+        "height": 329.860465116279,
+        "content": "Triggers the workflow once a week."
+      }
+    },
+    {
+      "id": "3c0ed796-94a4-488c-9cb7-e3d46db63815",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        360,
+        0
+      ],
+      "parameters": {
+        "height": 327.0154373927959,
+        "content": "Pulls the list of URLs to monitor from the Google Sheet. Ensure you clone the Google Sheet worksheet and update this node with its URL."
+      }
+    },
+    {
+      "id": "fdb2077c-7d6a-4255-b499-e90513a0de1d",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        620,
+        0
+      ],
+      "parameters": {
+        "height": 323.89365351629556,
+        "content": "Uses SSL-Checker.io to verify the SSL certificate of each URL. Fetches details like the host, validity period, and days remaining until expiry."
+      }
+    },
+    {
+      "id": "5cc1644b-6abc-4299-8a25-9507b09d863f",
+      "name": "Sticky Note3",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        -260
+      ],
+      "parameters": {
+        "height": 344.1852487135509,
+        "content": "Updates the Google Sheet with SSL details, including the expiry date and certificate status."
+      }
+    },
+    {
+      "id": "1001a69e-8efc-4a8b-a97b-a1bc021ada35",
+      "name": "Sticky Note4",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        140
+      ],
+      "parameters": {
+        "height": 344.1852487135509,
+        "content": "Checks if any SSL certificate is set to expire in 7 days or less."
+      }
+    },
+    {
+      "id": "ad9e359e-3d95-4e8c-97b0-d06475bb8883",
+      "name": "Sticky Note5",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        140
+      ],
+      "parameters": {
+        "height": 344.1852487135509,
+        "content": "Sends an email alert if an SSL certificate is nearing expiry, including the host and days remaining."
+      }
+    }
+  ],
+  "connections": {}
+}

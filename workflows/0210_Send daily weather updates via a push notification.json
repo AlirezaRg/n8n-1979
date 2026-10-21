@@ -1,0 +1,81 @@
+{
+  "active": false,
+  "name": "Send daily weather updates via a push notification",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "cdfc6629-9052-4582-8716-0deebce0f8c5",
+      "name": "Pushover",
+      "notes": "This pushover node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.pushover",
+      "typeVersion": 1,
+      "position": [
+        970,
+        300
+      ],
+      "parameters": {
+        "message": "=Hey! The temperature outside is {{$node[\"OpenWeatherMap\"].json[\"main\"][\"temp\"]}}�C.",
+        "userKey": "",
+        "priority": 0,
+        "additionalFields": {
+          "title": "Today's Weather"
+        }
+      },
+      "credentials": {
+        "pushoverApi": "pushover"
+      }
+    },
+    {
+      "id": "18e81565-ae25-41ad-8443-42ffbbfec527",
+      "name": "Cron",
+      "notes": "This cron node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        570,
+        300
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 9
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "b00609ed-d2a1-41bd-b8d4-ee5c049df15d",
+      "name": "OpenWeatherMap",
+      "notes": "This openWeatherMap node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.openWeatherMap",
+      "typeVersion": 1,
+      "position": [
+        770,
+        300
+      ],
+      "parameters": {
+        "cityName": "berlin"
+      },
+      "credentials": {
+        "openWeatherMapApi": "owm"
+      }
+    },
+    {
+      "id": "error-343bf29a",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

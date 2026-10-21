@@ -1,0 +1,121 @@
+{
+  "active": false,
+  "name": "Clearbit Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "c6862e64-f520-47cf-bb80-a89c86c6528d",
+      "name": "Clearbit",
+      "notes": "This clearbit node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.clearbit",
+      "typeVersion": 1,
+      "position": [
+        850,
+        300
+      ],
+      "parameters": {
+        "email": "={{$json[\"properties\"][\"email\"][\"value\"]}}",
+        "resource": "person",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "clearbitApi": {
+          "id": "{{ $credentials.clearbitApi.id }}",
+          "name": "Clearbit account"
+        }
+      }
+    },
+    {
+      "id": "6e9a1111-b506-4f55-95a6-fa45eb0c025b",
+      "name": "Hubspot Trigger",
+      "webhookId": "b9c442e0-6f98-4d6f-8170-7135c4dbd850",
+      "notes": "This hubspotTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.hubspotTrigger",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "eventsUi": {
+          "eventValues": [
+            {}
+          ]
+        },
+        "additionalFields": {}
+      },
+      "credentials": {
+        "hubspotDeveloperApi": {
+          "id": "{{ $credentials.hubspotDeveloperApi.id }}",
+          "name": "Hubspot Developer account"
+        }
+      }
+    },
+    {
+      "id": "d4b4e1b8-f77b-4ed6-aec2-303df9048673",
+      "name": "Get Contact",
+      "notes": "This hubspot node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "resource": "contact",
+        "contactId": "={{$json[\"contactId\"]}}",
+        "operation": "get",
+        "authentication": "{{ $credentials.oAuth2 }}",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "hubspotOAuth2Api": {
+          "id": "{{ $credentials.hubspotOAuth2Api.id }}",
+          "name": "HubSpot@Test Account"
+        }
+      }
+    },
+    {
+      "id": "ccd23436-300c-4a11-af45-c37a9fff7670",
+      "name": "Update Contact",
+      "notes": "This hubspot node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        300
+      ],
+      "parameters": {
+        "email": "={{$json[\"email\"]}}",
+        "resource": "contact",
+        "authentication": "{{ $credentials.oAuth2 }}",
+        "additionalFields": {
+          "city": "={{$json[\"geo\"][\"city\"]}}",
+          "jobTitle": "={{$json[\"employment\"][\"title\"]}}",
+          "companyName": "={{$json[\"employment\"][\"name\"]}}"
+        }
+      },
+      "credentials": {
+        "hubspotOAuth2Api": {
+          "id": "{{ $credentials.hubspotOAuth2Api.id }}",
+          "name": "HubSpot@Test Account"
+        }
+      }
+    },
+    {
+      "id": "error-1e1f39d1",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

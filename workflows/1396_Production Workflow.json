@@ -1,0 +1,89 @@
+{
+  "active": false,
+  "name": "Production Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-eb2e1d5e",
+      "name": "GraphQL",
+      "type": "n8n-nodes-base.graphql",
+      "typeVersion": 1,
+      "position": [
+        800,
+        300
+      ],
+      "parameters": {
+        "query": "=query {\n  country(code: \"{{$node[\"Webhook\"].data[\"query\"][\"code\"].toUpperCase()}}\") {\n    name\n    phone\n    emoji\n  } \n}",
+        "endpoint": "{{ $env.API_ENDPOINT }}",
+        "requestMethod": "GET",
+        "responseFormat": "string"
+      }
+    },
+    {
+      "id": "node-64f3678e",
+      "name": "Function",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        300
+      ],
+      "parameters": {
+        "functionCode": "items[0].json = JSON.parse(items[0].json.data).data.country;\nreturn items;"
+      }
+    },
+    {
+      "id": "node-9d019148",
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        300
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "data",
+              "value": "=The country code of {{$node[\"Function\"].data[\"name\"]}} {{$node[\"Function\"].data[\"emoji\"]}} is {{$node[\"Function\"].data[\"phone\"]}}"
+            }
+          ],
+          "boolean": []
+        },
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "node-b02b239a",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        600,
+        300
+      ],
+      "parameters": {
+        "path": "webhook",
+        "options": {},
+        "responseMode": "lastNode"
+      },
+      "webhookId": "db93ecd8-19dd-4c11-a997-d9ebac6e7092"
+    },
+    {
+      "id": "error-859aaffe",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

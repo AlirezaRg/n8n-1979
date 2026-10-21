@@ -1,0 +1,435 @@
+{
+  "active": false,
+  "name": "Create Email Campaign From LinkedIn Post Interactions",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "1e50b42d-7431-4329-9be1-9ba3d6cd97f6",
+      "name": "Cron",
+      "notes": "This cron node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        280,
+        500
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyHour"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "7352475b-fe80-42b0-b976-8127b63075aa",
+      "name": "Exists ?",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        480
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$node[\"Airtable - List\"].json[\"fields\"][\"Email\"]}}",
+              "value2": "={{$node[\"Dropcontact - GET\"].json[\"data\"][0][\"email\"][0][\"email\"]}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "a20f16a8-ffee-4531-86a3-ad1c1fa42677",
+      "name": "Airtable - List",
+      "notes": "This airtable node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        480
+      ],
+      "parameters": {
+        "table": "Contacts",
+        "operation": "list",
+        "additionalOptions": {
+          "fields": []
+        }
+      },
+      "credentials": {
+        "airtableApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "2e59ef11-8091-42bb-879f-782717ef6173",
+      "name": "Airtable - Update",
+      "notes": "This airtable node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        2100,
+        400
+      ],
+      "parameters": {
+        "id": "={{$node[\"Airtable - List\"].json[\"id\"]}}",
+        "table": "Contacts",
+        "options": {
+          "typecast": true
+        },
+        "operation": "update",
+        "updateAllFields": false
+      },
+      "credentials": {
+        "airtableApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "67a843c2-ca9d-4069-b7d0-b082ddc3324d",
+      "name": "Airtable - Create",
+      "notes": "This airtable node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        2100,
+        580
+      ],
+      "parameters": {
+        "table": "Contacts",
+        "options": {
+          "typecast": true
+        },
+        "operation": "append"
+      },
+      "credentials": {
+        "airtableApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "03f5cfe1-a50c-42d5-b570-716db482ff82",
+      "name": "Set - Update",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1900,
+        400
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "=ID",
+              "value": "={{$node[\"Airtable - List\"].json[\"id\"]}}"
+            },
+            {
+              "name": "Email",
+              "value": "={{$node[\"Dropcontact - GET\"].json[\"data\"][0][\"email\"][0][\"email\"]}}"
+            },
+            {
+              "name": "Phone",
+              "value": "={{$node[\"Dropcontact - GET\"].json[\"data\"][0][\"phone\"]}}"
+            },
+            {
+              "name": "LinkedIn",
+              "value": "={{$node[\"Dropcontact - GET\"].json[\"data\"][0][\"linkedin\"]}}"
+            },
+            {
+              "name": "Account",
+              "value": "={{$node[\"Dropcontact - GET\"].json[\"data\"][0][\"company\"]}}"
+            },
+            {
+              "name": "Company website",
+              "value": "={{$node[\"Dropcontact - GET\"].json[\"data\"][0][\"website\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "1e290e29-59f4-42b9-a5a4-31e850c689c4",
+      "name": "Set - New",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1900,
+        580
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "Name",
+              "value": "={{$node[\"Dropcontact - GET\"].json[\"data\"][0][\"full_name\"]}}"
+            },
+            {
+              "name": "Account",
+              "value": "={{$node[\"Dropcontact - GET\"].json[\"data\"][0][\"company\"]}}"
+            },
+            {
+              "name": "Company website",
+              "value": "={{$node[\"Dropcontact - GET\"].json[\"data\"][0][\"website\"]}}"
+            },
+            {
+              "name": "Email",
+              "value": "={{$node[\"Dropcontact - GET\"].json[\"data\"][0][\"email\"][0][\"email\"]}}"
+            },
+            {
+              "name": "Phone",
+              "value": "={{$node[\"Dropcontact - GET\"].json[\"data\"][0][\"phone\"]}}"
+            },
+            {
+              "name": "LinkedIn",
+              "value": "={{$node[\"Dropcontact - GET\"].json[\"data\"][0][\"linkedin\"]}}"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "b9d89e2a-a7cf-46a2-92b5-ad5dbdb1302a",
+      "name": "Lemlist",
+      "notes": "This lemlist node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.lemlist",
+      "typeVersion": 1,
+      "retryOnFail": false,
+      "continueOnFail": true,
+      "position": [
+        2300,
+        480
+      ],
+      "parameters": {
+        "email": "={{$node[\"Dropcontact - GET\"].json[\"data\"][0][\"email\"][0][\"email\"]}}",
+        "resource": "lead",
+        "campaignId": "",
+        "additionalFields": {
+          "lastName": "={{$node[\"Dropcontact - GET\"].json[\"data\"][0][\"last_name\"]}}",
+          "firstName": "={{$node[\"Dropcontact - GET\"].json[\"data\"][0][\"first_name\"]}}",
+          "companyName": "={{$node[\"Dropcontact - GET\"].json[\"data\"][0][\"company\"]}}"
+        }
+      },
+      "credentials": {
+        "lemlistApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "e42cd541-6efb-4868-9c8b-617ae1a99542",
+      "name": "Hubspot",
+      "notes": "This hubspot node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 1,
+      "position": [
+        2700,
+        480
+      ],
+      "parameters": {
+        "email": "={{$node[\"Dropcontact - GET\"].json[\"data\"][0][\"email\"][0][\"email\"]}}",
+        "resource": "contact",
+        "additionalFields": {
+          "city": "={{$node[\"Dropcontact - GET\"].json[\"data\"][0][\"siret_city\"]}}",
+          "gender": "={{$node[\"Dropcontact - GET\"].json[\"data\"][0][\"civility\"]}}",
+          "lastName": "={{$node[\"Dropcontact - GET\"].json[\"data\"][0][\"last_name\"]}}",
+          "firstName": "={{$node[\"Dropcontact - GET\"].json[\"data\"][0][\"first_name\"]}}",
+          "websiteUrl": "{{ $env.BASE_URL }}",
+          "companyName": "={{$node[\"Dropcontact - GET\"].json[\"data\"][0][\"company\"]}}",
+          "phoneNumber": "={{$node[\"Dropcontact - GET\"].json[\"data\"][0][\"phone\"]}}",
+          "originalSource": "SOCIAL_MEDIA"
+        }
+      },
+      "credentials": {
+        "hubspotApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "39249558-b1c7-416d-9569-dc721b54a34c",
+      "name": "LinkedIn Post Commenters",
+      "notes": "This phantombuster node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.phantombuster",
+      "typeVersion": 1,
+      "position": [
+        480,
+        400
+      ],
+      "parameters": {
+        "jsonParameters": true,
+        "additionalFields": {
+          "manualLaunch": true
+        }
+      },
+      "credentials": {
+        "phantombusterApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "8462d446-2992-4f2f-8a16-020fc01ba5f8",
+      "name": "Get Comments",
+      "notes": "This phantombuster node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.phantombuster",
+      "typeVersion": 1,
+      "executeOnce": true,
+      "position": [
+        880,
+        400
+      ],
+      "parameters": {
+        "operation": "getOutput",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "phantombusterApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "57c1f755-0043-4190-b8b0-81c7ddcf5f40",
+      "name": "Dropcontact",
+      "notes": "This dropcontact node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.dropcontact",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        480
+      ],
+      "parameters": {
+        "options": {},
+        "additionalFields": {
+          "company": "=",
+          "website": "",
+          "linkedin": "",
+          "last_name": "",
+          "first_name": "="
+        }
+      },
+      "credentials": {
+        "dropcontactApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "f18a256f-3b8e-4b36-8adf-1efa4549cd68",
+      "name": "Phantombuster",
+      "notes": "This phantombuster node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.phantombuster",
+      "typeVersion": 1,
+      "position": [
+        2500,
+        480
+      ],
+      "parameters": {
+        "additionalFields": {}
+      },
+      "credentials": {
+        "phantombusterApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "93a50283-58e9-4c25-bd9e-ae406f2c0fbd",
+      "name": "LinkedIn Post Liker",
+      "notes": "This phantombuster node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.phantombuster",
+      "typeVersion": 1,
+      "position": [
+        480,
+        600
+      ],
+      "parameters": {
+        "jsonParameters": true,
+        "additionalFields": {
+          "manualLaunch": true
+        }
+      },
+      "credentials": {
+        "phantombusterApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "7c30300d-b54c-438d-80b2-da899315964d",
+      "name": "Get Likers",
+      "notes": "This phantombuster node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.phantombuster",
+      "typeVersion": 1,
+      "executeOnce": true,
+      "position": [
+        880,
+        600
+      ],
+      "parameters": {
+        "operation": "getOutput",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "phantombusterApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "15f9dba6-7bd6-4a1a-a34e-efa3d6786c63",
+      "name": "Wait 30s",
+      "webhookId": "de87cd0e-ea00-43d8-896c-836494094779",
+      "notes": "This wait node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        680,
+        560
+      ],
+      "parameters": {
+        "unit": "seconds",
+        "amount": 30
+      }
+    },
+    {
+      "id": "error-9557ba59",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

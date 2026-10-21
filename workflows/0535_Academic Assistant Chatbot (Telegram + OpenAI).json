@@ -1,0 +1,137 @@
+{
+  "active": false,
+  "name": "Academic Assistant Chatbot (Telegram + OpenAI)",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "20a2d959-5412-447b-a2c4-7736b6b758b3",
+      "name": "Telegram Trigger",
+      "webhookId": "5757ba5b-b427-4af8-a23b-7527a0f01ae8",
+      "notes": "This telegramTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        256,
+        208
+      ],
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      }
+    },
+    {
+      "id": "8b30f207-8204-4548-8f51-38c387d98ae9",
+      "name": "OpenAI Chat Model",
+      "notes": "This lmChatOpenAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.1,
+      "position": [
+        656,
+        208
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL_ID_HERE",
+          "name": "OpenAI Account"
+        }
+      }
+    },
+    {
+      "id": "68303b67-2203-41e8-b370-220d884d2945",
+      "name": "Academic Assistant AI Agent",
+      "notes": "This agent node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.7,
+      "position": [
+        912,
+        208
+      ],
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Telegram Trigger').item.json.message.text }}",
+        "options": {
+          "systemMessage": "You are a helpful and knowledgeable AI academic assistant. Your goal is to assist students with their assignments, studies, and general academic inquiries. Provide explanations, study tips, help with research, clarify concepts, and offer guidance on academic tasks. Be encouraging, precise, and polite. Always ensure your responses are relevant to academic support."
+        }
+      }
+    },
+    {
+      "id": "15bb5fd5-7dfe-4da9-830c-e1d905831640",
+      "name": "Send Telegram Response",
+      "webhookId": "afcc418d-4723-4f60-a577-c5f3bd7a309e",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1152,
+        208
+      ],
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $('Academic Assistant AI Agent').item.json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID_HERE",
+          "name": "Telegram Account"
+        }
+      }
+    },
+    {
+      "id": "error-7842db22",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Telegram Response": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

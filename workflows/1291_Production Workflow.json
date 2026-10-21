@@ -1,0 +1,265 @@
+{
+  "active": false,
+  "name": "Production Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-5b8ccfaf",
+      "name": "On clicking 'execute'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        260,
+        210
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-35dc31e9",
+      "name": "Fetch new followers",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        460,
+        210
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "authentication": "{{ $credentials.headerAuth }}"
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "{{ $credentials.httpHeaderAuth.id }}",
+          "name": "Twitter Token"
+        }
+      }
+    },
+    {
+      "id": "node-65976655",
+      "name": "Item Lists",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        660,
+        210
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "data"
+      }
+    },
+    {
+      "id": "node-e9563a89",
+      "name": "Function",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1660,
+        210
+      ],
+      "parameters": {
+        "functionCode": "const binary = {};\nfor (let i=0; i < items.length; i++) {\n binary[`data${i}`] = items[i].binary.avatar;\n}\n\nreturn [\n {\n json: {\n numIcons: items.length,\n },\n binary,\n }\n];\n"
+      }
+    },
+    {
+      "id": "node-42968e64",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 1,
+      "position": [
+        1910,
+        110
+      ],
+      "parameters": {
+        "mode": "mergeByIndex"
+      }
+    },
+    {
+      "id": "node-5ae0f030",
+      "name": "Fetching images",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        860,
+        210
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "responseFormat": "file",
+        "dataPropertyName": "avatar"
+      }
+    },
+    {
+      "id": "node-e7fa20d6",
+      "name": "Fetch bg",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1660,
+        -40
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "responseFormat": "file",
+        "dataPropertyName": "bg"
+      }
+    },
+    {
+      "id": "node-f7d16e5a",
+      "name": "Resize",
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        210
+      ],
+      "parameters": {
+        "width": 200,
+        "height": 200,
+        "options": {},
+        "operation": "resize",
+        "dataPropertyName": "avatar"
+      }
+    },
+    {
+      "id": "node-887bc8f9",
+      "name": "Crop",
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        210
+      ],
+      "parameters": {
+        "options": {
+          "format": "png"
+        },
+        "operation": "multiStep",
+        "operations": {
+          "operations": [
+            {
+              "width": 200,
+              "height": 200,
+              "operation": "create",
+              "backgroundColor": "#000000ff"
+            },
+            {
+              "color": "#ffffff00",
+              "operation": "draw",
+              "primitive": "circle",
+              "endPositionX": 25,
+              "endPositionY": 50,
+              "startPositionX": 100,
+              "startPositionY": 100
+            },
+            {
+              "operator": "In",
+              "operation": "composite",
+              "dataPropertyNameComposite": "avatar"
+            }
+          ]
+        },
+        "dataPropertyName": "avatar"
+      }
+    },
+    {
+      "id": "node-c2d6956c",
+      "name": "Edit Image",
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        2110,
+        110
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "multiStep",
+        "operations": {
+          "operations": [
+            {
+              "operation": "composite",
+              "positionX": 1000,
+              "positionY": 375,
+              "dataPropertyNameComposite": "data0"
+            },
+            {
+              "operation": "composite",
+              "positionX": 1100,
+              "positionY": 375,
+              "dataPropertyNameComposite": "data1"
+            },
+            {
+              "operation": "composite",
+              "positionX": 1200,
+              "positionY": 375,
+              "dataPropertyNameComposite": "data2"
+            }
+          ]
+        },
+        "dataPropertyName": "bg"
+      }
+    },
+    {
+      "id": "node-502bdf9f",
+      "name": "Resize1",
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        1450,
+        210
+      ],
+      "parameters": {
+        "width": 75,
+        "height": 75,
+        "options": {},
+        "operation": "resize",
+        "dataPropertyName": "avatar"
+      }
+    },
+    {
+      "id": "node-4551f282",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        2310,
+        110
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {
+          "bodyContentType": "multipart-form-data"
+        },
+        "requestMethod": "POST",
+        "authentication": "{{ $credentials.oAuth1 }}",
+        "jsonParameters": true,
+        "sendBinaryData": true,
+        "binaryPropertyName": "banner:bg"
+      },
+      "credentials": {
+        "oAuth1Api": {
+          "id": "{{ $credentials.oAuth1Api.id }}",
+          "name": "Twitter OAuth1.0"
+        }
+      }
+    },
+    {
+      "id": "error-cb4200e6",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

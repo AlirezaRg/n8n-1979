@@ -1,0 +1,117 @@
+{
+  "active": false,
+  "name": "Typeformtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "6a103d02-a466-4be2-8a90-53d704e09f29",
+      "name": "Typeform Trigger",
+      "notes": "This typeformTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.typeformTrigger",
+      "typeVersion": 1,
+      "position": [
+        500,
+        520
+      ],
+      "parameters": {
+        "formId": ""
+      },
+      "credentials": {
+        "typeformApi": ""
+      },
+      "webhookId": "78ec3361-09a1-4883-9921-648777ea6044"
+    },
+    {
+      "id": "02ddcb7d-fd48-4988-a80a-0b0c6af5d654",
+      "name": "NextCloud",
+      "notes": "This nextCloud node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.nextCloud",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "path": "examples/Problems.xls",
+        "operation": "download"
+      },
+      "credentials": {
+        "nextCloudApi": ""
+      }
+    },
+    {
+      "id": "cd1b0104-d842-4bbf-92fd-10376d7b1861",
+      "name": "Spreadsheet File",
+      "notes": "This spreadsheetFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 1,
+      "position": [
+        800,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "f3276312-5972-4607-a098-81ea1db6393b",
+      "name": "Merge",
+      "notes": "This merge node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        470
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "cf469eed-c29c-4983-ab7d-5e50480803fb",
+      "name": "Spreadsheet File1",
+      "notes": "This spreadsheetFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 1,
+      "position": [
+        1150,
+        470
+      ],
+      "parameters": {
+        "operation": "toFile"
+      }
+    },
+    {
+      "id": "87b58af7-e08f-49a6-beda-1e0c4e547de7",
+      "name": "NextCloud1",
+      "notes": "This nextCloud node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.nextCloud",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        470
+      ],
+      "parameters": {
+        "path": "={{$node[\"NextCloud\"].parameter[\"path\"]}}",
+        "binaryDataUpload": true
+      },
+      "credentials": {
+        "nextCloudApi": {
+          "id": null,
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "error-67bc607c",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

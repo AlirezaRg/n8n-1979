@@ -1,0 +1,93 @@
+{
+  "active": false,
+  "name": "Airtable Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "24b869d5-e67d-4b7e-84d5-421c19e9feca",
+      "name": "Airtable",
+      "notes": "This airtable node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        1090,
+        340
+      ],
+      "parameters": {
+        "table": "Table 1",
+        "options": {},
+        "operation": "append",
+        "application": ""
+      },
+      "credentials": {
+        "airtableApi": "Airtable Credentials n8n"
+      }
+    },
+    {
+      "id": "70383aa7-42e1-400d-9249-421e18f2ef35",
+      "name": "Set",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        890,
+        340
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "Name",
+              "value": "={{$json[\"contact_name\"]}}"
+            },
+            {
+              "name": "Email",
+              "value": "={{$json[\"contact_email\"]}}"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "4bc44f14-2a17-420b-a26b-6a4c1a72bc77",
+      "name": "GetResponse Trigger",
+      "webhookId": "4bdfc1fa-44bc-4293-987c-fb512327e845",
+      "notes": "This getResponseTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.getResponseTrigger",
+      "typeVersion": 1,
+      "position": [
+        690,
+        340
+      ],
+      "parameters": {
+        "events": [
+          "subscribe"
+        ],
+        "listIds": [
+          "qtPk7"
+        ],
+        "options": {}
+      },
+      "credentials": {
+        "getResponseApi": "GetResponse API Credentials"
+      }
+    },
+    {
+      "id": "error-96e5fbf0",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,49 @@
+{
+  "active": false,
+  "name": "Manualtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "497a5c81-80bc-4bc5-816b-a0e0e4320bbb",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "f58635d8-94f9-491e-9053-3d8ca1063159",
+      "name": "Hacker News",
+      "notes": "This hackerNews node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.hackerNews",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "resource": "all",
+        "additionalFields": {}
+      }
+    },
+    {
+      "id": "error-e5f46d46",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

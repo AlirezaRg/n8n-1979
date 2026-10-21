@@ -1,0 +1,52 @@
+{
+  "active": false,
+  "name": "Create an deal in Pipedrive",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "2c840992-4536-43b7-b30b-f1ff8da69af6",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "89a90b54-b973-4b24-b1ef-fcf26c92b27e",
+      "name": "Pipedrive",
+      "notes": "This pipedrive node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "title": "",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "pipedriveApi": ""
+      }
+    },
+    {
+      "id": "error-7e557e57",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

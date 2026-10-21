@@ -1,0 +1,141 @@
+{
+  "active": false,
+  "name": "Get only new RSS with Photo",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "4c1290eb-be06-4618-aff2-dbbc34e1d0c7",
+      "name": "Cron",
+      "notes": "This cron node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        920
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "unit": "minutes",
+              "value": 5
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "2094b45d-54a1-4952-8c97-48b36c21b862",
+      "name": "RSS Feed Read",
+      "notes": "This rssFeedRead node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "executeOnce": true,
+      "position": [
+        1220,
+        920
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}"
+      }
+    },
+    {
+      "id": "b6252170-f858-4d82-b139-69b9ceead313",
+      "name": "Extract Image1",
+      "notes": "This htmlExtract node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.htmlExtract",
+      "typeVersion": 1,
+      "position": [
+        1740,
+        920
+      ],
+      "parameters": {
+        "options": {},
+        "dataPropertyName": "=content",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "attribute": "src",
+              "cssSelector": "img",
+              "returnValue": "attribute"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "bc069553-b484-4159-a7b3-6c7bb4cc3307",
+      "name": "Filter RSS Data",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1390,
+        920
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "Title",
+              "value": "={{$node[\"RSS Feed Read\"].json[\"title\"]}}"
+            },
+            {
+              "name": "Subtitle",
+              "value": "={{$json[\"contentSnippet\"]}}"
+            },
+            {
+              "name": "Author",
+              "value": "={{$json[\"creator\"]}}"
+            },
+            {
+              "name": "URL",
+              "value": "={{$node[\"RSS Feed Read\"].json[\"link\"]}}"
+            },
+            {
+              "name": "Date",
+              "value": "={{$node[\"RSS Feed Read\"].json[\"pubDate\"]}}"
+            },
+            {
+              "name": "content",
+              "value": "={{$json[\"content\"]}}"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "3cacc6cc-520b-4ea4-bde1-579f6317aa37",
+      "name": "Only get new RSS1",
+      "notes": "This function node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        920
+      ],
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newRSSIds = items.map(item => item.json[\"Date\"]);\nconst oldRSSIds = staticData.oldRSSIds; \n\nif (!oldRSSIds) {\n  staticData.oldRSSIds = newRSSIds;\n  return items;\n}\n\n\nconst actualNewRSSIds = newRSSIds.filter((id) => !oldRSSIds.includes(id));\nconst actualNewRSS = items.filter((data) => actualNewRSSIds.includes(data.json['Date']));\nstaticData.oldRSSIds = [...actualNewRSSIds, ...oldRSSIds];\n\nreturn actualNewRSS;\n"
+      }
+    },
+    {
+      "id": "error-4db9264b",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

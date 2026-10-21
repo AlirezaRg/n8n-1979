@@ -1,0 +1,171 @@
+{
+  "active": false,
+  "name": "Production Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-cee6415d",
+      "name": "On clicking 'execute'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        470
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-439dd4e4",
+      "name": "HTTP Request",
+      "notesInFlow": true,
+      "notes": "Get news page",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        100,
+        470
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {
+          "fullResponse": true,
+          "batchInterval": 500
+        },
+        "responseFormat": "file",
+        "queryParametersUi": {
+          "parameter": []
+        },
+        "headerParametersUi": {
+          "parameter": []
+        },
+        "allowUnauthorizedCerts": true
+      }
+    },
+    {
+      "id": "node-40d60771",
+      "name": "HTML Extract",
+      "notesInFlow": true,
+      "notes": "extract news data",
+      "type": "n8n-nodes-base.htmlExtract",
+      "typeVersion": 1,
+      "position": [
+        310,
+        470
+      ],
+      "parameters": {
+        "options": {},
+        "sourceData": "binary",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "news_title",
+              "cssSelector": ".storylink",
+              "returnArray": true
+            },
+            {
+              "key": "news_url",
+              "attribute": "href",
+              "cssSelector": ".storylink",
+              "returnArray": true,
+              "returnValue": "attribute"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-de5c580f",
+      "name": "list news url",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        500,
+        570
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "news_url"
+      }
+    },
+    {
+      "id": "node-4972722d",
+      "name": "list news title",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        500,
+        390
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "news_title"
+      }
+    },
+    {
+      "id": "node-ee39fa6f",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 1,
+      "position": [
+        700,
+        470
+      ],
+      "parameters": {
+        "mode": "mergeByIndex"
+      }
+    },
+    {
+      "id": "node-2d559433",
+      "name": "Spreadsheet File",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 1,
+      "position": [
+        870,
+        470
+      ],
+      "parameters": {
+        "options": {
+          "fileName": "=Ycombinator_news_{{new Date().toISOString().split('T', 1)[0]}}.{{$parameter[\"fileFormat\"]}}",
+          "sheetName": "Latest news"
+        },
+        "operation": "toFile"
+      }
+    },
+    {
+      "id": "node-bf39fba3",
+      "name": "Send email notification",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        470
+      ],
+      "parameters": {
+        "text": "=Here are the latest news attached!",
+        "options": {},
+        "subject": "Ycombinator news",
+        "toEmail": "",
+        "fromEmail": "",
+        "attachments": "data"
+      },
+      "credentials": {
+        "smtp": ""
+      }
+    },
+    {
+      "id": "error-a5a84d1f",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

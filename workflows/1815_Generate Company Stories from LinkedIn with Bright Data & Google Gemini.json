@@ -1,0 +1,460 @@
+{
+  "active": false,
+  "name": "Generate Company Stories from LinkedIn with Bright Data & Google Gemini",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "1424195e-79ec-48e8-9bb6-fbae072aca81",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1440,
+        245
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "509519c2-efe9-4191-87af-9c5c782350d6",
+      "name": "Google Gemini Chat Model",
+      "notesInFlow": true,
+      "notes": "Gemini Experimental Model",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        696,
+        540
+      ],
+      "parameters": {
+        "options": {},
+        "modelName": "models/gemini-2.0-flash-thinking-exp-01-21"
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YeO7dHZnuGBVQKVZ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "id": "3be8be65-38c2-4500-8676-925bdf7844ac",
+      "name": "Default Data Loader",
+      "notes": "This documentDefaultDataLoader node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        816,
+        542.5
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "65b72f55-6424-487b-a622-879589d43344",
+      "name": "Recursive Character Text Splitter",
+      "notes": "This textSplitterRecursiveCharacterTextSplitter node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        904,
+        740
+      ],
+      "parameters": {
+        "options": {},
+        "chunkOverlap": 100
+      }
+    },
+    {
+      "id": "4ab31927-5372-4a8f-83b5-355bcd6eaae2",
+      "name": "If Node",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -340,
+        170
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "6a7e5360-4cb5-4806-892e-5c85037fa71c",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $('Check Snapshot Status').item.json.status }}",
+              "rightValue": "ready"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "30382d3b-6ba8-4a96-93ce-9d22fc547793",
+      "name": "Set Snapshot Id",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -780,
+        245
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2c3369c6-9206-45d7-9349-f577baeaf189",
+              "name": "snapshot_id",
+              "type": "string",
+              "value": "={{ $json.snapshot_id }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "a4867b6f-fa91-4b83-befc-9ce97c10228c",
+      "name": "Download Snapshot",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        100,
+        120
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {
+          "timeout": 10000
+        },
+        "sendQuery": true,
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "genericAuthType": "httpHeaderAuth",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "format",
+              "value": "json"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "kdbqXuxIR8qIxF7y",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "id": "16580d94-23fc-45d6-a282-640148b602d3",
+      "name": "Set LinkedIn URL",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1220,
+        245
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "47f839a1-df2a-4972-9dad-597a8af0bf75",
+              "name": "url",
+              "type": "string",
+              "value": "{{ $env.WEBHOOK_URL }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "be007904-269a-4823-bdd8-1ba5b4f69f5c",
+      "name": "Google Gemini Chat Model1",
+      "notes": "This lmChatGoogleGemini node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        408,
+        340
+      ],
+      "parameters": {
+        "options": {},
+        "modelName": "models/gemini-2.0-flash-exp"
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YeO7dHZnuGBVQKVZ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "id": "56a08c75-5122-483e-af0e-da1dd3e08eaf",
+      "name": "Check on the errors",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -120,
+        120
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "b267071c-7102-407b-a98d-f613bcb1a106",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $json.errors.toString() }}",
+              "rightValue": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "6925a606-1108-4605-9124-c74d3df555ac",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1420,
+        -100
+      ],
+      "parameters": {
+        "width": 400,
+        "height": 280,
+        "content": "## Note\n\nDeals with the LinkedIn data extraction using the Bright Data Web Scrapper API.\n\nThe information extraction and summarization are being used to demonstrate the usage of the N8N AI capabilities.\n\n**Please make sure to set the LinkedIn URL and Webhook Notification URL**"
+      }
+    },
+    {
+      "id": "a5f977db-14e5-4652-b2d3-0a1b0470be9a",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -940,
+        -100
+      ],
+      "parameters": {
+        "width": 420,
+        "height": 280,
+        "content": "## LLM Usages\n\nGoogle Gemini Flash Exp model is being used.\n\nInformation extraction is being used for formatting the LinkedIn response to produce a story.\n\nSummarization Chain is being used for summarization of the content"
+      }
+    },
+    {
+      "id": "ae6377e2-6ca0-4218-affd-d3c81c16d996",
+      "name": "Perform LinkedIn Web Request",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1000,
+        245
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "=[\n  {\n    \"url\": \"{{ $json.url }}\"\n  }\n]",
+        "sendBody": true,
+        "sendQuery": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "genericAuthType": "httpHeaderAuth",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "dataset_id",
+              "value": "gd_l1vikfnt1wgvvqz95w"
+            },
+            {
+              "name": "include_errors",
+              "value": "true"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "kdbqXuxIR8qIxF7y",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "id": "9a1e8d92-24a9-481c-b81f-5e37bca46fe2",
+      "name": "Check Snapshot Status",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -560,
+        245
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "sendHeaders": true,
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "genericAuthType": "httpHeaderAuth",
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "kdbqXuxIR8qIxF7y",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "id": "543d6087-c1d8-4f98-9b7c-fedbce9b0215",
+      "name": "LinkedIn Data Extractor",
+      "notes": "This informationExtractor node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        320,
+        120
+      ],
+      "parameters": {
+        "text": "=Write a complete story of the provided company information in JSON. Use the following Company info to produce a story or a blog post. Make sure to incorporate all the provided company context.\n\nHere's the Company Info in JSON - {{ $json.input }}",
+        "options": {
+          "systemPromptTemplate": "You are an expert data formatter"
+        },
+        "attributes": {
+          "attributes": [
+            {
+              "name": "company_story",
+              "required": true,
+              "description": "Detailed Company Info"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "d07c83f0-5adf-4d5a-976a-b344aa8a853e",
+      "name": "Concise Summary Generator",
+      "notes": "This chainSummarization node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 2,
+      "position": [
+        712,
+        320
+      ],
+      "parameters": {
+        "options": {
+          "summarizationMethodAndPrompts": {
+            "values": {
+              "prompt": "=Write a concise summary of the following:\n\n\n{{ $json.output.company_story }}\n\n",
+              "combineMapPrompt": "=Write a concise summary of the following:\n\n\n\n\n\nCONCISE SUMMARY: {{ $json.output.company_story }}"
+            }
+          }
+        },
+        "operationMode": "documentLoader"
+      }
+    },
+    {
+      "id": "0867753e-c3ab-473e-960a-344573cdde29",
+      "name": "Webhook Notifier for Data Extractor",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        834,
+        -80
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}",
+        "options": {},
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "response",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "d666cbb8-64bf-47b9-802a-d78ed5caa128",
+      "name": "Webhook Notifier for Summary Generator",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1192,
+        320
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}",
+        "options": {},
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "response",
+              "value": "={{ $json.response.text }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "fbd962be-5003-4039-b17e-fc0f16c2edf7",
+      "name": "Wait for 30 seconds",
+      "webhookId": "f2aafd71-61f2-4aa4-8290-fa3bbe3d46b9",
+      "notes": "This wait node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -120,
+        345
+      ],
+      "parameters": {
+        "amount": 30
+      }
+    }
+  ],
+  "connections": {}
+}

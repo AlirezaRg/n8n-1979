@@ -1,0 +1,131 @@
+{
+  "active": false,
+  "name": "Googlesheets Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "trigger-5cd75600",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        100
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "cd912cf7-67ca-4f45-89d9-82a3ea3a3487",
+      "name": "Get Content Ideas",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ],
+      "parameters": {
+        "range": "Sheet1!A:C",
+        "sheetId": "YOUR_GOOGLE_SHEET_ID"
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": "YOUR_GOOGLE_SHEETS_CREDENTIALS"
+      }
+    },
+    {
+      "id": "9e632dde-3e1f-4551-8689-78c865affaa8",
+      "name": "Generate Post with OpenAI",
+      "notes": "This openAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        500,
+        300
+      ],
+      "parameters": {
+        "model": "gpt-4",
+        "prompt": "Create a social media post for {{$node[\"Get Content Ideas\"].json[\"Platform\"]}} based on this idea: {{$node[\"Get Content Ideas\"].json[\"Idea\"]}}. Keep it engaging and concise."
+      },
+      "credentials": {
+        "openAIApi": "YOUR_OPENAI_CREDENTIALS"
+      }
+    },
+    {
+      "id": "be27defe-cc38-45d3-9f20-9b725c10d37d",
+      "name": "Check Platform",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        800,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "{{$node[\"Get Content Ideas\"].json[\"Platform\"]}}",
+              "value2": "Twitter",
+              "operation": "equal"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "d269f30f-ae22-47b5-8445-27d2f9fc06d5",
+      "name": "Post to Twitter",
+      "notes": "This twitter node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        200
+      ],
+      "parameters": {
+        "text": "{{$node[\"Generate Post with OpenAI\"].json[\"text\"]}}"
+      },
+      "credentials": {
+        "twitterOAuth1Api": "YOUR_TWITTER_CREDENTIALS"
+      }
+    },
+    {
+      "id": "17ca6222-4448-4936-9f4c-e0b22ba996eb",
+      "name": "Update Google Sheet",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        300
+      ],
+      "parameters": {
+        "range": "Sheet1!D:F",
+        "values": "Posted,{{$node[\"Generate Post with OpenAI\"].json[\"text\"]}},{{Date.now()}}",
+        "sheetId": "YOUR_GOOGLE_SHEET_ID",
+        "updateOperation": "append"
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": null,
+          "name": "YOUR_GOOGLE_SHEETS_CREDENTIALS"
+        }
+      }
+    },
+    {
+      "id": "error-ccfac0b3",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

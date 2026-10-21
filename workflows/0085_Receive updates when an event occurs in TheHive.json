@@ -1,0 +1,39 @@
+{
+  "active": false,
+  "name": "Receive updates when an event occurs in TheHive",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "f05054b0-79e0-40fb-ae82-42be21f282dd",
+      "name": "TheHive Trigger",
+      "webhookId": "bef3fea8-2d68-43e8-9061-6c17c1059c86",
+      "notes": "This theHiveTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.theHiveTrigger",
+      "typeVersion": 1,
+      "position": [
+        690,
+        220
+      ],
+      "parameters": {
+        "events": [
+          "*"
+        ]
+      }
+    },
+    {
+      "id": "error-32e6cb7d",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

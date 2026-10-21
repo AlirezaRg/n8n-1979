@@ -1,0 +1,55 @@
+{
+  "active": false,
+  "name": "Create a new customer in Chargebee",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "00b94a02-24d2-490b-8f61-9197ccd13243",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "81f0d87d-b721-42fa-8052-c9ac7c2d3453",
+      "name": "Chargebee",
+      "notes": "This chargebee node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.chargebee",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ],
+      "parameters": {
+        "resource": "customer",
+        "properties": {
+          "last_name": "",
+          "first_name": ""
+        }
+      },
+      "credentials": {
+        "chargebeeApi": ""
+      }
+    },
+    {
+      "id": "error-b4c15f56",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

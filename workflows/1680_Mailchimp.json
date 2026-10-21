@@ -1,0 +1,62 @@
+{
+  "active": false,
+  "name": "Mailchimp",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "9c13311c-496c-4563-9a79-0859cad14387",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        480,
+        310
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "e2cce11d-4321-4881-83bb-4a03c0260939",
+      "name": "Mailchimp",
+      "notes": "This mailchimp node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.mailchimp",
+      "typeVersion": 1,
+      "position": [
+        780,
+        310
+      ],
+      "parameters": {
+        "list": "97542c5cf8",
+        "email": "xxxx@email.com",
+        "status": "subscribed",
+        "options": {},
+        "mergeFieldsUi": {
+          "mergeFieldsValues": [
+            {
+              "name": "FNAME",
+              "value": "Joe"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "mailchimpApi": "mailchimpAPI"
+      }
+    },
+    {
+      "id": "error-afcf8e27",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

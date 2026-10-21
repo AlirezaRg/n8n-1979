@@ -1,0 +1,407 @@
+{
+  "active": false,
+  "name": "Send Emails from Obsidian",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "9bd809d6-c270-4429-945d-1e519384acae",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        20
+      ],
+      "parameters": {
+        "width": 395.06030313757196,
+        "height": 388.5681601162638,
+        "content": "## Obsidian to Email Overview\n\nThis workflow allows you to send your Obsidian notes (including attachments) via email, with YAML metadata for customization.\n\n### Key Features:\n- Trigger email sending through [Obsidian's Post Webhook plugin]({{ $env.WEBHOOK_URL }}\n- Parse YAML frontmatter for email metadata like recipients, subject, and more.\n- Automatic handling of attachments (images/files) via base64 encoding.\n- Append Webhook response automatically to the bottom of your note in Obsidian"
+      }
+    },
+    {
+      "id": "bc2376ea-31db-43dc-84c4-7933bc7a96f8",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        439
+      ],
+      "parameters": {
+        "color": 3,
+        "width": 398.9156829431131,
+        "height": 447.41755555994735,
+        "content": "## YAML Frontmatter Example\n\nUse YAML frontmatter in your Obsidian notes to define key email details such as recipients, subject, and more.\n\n### Example YAML:\n```yaml\n---\nto: \"recipient@example.com\"\ncc: \"cc@example.com\"\nbcc: \"bcc@example.com\"\nsubject: \"Your Obsidian Note\"\nsender-name: \"Your Name\"\nsend-replies-to: \"replies@example.com\"\n---\nNote content goes here...\n"
+      }
+    },
+    {
+      "id": "1e439841-cc53-4913-b23b-040746bab5ec",
+      "name": "Check if attachments exist",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        340,
+        380
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "3d870306-d912-4582-960d-f031538a5045",
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.body.attachments }}",
+              "rightValue": ""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "39cf3ab8-47be-4153-afb8-a1a68c7c04f6",
+      "name": "Separate attachment data",
+      "notes": "This splitOut node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        600,
+        220
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "body.attachments"
+      }
+    },
+    {
+      "id": "f4b75a54-2cd8-4f6c-afd8-486fea552f00",
+      "name": "Sticky Note3",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        540,
+        20
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 493.7005132824585,
+        "height": 874.8910456745886,
+        "content": "## Attachment Handling\n\nThe plugin automatically handles attachments in your Obsidian notes.\n\nThis workflow automates the processing of attachments by converting each attachment into a binary format.\n"
+      }
+    },
+    {
+      "id": "b5df08f3-c0a1-429a-a003-24c77fd00461",
+      "name": "Process Each Attachment",
+      "notes": "This splitInBatches node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        600,
+        480
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "220f49b2-9cf8-4395-ae8e-4167ac452954",
+      "name": "Convert Attachment to File",
+      "notes": "This convertToFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        900,
+        580
+      ],
+      "parameters": {
+        "options": {
+          "fileName": "={{ $json.name }}"
+        },
+        "operation": "toBinary",
+        "sourceProperty": "data"
+      }
+    },
+    {
+      "id": "7e5c643f-4545-47b1-91cb-c306900f7842",
+      "name": "Prepare Attachments for Email",
+      "notes": "This aggregate node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        900,
+        400
+      ],
+      "parameters": {
+        "options": {
+          "includeBinaries": true
+        },
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "data"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "4fc9dffb-ad6b-4e7a-a814-3bb63189e4e7",
+      "name": "Email With Attachments",
+      "webhookId": "479fab78-5e9c-4dc9-ac36-fb656222cae7",
+      "notes": "This gmail node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1100,
+        480
+      ],
+      "parameters": {
+        "sendTo": "={{ Array.isArray($('Webhook').item.json.body.to) ? $('Webhook').item.json.body.to.join('; ') : $('Webhook').item.json.body.to }}",
+        "message": "={{ $('Webhook').item.json.body.content }}",
+        "options": {
+          "ccList": "={{ $('Webhook').item.json.body.cc ?? '' }}",
+          "bccList": "={{ $('Webhook').item.json.body.bcc ?? '' }}",
+          "replyTo": "={{ $('Webhook').item.json.body['send-replies-to'] ?? '' }}",
+          "senderName": "={{ $('Webhook').item.json.body['sender-name'] ?? '' }}",
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "={{ Object.keys($binary).join(',') }}"
+              }
+            ]
+          },
+          "appendAttribution": false
+        },
+        "subject": "={{ $('Webhook').item.json.body.subject }}",
+        "emailType": "text"
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y4RWMfx2YG0VDaFJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "id": "8457e27f-449d-43eb-baa8-cd2dedbd27c3",
+      "name": "Email Without Attachments",
+      "webhookId": "479fab78-5e9c-4dc9-ac36-fb656222cae7",
+      "notes": "This gmail node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1100,
+        720
+      ],
+      "parameters": {
+        "sendTo": "={{ $json.body.to }}",
+        "message": "={{ $json.body.content }}",
+        "options": {
+          "ccList": "={{ $json.body?.cc ?? '' }}",
+          "bccList": "={{ $json.body?.bcc ?? '' }}",
+          "replyTo": "={{ $json.body?.send-replies-to ?? '' }}",
+          "senderName": "={{ $json.body?.sender-name ?? '' }}"
+        },
+        "subject": "={{ $json.body.subject }}",
+        "emailType": "text"
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y4RWMfx2YG0VDaFJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "id": "647de484-8a8f-479b-844c-69669d783a66",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        104,
+        20
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 410.45568358442864,
+        "height": 866.9256684369553,
+        "content": "## Obsidian Configuration\n\nInstall the [Obsidian Post Webhook plugin]({{ $env.WEBHOOK_URL }}\n\n### How to set-up webhook connection:\n1. Set your webhook URL in the plugin settings.\n2. Use the built-in testing functionality to ensure your webhook is set up correctly.\n3. Open any note in Obsidian.\n4. Use the command palette (`Ctrl/Cmd + P`) to search for \"Send to Webhook\".\n5. Once sent, this workflow begins."
+      }
+    },
+    {
+      "id": "97f0c5dc-e8c8-4b98-8b49-baafe41dad60",
+      "name": "Sticky Note4",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        180
+      ],
+      "parameters": {
+        "color": 5,
+        "height": 264.2421600929918,
+        "content": "![logo]({{ $env.WEBHOOK_URL }}"
+      }
+    },
+    {
+      "id": "5eeec7cd-0bef-4bc2-a2ba-fd6f88300e04",
+      "name": "Check if it is a test",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        160,
+        700
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "f9864a1c-3188-4640-82bd-2cddc8798b0f",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.body.test }}",
+              "rightValue": "true"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "36bce77b-6ef1-4a5a-898b-80a8c935a811",
+      "name": "Sticky Note5",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        27.003515763841165
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 457.22695080436733,
+        "height": 863.6667893577376,
+        "content": "## Send Email and Respond\n\nAfter the email is sent, the workflow confirms the email's status and sends a response back to Obsidian."
+      }
+    },
+    {
+      "id": "c11f11a4-7e45-46f9-8450-628b9b73de64",
+      "name": "Respond to Obsidian",
+      "notes": "This respondToWebhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1400,
+        600
+      ],
+      "parameters": {
+        "options": {},
+        "respondWith": "text",
+        "responseBody": "=E-mail sent on  {{ new Date($json.currentDate).toLocaleString('en-GB', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).replace(':', 'h') }}\n"
+      }
+    },
+    {
+      "id": "fc3b3aa0-a90b-4e1e-a491-fb93d50494ec",
+      "name": "Fix Base64 string",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        760,
+        220
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b72a1b54-978d-408c-876a-d3e103b1f667",
+              "name": "data",
+              "type": "string",
+              "value": "={{ $json.data.replace(/^data:.*?,/, '') }}"
+            }
+          ]
+        },
+        "includeOtherFields": true
+      }
+    },
+    {
+      "id": "f3c5d9d2-7c76-48f4-8dd6-df665bd32ec1",
+      "name": "Test Succesfull",
+      "notes": "This respondToWebhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        360,
+        620
+      ],
+      "parameters": {
+        "options": {},
+        "respondWith": "text",
+        "responseBody": "=Test succesfull\n"
+      }
+    },
+    {
+      "id": "e7ac7407-f2fc-4cdb-bd18-97f746335103",
+      "name": "Get date",
+      "notes": "This dateTime node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        1260,
+        600
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "4be431e2-e21b-48bd-8425-eac17e3174c8",
+      "name": "Webhook",
+      "webhookId": "e634d721-48b0-4985-8a57-62ca4c7b3cfb",
+      "notes": "This webhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        140,
+        380
+      ],
+      "parameters": {
+        "path": "e634d721-48b0-4985-8a57-62ca4c7b3cfb",
+        "options": {
+          "allowedOrigins": "*"
+        },
+        "httpMethod": "POST",
+        "responseMode": "responseNode"
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,211 @@
+{
+  "active": false,
+  "name": "Manualtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "35c4aa9f-7535-4315-9174-fe97afc6de2e",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "ed1f4f78-733f-4dd5-9785-969c9ec0d637",
+      "name": "Get overview page",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        460,
+        300
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}",
+        "options": {},
+        "responseFormat": "string"
+      }
+    },
+    {
+      "id": "28333c78-aa8f-401a-8033-2007a5e6991c",
+      "name": "Extract links",
+      "notes": "This htmlExtract node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.htmlExtract",
+      "typeVersion": 1,
+      "position": [
+        680,
+        300
+      ],
+      "parameters": {
+        "options": {},
+        "extractionValues": {
+          "values": [
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "attribute": "href",
+              "cssSelector": "a[href*=\"/episode/\"]",
+              "returnArray": true,
+              "returnValue": "attribute"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "58840494-4208-49ce-b82a-d7cf8abd3b29",
+      "name": "Remove duplicate links",
+      "notes": "This itemLists node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        300
+      ],
+      "parameters": {
+        "operation": "removeDuplicates"
+      }
+    },
+    {
+      "id": "17efb905-b947-4538-ab34-d50bf7fdbd75",
+      "name": "Split out lists",
+      "notes": "This itemLists node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        900,
+        300
+      ],
+      "parameters": {
+        "options": {
+          "destinationFieldName": "link"
+        },
+        "fieldToSplitOut": "links"
+      }
+    },
+    {
+      "id": "59a69e64-ebba-42cb-b8d0-8dd73f0ae962",
+      "name": "Get episode page",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1340,
+        300
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "responseFormat": "string"
+      }
+    },
+    {
+      "id": "68749bff-1499-4ef5-aefd-c4b6233d0fa7",
+      "name": "Extract script",
+      "notes": "This htmlExtract node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.htmlExtract",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        300
+      ],
+      "parameters": {
+        "options": {},
+        "extractionValues": {
+          "values": [
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "cssSelector": "script:nth-of-type(2)",
+              "returnValue": "html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "158e7b18-f58d-453f-80f8-97e65f0b1fde",
+      "name": "Parse JSON",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1780,
+        300
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "data",
+              "value": "={{ JSON.parse($json.script) }}"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "a613c52e-395b-4d88-ab7d-b1cf2b664b43",
+      "name": "Define feed items",
+      "notes": "This function node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        300
+      ],
+      "parameters": {
+        "functionCode": "const escapeHTML = str => str.replace(/[&<>'\"]/g, \n  tag => ({\n      '&': '&amp;',\n      '<': '&lt;',\n      '>': '&gt;',\n      \"'\": '&#39;',\n      '\"': '&quot;'\n    }[tag]));\n\nlet feedItems = [];\nfor (item of items) {\n  feedItems.push(`<item>\n  <title>${escapeHTML(item.json.data.name)}</title>\n  <enclosure url=\"${item.json.data.associatedMedia.contentUrl}\" length=\"${item.json.data.timeRequired * 20 * 1000}\" type=\"${item.json.data.encodingFormat}\"/>\n  <guid isPermaLink=\"false\">${item.json.data.identifier}</guid>\n  <pubDate>${DateTime.fromISO(item.json.data.datePublished).toRFC2822()}</pubDate>\n  <description>${escapeHTML(item.json.data.description)}</description>\n</item>`);\n}\n\nreturn [{\n  data: `<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\" xmlns:itunes=\"{{ $env.WEBHOOK_URL }}\" xmlns:content=\"{{ $env.WEBHOOK_URL }}\">\n  <channel>\n    <title>${escapeHTML(items[0].json.data.partOfSeries.name)}</title>\n    <description>${escapeHTML(items[0].json.data.partOfSeries.about)}</description>\n    <itunes:image href=\"${escapeHTML(items[0].json.data.image)}\" />\n    <language>${items[0].json.data.inLanguage}</language>\n    <itunes:category text=\"Comedy\" />\n    <itunes:explicit>no</itunes:explicit>\n    <link>${items[0].json.data.partOfSeries.url}</link>\n    <copyright>� ${$now.toFormat('yyyy')} ${escapeHTML(items[0].json.data.productionCompany)}</copyright>\n    <itunes:author>${escapeHTML(items[0].json.data.productionCompany)}</itunes:author>\n    ${feedItems.join('\\n')}\n  </channel>\n</rss>\n`\n}];\n"
+      }
+    },
+    {
+      "id": "cbdc367d-a685-4f0b-a9f3-0aedc2c8b3c1",
+      "name": "Feed",
+      "webhookId": "3fbd94de-2fb3-4b32-a46e-c237865479b9",
+      "notes": "This webhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        240,
+        100
+      ],
+      "parameters": {
+        "path": "3fbd94de-2fb3-4b32-a46e-c237865479b9.rss",
+        "options": {},
+        "responseMode": "responseNode"
+      }
+    },
+    {
+      "id": "0dfb02cc-1944-4542-b5c5-9e0b198e143d",
+      "name": "Serve feed",
+      "notes": "This respondToWebhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        2220,
+        300
+      ],
+      "parameters": {
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/rss+xml"
+              }
+            ]
+          }
+        },
+        "respondWith": "text",
+        "responseBody": "={{ $json[\"data\"] }}"
+      }
+    }
+  ],
+  "connections": {}
+}

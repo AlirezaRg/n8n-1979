@@ -1,0 +1,111 @@
+{
+  "active": false,
+  "name": "Get all the contacts from GetResponse and update them",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "228c6a98-b272-4b86-bd12-79c9a4b6de48",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "320f7a23-9c73-4494-acc0-1e9e053ccd52",
+      "name": "GetResponse",
+      "notes": "This getResponse node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.getResponse",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "getAll",
+        "returnAll": true
+      },
+      "credentials": {
+        "getResponseApi": "getresponse-api"
+      }
+    },
+    {
+      "id": "06f2db1e-99a4-498b-97a7-e009d6b95d07",
+      "name": "If Node",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$node[\"GetResponse\"].json[\"campaign\"][\"name\"]}}",
+              "value2": "n8n",
+              "operation": "notEqual"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "341c942f-c606-4916-97af-347e0e25651b",
+      "name": "GetResponse1",
+      "notes": "This getResponse node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.getResponse",
+      "typeVersion": 1,
+      "position": [
+        860,
+        200
+      ],
+      "parameters": {
+        "contactId": "={{$node[\"IF\"].json[\"contactId\"]}}",
+        "operation": "update",
+        "updateFields": {
+          "campaignId": "WRVXO"
+        }
+      },
+      "credentials": {
+        "getResponseApi": {
+          "id": null,
+          "name": "getresponse-api"
+        }
+      }
+    },
+    {
+      "id": "cc5b990d-603b-4662-bc3b-b8d1d4dd09f9",
+      "name": "NoOp",
+      "notes": "This noOp node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        860,
+        400
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "error-d81263d3",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

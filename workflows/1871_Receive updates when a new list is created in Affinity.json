@@ -1,0 +1,42 @@
+{
+  "active": false,
+  "name": "Receive updates when a new list is created in Affinity",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "6890a8f8-7785-4eb9-a0df-c008e16a7ecc",
+      "name": "Affinity-Trigger",
+      "webhookId": "e9d2b8f0-9fa9-43c2-b45d-dc96c869bd20",
+      "notes": "This affinityTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.affinityTrigger",
+      "typeVersion": 1,
+      "position": [
+        690,
+        260
+      ],
+      "parameters": {
+        "events": [
+          "list.created"
+        ]
+      },
+      "credentials": {
+        "affinityApi": "affinity"
+      }
+    },
+    {
+      "id": "error-8265ff8e",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

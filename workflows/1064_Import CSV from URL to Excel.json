@@ -1,0 +1,95 @@
+{
+  "active": false,
+  "name": "Import CSV from URL to Excel",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "580d8a47-32cc-4976-a464-793523ae3d1e",
+      "name": "When clicking \"Execute Workflow\"",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        860,
+        380
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "2ca1b012-db79-415a-8983-53ac23cd42d1",
+      "name": "Import CSV",
+      "notes": "This spreadsheetFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 2,
+      "position": [
+        1260,
+        380
+      ],
+      "parameters": {
+        "options": {
+          "delimiter": ";",
+          "headerRow": true
+        },
+        "fileFormat": "csv"
+      }
+    },
+    {
+      "id": "5bc0a423-91bc-4b52-af05-2869223bbbff",
+      "name": "Download CSV",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1060,
+        380
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "d403206d-e53c-44d7-b39e-361fa8fc3a23",
+      "name": "Convert to Excel",
+      "notes": "This spreadsheetFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        380
+      ],
+      "parameters": {
+        "options": {
+          "fileName": "=converted_csv.{{ $parameter.fileFormat }}",
+          "headerRow": true,
+          "sheetName": "csv_page"
+        },
+        "operation": "toFile",
+        "fileFormat": "xlsx"
+      }
+    },
+    {
+      "id": "66279cfc-4bde-45af-910f-84854eca9a70",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        820,
+        177
+      ],
+      "parameters": {
+        "width": 808,
+        "height": 385,
+        "content": "## Convert CSV to Excel (.xlsx)\n1. Click Execute Workflow to begin\n2. Download the data from the Web\n3. Import CSV binary data as a JSON\n4. Convert JSON to .xlsx file\n\nSource:\n{{ $env.WEBHOOK_URL }}"
+      }
+    }
+  ],
+  "connections": {}
+}

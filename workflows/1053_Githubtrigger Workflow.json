@@ -1,0 +1,104 @@
+{
+  "active": false,
+  "name": "Githubtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "1a825fcf-9d63-49fb-ba99-8e3d066678f4",
+      "name": "Github Trigger",
+      "webhookId": "01518289-14b1-4a45-9d33-39be08f7a544",
+      "notes": "This githubTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.githubTrigger",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "owner": "n8n-io",
+        "events": [
+          "push",
+          "pull_request"
+        ],
+        "repository": "n8n",
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "githubOAuth2Api": "GitHub Credentials"
+      }
+    },
+    {
+      "id": "dd55dac5-15b0-4bae-a10a-047d198c0e75",
+      "name": "If Node",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"headers\"][\"x-github-event\"]}}",
+              "value2": "push"
+            },
+            {
+              "value1": "={{$json[\"body\"][\"action\"]}}",
+              "value2": "opened"
+            }
+          ]
+        },
+        "combineOperation": "any"
+      }
+    },
+    {
+      "id": "cbb734a3-caba-48af-96b4-f351d1416eec",
+      "name": "TravisCI",
+      "notes": "This travisCi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.travisCi",
+      "typeVersion": 1,
+      "position": [
+        850,
+        200
+      ],
+      "parameters": {
+        "slug": "={{$json[\"body\"][\"repository\"][\"full_name\"]}}",
+        "branch": "=",
+        "operation": "trigger",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "travisCiApi": "Travis API"
+      }
+    },
+    {
+      "id": "287acce9-88d0-4884-bf1a-00b40e2b8631",
+      "name": "NoOp",
+      "notes": "This noOp node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        850,
+        400
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "error-640bbced",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

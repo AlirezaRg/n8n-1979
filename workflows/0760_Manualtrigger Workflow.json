@@ -1,0 +1,234 @@
+{
+  "active": false,
+  "name": "Manualtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "70a44436-4b51-458a-ae93-60edeed170de",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "d4c2dfa2-30bb-4f06-96c2-5811472302d2",
+      "name": "Cron",
+      "notes": "This cron node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        240,
+        100
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "custom",
+              "cronExpression": "15 7 * * 1-6"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "86924546-e4f2-4795-8e80-9e49626d2c42",
+      "name": "Baserow",
+      "notes": "This baserow node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.baserow",
+      "typeVersion": 1,
+      "position": [
+        460,
+        200
+      ],
+      "parameters": {
+        "tableId": 680,
+        "databaseId": 146,
+        "additionalOptions": {}
+      },
+      "credentials": {
+        "baserowApi": {
+          "id": "{{ $credentials.baserowApi.id }}",
+          "name": "Baserow account"
+        }
+      }
+    },
+    {
+      "id": "36f2947b-67cf-47eb-891f-e7e3b5ba9eac",
+      "name": "Fetch tradegate stock page",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        680,
+        200
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}",
+        "options": {},
+        "responseFormat": "string",
+        "queryParametersUi": {
+          "parameter": [
+            {
+              "name": "isin",
+              "value": "={{$json[\"ISIN\"]}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "b516e751-d1d1-43a0-8f19-6787a5c56ddc",
+      "name": "Parse tradegate stock page",
+      "notes": "This htmlExtract node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.htmlExtract",
+      "typeVersion": 1,
+      "position": [
+        900,
+        200
+      ],
+      "parameters": {
+        "options": {},
+        "extractionValues": {
+          "values": [
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "cssSelector": "#col1_content > table > tbody > tr:nth-child(2) > td:nth-child(1)"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "cssSelector": "#col1_content > table > tbody > tr:nth-child(2) > td:nth-child(3)"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "cssSelector": "#col1_content > table > tbody > tr:nth-child(2) > td:nth-child(4)"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "cssSelector": "#col1_content > h2"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "cssSelector": "#bid"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "cssSelector": "#ask"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "e51556c7-3f3a-4e4d-96e9-942f436422af",
+      "name": "Build HTML",
+      "notes": "This function node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        200
+      ],
+      "parameters": {
+        "functionCode": "const columns = Object.keys(items[0].json);\n\n// Define the basic table structure\nlet table_header = `<table style=\"border: 1px solid black; border-collapse: collapse;\"><tr>${columns.map(e => '<th style=\"border: 1px solid black; border-collapse: collapse;\">' + e + '</th>').join('')}</tr>`;\nlet table_content = \"\";\nlet table_footer = '</table>';\n\n// Add content to our table\nfor (item of items) {\n    table_content += '<tr>'\n    for (column of columns) {\n        table_content += `<td style=\\\"border: 1px solid black; border-collapse: collapse;\\\">${item.json[column]}</td>`\n    }\n    table_content += '</tr>'\n}\n\n// Prepare HTML email body\nconst email_html = `<body style=\"font-family: Sans-Serif;\">\n<p>Investments as of ${$now.setZone(\"Europe/Dublin\").setLocale('ie').toFormat('fff')}:</p>\n${table_header}\n${table_content}\n${table_footer}\n<p>Total: ${items.map(e => parseFloat(e.json['Current Value'])).reduce((a, b) => a + b, 0).toFixed(2)}</p>\n<p><small>Workflow #${$workflow.id}</small></p>\n</body>`\n\n\nreturn [{\n    json: {\n        html: email_html\n    }\n}];"
+      }
+    },
+    {
+      "id": "361bf8f2-298c-4b96-9f21-4f4620f1e9a9",
+      "name": "Format result",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        200
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "Name",
+              "value": "={{ $node[\"Baserow\"].json[\"Name\"] }}"
+            },
+            {
+              "name": "ISIN",
+              "value": "={{ $node[\"Baserow\"].json[\"ISIN\"] }}"
+            },
+            {
+              "name": "Count",
+              "value": "={{ $node[\"Baserow\"].json[\"Count\"] }}"
+            },
+            {
+              "name": "Purchase Price",
+              "value": "={{ $node[\"Baserow\"].json[\"Purchase Price\"] }}"
+            },
+            {
+              "name": "Current Value",
+              "value": "={{ (parseFloat($json[\"Bid\"].replace(',', '.')) * parseFloat($node[\"Baserow\"].json[\"Count\"])).toFixed(2) }}"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "c2f329dc-3b97-402a-9d63-ed863c2aee84",
+      "name": "Calculate change",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        200
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "Change",
+              "value": "={{ ( parseFloat($json[\"Current Value\"]) - parseFloat($json[\"Purchase Price\"]) ).toFixed(2) }}"
+            },
+            {
+              "name": "Change (%)",
+              "value": "={{ ( ( ( parseFloat($json[\"Current Value\"]) - parseFloat($json[\"Purchase Price\"]) ) / parseFloat($json[\"Purchase Price\"]) ) * 100).toFixed(2) }}"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "e0876374-c9f3-4253-8764-9aa78faa2193",
+      "name": "SendGrid",
+      "notes": "This sendGrid node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.sendGrid",
+      "typeVersion": 1,
+      "position": [
+        1780,
+        200
+      ],
+      "parameters": {
+        "subject": "Investment report",
+        "toEmail": "mutedjam@n8n.io",
+        "resource": "mail",
+        "fromEmail": "mutedjam@n8n.io",
+        "contentType": "text/html",
+        "contentValue": "={{ $json[\"html\"] }}",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "sendGridApi": {
+          "id": "{{ $credentials.sendGridApi.id }}",
+          "name": "SendGrid account"
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

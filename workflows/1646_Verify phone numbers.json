@@ -1,0 +1,88 @@
+{
+  "active": false,
+  "name": "Verify phone numbers",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "ec30d4c4-b774-44bf-9907-de690a2bcf64",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        440,
+        510
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "e10a7e80-6a96-47df-a8cf-07ff6c5dbe88",
+      "name": "Create Phone Item",
+      "notes": "This functionItem node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.functionItem",
+      "typeVersion": 1,
+      "position": [
+        640,
+        510
+      ],
+      "parameters": {
+        "functionCode": "item.phone = \"+34605281220\";\nreturn item;"
+      }
+    },
+    {
+      "id": "0a3c8825-8dbb-4040-9da6-d0b63467ad2a",
+      "name": "Parse and Validate Phone",
+      "notes": "This uproc node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.uproc",
+      "typeVersion": 1,
+      "position": [
+        850,
+        510
+      ],
+      "parameters": {
+        "tool": "getPhoneParsed",
+        "phone": "={{$node[\"Create Phone Item\"].json[\"phone\"]}}",
+        "additionalOptions": {}
+      },
+      "credentials": {
+        "uprocApi": "miquel-uproc"
+      }
+    },
+    {
+      "id": "67fe16f9-c711-4fbd-a076-e91e2347c7a9",
+      "name": "Phone is Valid?",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        510
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$node[\"Parse and Validate Phone\"].json[\"message\"][\"valid\"]+\"\"}}",
+              "value2": "true"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "error-54b0b59b",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

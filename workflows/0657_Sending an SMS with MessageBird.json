@@ -1,0 +1,54 @@
+{
+  "active": false,
+  "name": "Sending an SMS with MessageBird",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "8832742f-bb2e-4247-babc-e1fef154d330",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "3816b3ec-8419-450d-8404-77b700ecd835",
+      "name": "MessageBird",
+      "notes": "This messageBird node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.messageBird",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "message": "",
+        "originator": "",
+        "recipients": "",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "messageBirdApi": ""
+      }
+    },
+    {
+      "id": "error-9af517f1",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

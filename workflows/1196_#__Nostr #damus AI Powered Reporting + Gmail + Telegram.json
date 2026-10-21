@@ -1,0 +1,528 @@
+{
+  "active": false,
+  "name": "#??Nostr #damus AI Powered Reporting + Gmail + Telegram",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "e9c4c7bf-0cce-456e-9b95-726669e4b260",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -500,
+        -60
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "b8f57e15-8a6e-4a29-a6e8-745bebbd1f44",
+      "name": "Get HTML",
+      "notes": "This markdown node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        880,
+        -840
+      ],
+      "parameters": {
+        "mode": "markdownToHtml",
+        "options": {},
+        "markdown": "={{ $json.text }}"
+      }
+    },
+    {
+      "id": "8b212119-9b69-449c-8a3b-4fdc5b085f30",
+      "name": "Gmail Themes",
+      "webhookId": "e07f9378-bfa5-48ac-88fd-0ef88a725ede",
+      "notes": "This gmail node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1080,
+        -840
+      ],
+      "parameters": {
+        "sendTo": "joe@example.com",
+        "message": "={{ $json.data }}",
+        "options": {
+          "appendAttribution": false
+        },
+        "subject": "#damus"
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y4RWMfx2YG0VDaFJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "id": "b7fc214b-72cb-4caf-8563-7b2f13a1110d",
+      "name": "Get HTML Report",
+      "notes": "This markdown node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        880,
+        80
+      ],
+      "parameters": {
+        "mode": "markdownToHtml",
+        "options": {},
+        "markdown": "={{ $json.text }}"
+      }
+    },
+    {
+      "id": "dd7580bc-f97c-4ad1-8556-2329f88bea75",
+      "name": "#damus Themes List",
+      "notes": "This chainLlm node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.5,
+      "position": [
+        500,
+        -400
+      ],
+      "parameters": {
+        "text": "=Extract a list of themes from this: {{ $json.text }}\n\nDo not include any preamble or further explanation.",
+        "promptType": "define"
+      }
+    },
+    {
+      "id": "60a9d8fe-4ba0-4450-8073-4108b832981e",
+      "name": "#damus Thread Themes",
+      "notes": "This chainLlm node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.5,
+      "position": [
+        500,
+        -840
+      ],
+      "parameters": {
+        "text": "=Tell me the theme and highlight some common threads associated with these Nostr threads that are all #damus.  Specifically mention the main reason #damus is hashtagged.  These are the threads: {{ $json.content.toJsonString() }}",
+        "promptType": "define"
+      }
+    },
+    {
+      "id": "72ab08a7-f729-46e3-8a4d-56005cabaf17",
+      "name": "#damus Themes & Threads Report",
+      "notes": "This chainLlm node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.5,
+      "position": [
+        500,
+        80
+      ],
+      "parameters": {
+        "text": "=**Task:** Analyze the attached file containing Nostr threads using the hashtag #damus. Provide a detailed report with examples thread based on the following themes.  Got deep and seek out the underlying motivation of the users who posted the threads: \n\n## Themes\n{{ $json.text }}\n\n1. **Overall Theme:** Summarize the central topic(s) discussed across the threads.\n2. **Common Threads:** Identify recurring topics or ideas that unify the posts.\n3. **Key Highlights:** Extract specific examples or quotes that illustrate prominent themes.\n4. **Insights and Observations:** Offer insights on how the #damus community engages with the app and its ecosystem.\n5. **Suggestions for Improvement:** If applicable, suggest ways to enhance user experience or community engagement based on the analysis.\n\n**Requirements:**\n- Expand on each theme with comprehensive details and analysis.\n- Use bullet points or numbered lists for clarity.\n- Include relevant quotes or examples from the text to support your analysis.\n- Ensure your response is detailed, well-structured, and easy to read.\n\n**Context:** The analysis should focus on understanding how users interact with Damus, their appreciation for its features, challenges they face, and how it fits into the broader Nostr ecosystem.\n\n## Nostr thread with hashtag #damus: \n{{ $json.content.toJsonString() }}\n\n",
+        "promptType": "define"
+      }
+    },
+    {
+      "id": "55362e03-ca0b-4f5e-a7ff-02828522fc7d",
+      "name": "gemini-2.0-flash-lite-preview",
+      "notes": "This lmChatGoogleGemini node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        600,
+        -680
+      ],
+      "parameters": {
+        "options": {
+          "temperature": 0.4
+        },
+        "modelName": "=models/gemini-2.0-flash-lite-preview"
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "L9UNQHflYlyF9Ngd",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "id": "7f457b3f-d39b-4062-ada0-5e81f3768857",
+      "name": "gemini-2.0-flash-lite-preview1",
+      "notes": "This lmChatGoogleGemini node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        600,
+        -240
+      ],
+      "parameters": {
+        "options": {
+          "temperature": 0.4
+        },
+        "modelName": "models/gemini-2.0-flash-lite-preview"
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "L9UNQHflYlyF9Ngd",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "id": "bd68e36a-2fa7-4b78-96d8-9c4f97388249",
+      "name": "gemini-2.0-flash-lite-preview2",
+      "notes": "This lmChatGoogleGemini node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        600,
+        240
+      ],
+      "parameters": {
+        "options": {
+          "temperature": 0.4
+        },
+        "modelName": "models/gemini-2.0-flash-lite-preview"
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "L9UNQHflYlyF9Ngd",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "id": "24f378ca-8a10-441f-886d-136314fa30de",
+      "name": "Gmail Report",
+      "webhookId": "e07f9378-bfa5-48ac-88fd-0ef88a725ede",
+      "notes": "This gmail node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1080,
+        80
+      ],
+      "parameters": {
+        "sendTo": "joe@example.com",
+        "message": "={{ $json.data }}",
+        "options": {
+          "appendAttribution": false
+        },
+        "subject": "#damus"
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y4RWMfx2YG0VDaFJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "id": "f4814872-577a-4243-ac1b-e152e147dca0",
+      "name": "Aggregate #damus Content",
+      "notes": "This aggregate node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        120,
+        -140
+      ],
+      "parameters": {
+        "options": {},
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "content"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "d2079c9e-b743-4353-bda9-e269168f5461",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        360,
+        -940
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 960,
+        "height": 420,
+        "content": "## #damus Threads Themes"
+      }
+    },
+    {
+      "id": "5f69afb5-6e3c-4f65-84bb-8c1f4544b2c5",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        360,
+        -480
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 520,
+        "height": 420,
+        "content": "## #damus Threads Themes"
+      }
+    },
+    {
+      "id": "6de3d9d2-98be-4102-9ed5-cda48b37eee7",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        360,
+        -20
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 960,
+        "height": 420,
+        "content": "## #damus Threads & Threads Report"
+      }
+    },
+    {
+      "id": "42f333ce-bdd7-4950-9ef1-ae797a671f5d",
+      "name": "Merge Themes and Content",
+      "notes": "This merge node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1000,
+        -160
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {},
+        "combineBy": "combineByPosition"
+      }
+    },
+    {
+      "id": "7ff77e60-03ed-4937-b923-74a7f588fd2a",
+      "name": "Schedule Trigger",
+      "notes": "This scheduleTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -500,
+        -260
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      }
+    },
+    {
+      "id": "d1939a96-1e68-4d90-a456-55852c941e28",
+      "name": "Sticky Note3",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        -580
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 340,
+        "height": 700,
+        "content": "## Get Nostr Threads with Hashtag #damus\n\nThe social network you control\nYour very own social network for your friends or business.\nAvailable Now on iOS, iPad and macOS (M1/M2)\n\n{{ $env.WEBHOOK_URL }}\n{{ $env.WEBHOOK_URL }}\n{{ $env.WEBHOOK_URL }}\n\n### n8n Community Node {{ $env.WEBHOOK_URL }}\n"
+      }
+    },
+    {
+      "id": "89905442-bf8d-40d2-a9b1-fb3cf3a2ac44",
+      "name": "Sticky Note4",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        940,
+        -640
+      ],
+      "parameters": {
+        "width": 320,
+        "height": 280,
+        "content": "## Telegram \n"
+      }
+    },
+    {
+      "id": "aee0f3eb-7b0e-4df1-968d-5abe1c22e26a",
+      "name": "Sticky Note5",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        940,
+        280
+      ],
+      "parameters": {
+        "width": 320,
+        "height": 280,
+        "content": "## Telegram \n"
+      }
+    },
+    {
+      "id": "f6b00109-74ef-4522-b568-6426b054bea3",
+      "name": "Telegram Themes",
+      "webhookId": "8406b3d2-5ac6-452d-847f-c0886c8cd058",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        -560
+      ],
+      "parameters": {
+        "text": "={{ $json.text.slice(0, 4000) }}",
+        "chatId": "={{ $env.TELEGRAM_CHAT_ID }}",
+        "additionalFields": {
+          "parse_mode": "HTML",
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "pAIFhguJlkO3c7aQ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "3e7e9c70-43c6-4074-be9a-2f5ed6c4fb0e",
+      "name": "Telegram Themes & Threads",
+      "webhookId": "8406b3d2-5ac6-452d-847f-c0886c8cd058",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        360
+      ],
+      "parameters": {
+        "text": "={{ $json.text.slice(0, 4000) }}",
+        "chatId": "={{ $env.TELEGRAM_CHAT_ID }}",
+        "additionalFields": {
+          "parse_mode": "HTML",
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "pAIFhguJlkO3c7aQ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "5bc52456-7bbc-445a-8ffd-f47403a4b978",
+      "name": "Sticky Note6",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -580,
+        -340
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 260,
+        "height": 460,
+        "content": "## Try Me!"
+      }
+    },
+    {
+      "id": "3b61555e-4e20-41d2-8fb7-490a2488f5f2",
+      "name": "Nostr Read #damus",
+      "notes": "This nostrobotsread node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-nostrobots.nostrobotsread",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        -140
+      ],
+      "parameters": {
+        "from": 180,
+        "hashtag": "#damus",
+        "strategy": "hashtag"
+      }
+    },
+    {
+      "id": "error-0cef2bde",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "gemini-2.0-flash-lite-preview": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gemini-2.0-flash-lite-preview1": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gemini-2.0-flash-lite-preview2": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Themes": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Themes & Threads": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "active": false,
+  "name": "Manualtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "7d722d43-7ed2-44dd-9c0a-e85558da9fef",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        420,
+        260
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "341ed8e4-00fe-412c-ab1b-7cec45980a29",
+      "name": "Salesforce",
+      "notes": "This salesforce node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.salesforce",
+      "typeVersion": 1,
+      "position": [
+        620,
+        260
+      ],
+      "parameters": {
+        "company": "CompanyInc",
+        "lastname": "DudeOne",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "salesforceOAuth2Api": "salesforce_creds"
+      }
+    },
+    {
+      "id": "71afc216-a9b3-41d6-b054-5e9295e4171d",
+      "name": "Salesforce1",
+      "notes": "This salesforce node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.salesforce",
+      "typeVersion": 1,
+      "position": [
+        810,
+        260
+      ],
+      "parameters": {
+        "leadId": "={{$node[\"Salesforce\"].json[\"id\"]}}",
+        "operation": "update",
+        "updateFields": {
+          "city": "Berlin"
+        }
+      },
+      "credentials": {
+        "salesforceOAuth2Api": {
+          "id": null,
+          "name": "salesforce_creds"
+        }
+      }
+    },
+    {
+      "id": "9f08393c-e1b1-49fe-9d98-47402ebf27f2",
+      "name": "Salesforce2",
+      "notes": "This salesforce node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.salesforce",
+      "typeVersion": 1,
+      "position": [
+        1020,
+        260
+      ],
+      "parameters": {
+        "title": "Deal Won!",
+        "leadId": "={{$node[\"Salesforce\"].json[\"id\"]}}",
+        "options": {},
+        "operation": "addNote"
+      },
+      "credentials": {
+        "salesforceOAuth2Api": {
+          "id": null,
+          "name": "salesforce_creds"
+        }
+      }
+    },
+    {
+      "id": "error-a6a06520",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

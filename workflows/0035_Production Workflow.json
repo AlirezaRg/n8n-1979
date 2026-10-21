@@ -1,0 +1,70 @@
+{
+  "active": false,
+  "name": "Production Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-bf2ca1fc",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        700,
+        350
+      ],
+      "parameters": {
+        "path": "test",
+        "responseData": "firstEntryBinary",
+        "responseMode": "lastNode"
+      },
+      "webhookId": "3a176ef6-4dc1-4a56-8bbe-0d2ffd4f2c36"
+    },
+    {
+      "id": "node-ced985e7",
+      "name": "Edit Image",
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        350
+      ],
+      "parameters": {
+        "text": "=They found the killer it was {{$node[\"Webhook\"].data[\"query\"][\"name\"]}}!",
+        "fontSize": "=25",
+        "operation": "text",
+        "positionX": 150,
+        "positionY": 180,
+        "lineLength": 18
+      }
+    },
+    {
+      "id": "node-1b4d9aa1",
+      "name": "Read File URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        900,
+        350
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "responseFormat": "file"
+      }
+    },
+    {
+      "id": "error-de43016b",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

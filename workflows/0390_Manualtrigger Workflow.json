@@ -1,0 +1,125 @@
+{
+  "active": false,
+  "name": "Manualtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "6882e5c9-a468-4089-bffa-c8c04d28d8aa",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        380,
+        240
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "5688dfe6-aeba-4c00-8626-396eb1a5d695",
+      "name": "Write Result File to Disk",
+      "notes": "This readWriteFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        980,
+        240
+      ],
+      "parameters": {
+        "options": {},
+        "fileName": "document.pdf",
+        "operation": "write",
+        "dataPropertyName": "=data"
+      }
+    },
+    {
+      "id": "fde98636-e4a2-4950-9b82-015ff841f24b",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        720,
+        100
+      ],
+      "parameters": {
+        "width": 218,
+        "height": 132,
+        "content": "## Authentication\nConversion requests must be authenticated. Please create \n[ConvertAPI account to get authentication secret]({{ $env.API_BASE_URL }}"
+      }
+    },
+    {
+      "id": "c322b7d4-0858-45de-a5ed-0efddb2608c9",
+      "name": "Download XLSX File",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        580,
+        240
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "3f3d190e-0c39-4a99-a65e-cb7c5e1e0f65",
+      "name": "File conversion to PDF",
+      "notesInFlow": true,
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        780,
+        240
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "sendHeaders": true,
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "file",
+              "parameterType": "formBinaryData",
+              "inputDataFieldName": "=data"
+            }
+          ]
+        },
+        "genericAuthType": "httpQueryAuth",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/octet-stream"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "WdAklDMod8fBEMRk",
+          "name": "Query Auth account"
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

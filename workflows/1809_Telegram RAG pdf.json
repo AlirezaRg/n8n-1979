@@ -1,0 +1,481 @@
+{
+  "active": false,
+  "name": "Telegram RAG pdf",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "9fbce801-8c42-43a4-bc70-d93042d68b2c",
+      "name": "Telegram Trigger",
+      "webhookId": "b178f034-9997-4832-9bb4-a43c3015506e",
+      "notes": "This telegramTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -220,
+        240
+      ],
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "1bfc1fbd-86b1-4a8a-9301-fe54497f5acd",
+      "name": "Embeddings OpenAI",
+      "notes": "This embeddingsOpenAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        720,
+        460
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "d5ad7851-ed40-4b3a-b0d5-aeaf04362f1c",
+      "name": "Default Data Loader",
+      "notes": "This documentDefaultDataLoader node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        860,
+        460
+      ],
+      "parameters": {
+        "options": {},
+        "dataType": "binary"
+      }
+    },
+    {
+      "id": "fed803d0-49a2-4b82-8f20-a02a10caa027",
+      "name": "Recursive Character Text Splitter",
+      "notes": "This textSplitterRecursiveCharacterTextSplitter node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        940,
+        680
+      ],
+      "parameters": {
+        "options": {},
+        "chunkSize": 3000,
+        "chunkOverlap": 200
+      }
+    },
+    {
+      "id": "ab60f36f-fada-4812-8dbd-441ad372cb80",
+      "name": "Stop and Error",
+      "notes": "This stopAndError node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        220,
+        840
+      ],
+      "parameters": {
+        "errorMessage": "An error occurred"
+      }
+    },
+    {
+      "id": "c87f1db3-7cc9-4063-9895-4b4d68ea53a1",
+      "name": "Question and Answer Chain",
+      "notes": "This chainRetrievalQa node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.3,
+      "position": [
+        -280,
+        500
+      ],
+      "parameters": {
+        "text": "={{ $json.message.text }}\nSearch the database with the retriever for information for the answer",
+        "promptType": "define"
+      }
+    },
+    {
+      "id": "c9bc4c80-8e57-48bc-a405-131ed7348c1d",
+      "name": "Vector Store Retriever",
+      "notes": "This retrieverVectorStore node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        680
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "0217056f-2b71-4308-adf1-19dcd4d2cc11",
+      "name": "Pinecone Vector Store1",
+      "notes": "This vectorStorePinecone node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        860
+      ],
+      "parameters": {
+        "options": {},
+        "pineconeIndex": {
+          "__rl": true,
+          "mode": "list",
+          "value": "telegram",
+          "cachedResultName": "telegram"
+        }
+      },
+      "credentials": {
+        "pineconeApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "693f9026-f47f-48dc-8e5d-e8b832a37235",
+      "name": "Groq Chat Model",
+      "notes": "This lmChatGroq node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -380,
+        660
+      ],
+      "parameters": {
+        "model": "llama-3.1-70b-versatile",
+        "options": {}
+      },
+      "credentials": {
+        "groqApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "c7acf014-138f-4be7-b569-c309bb10e50d",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        500,
+        73.04879287725316
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 1139.5159692915001,
+        "height": 873.6068151028411,
+        "content": "# Load data into database\nFetch file from **Telegram**, split it into chunks and insert into **Pinecone** index, a message from **Telegram** will be sent just to let the user know that the process finished"
+      }
+    },
+    {
+      "id": "dd3b9d8b-5771-4a09-8c1b-794cb8737d5d",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -878.769,
+        400
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 1344.7918019808176,
+        "height": 806.8716167324012,
+        "content": "# Chat with Database\n\n1. **Receive** the incoming chat message.\n2. **Retrieve** relevant chunks from the _vector store_.\n3. **Pass** these chunks to the model.\n\nThe model will use the retrieved information to **formulate a precise response**.\n"
+      }
+    },
+    {
+      "id": "9aaf575a-5e40-407c-951c-10b1d16e5d3c",
+      "name": "Check If is a document",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        220,
+        240
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "8839993b-9fe7-4e1e-a1cc-fe5de6b0bb62",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.message.document }}",
+              "rightValue": ""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "c1edb6bf-ba95-4a5f-9626-add673274086",
+      "name": "Change to application/pdf",
+      "notes": "This code node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        220
+      ],
+      "parameters": {
+        "jsCode": "// Fun��o para modificar os metadados do arquivo bin�rio\nfunction modifyBinaryMetadata(items) {\n for (const item of items) {\n if (item.binary && item.binary.data) {\n // Modifica o tipo MIME\n item.binary.data.mimeType = 'application/pdf';\n \n // Garante que o nome do arquivo termine com .pdf\n if (!item.binary.data.fileName.toLowerCase().endsWith('.pdf')) {\n item.binary.data.fileName += '.pdf';\n }\n \n // Atualiza o contentType no fileType (se existir)\n if (item.binary.data.fileType) {\n item.binary.data.fileType.contentType = 'application/pdf';\n }\n }\n }\n return items;\n}\n\n// Aplica a modifica��o e retorna os itens atualizados\nreturn modifyBinaryMetadata($input.all());"
+      }
+    },
+    {
+      "id": "ea4d4e74-8954-47f0-a3a0-662d47ea2298",
+      "name": "Telegram get File",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        520,
+        220
+      ],
+      "parameters": {
+        "fileId": "={{ $json.message.document.file_id }}",
+        "resource": "file"
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": ""
+        }
+      },
+      "webhookId": "f6f313e3-8159-43f8-bc64-7768a439b7e6"
+    },
+    {
+      "id": "cf548bee-d5d5-4f1a-a059-932ea163e155",
+      "name": "Embeddings",
+      "notes": "This embeddingsOpenAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        1080
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "e3bd4759-80cc-42bb-ba53-f9e88e9ba916",
+      "name": "Telegram Response",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "onError": "continueErrorOutput",
+      "position": [
+        160,
+        560
+      ],
+      "parameters": {
+        "text": "={{ $json.response.text }}",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": ""
+        }
+      },
+      "webhookId": "4c15ca0f-957e-486c-b6eb-f1bf94a94970"
+    },
+    {
+      "id": "e478df48-9e6d-4a84-89be-beb569914ae3",
+      "name": "Telegram Response about Database",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "onError": "continueErrorOutput",
+      "position": [
+        1400,
+        220
+      ],
+      "parameters": {
+        "text": "={{ $json.metadata.pdf.totalPages }} pages saved on Pinecone",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": ""
+        }
+      },
+      "webhookId": "a2849956-5fa5-40c2-b96f-7bdb9ae7da94"
+    },
+    {
+      "id": "5be7a321-1be6-4173-83de-3d569666718d",
+      "name": "Stop and Error1",
+      "notes": "This stopAndError node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1400,
+        580
+      ],
+      "parameters": {
+        "errorMessage": "An error occurred."
+      }
+    },
+    {
+      "id": "aae26861-f34d-4b59-bd99-3662fbd6676c",
+      "name": "Pinecone Vector Store",
+      "notes": "This vectorStorePinecone node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        880,
+        220
+      ],
+      "parameters": {
+        "mode": "insert",
+        "options": {},
+        "pineconeIndex": {
+          "__rl": true,
+          "mode": "list",
+          "value": "telegram",
+          "cachedResultName": "telegram"
+        }
+      },
+      "credentials": {
+        "pineconeApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "312fb807-4225-4630-ab32-aa12fe07c127",
+      "name": "Limit to 1",
+      "notes": "This limit node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        1220,
+        220
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "error-c3a23834",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram get File": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Response": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Response about Database": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,187 @@
+{
+  "active": false,
+  "name": "Line Chatbot Handling AI Responses with Groq and Llama3",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "9b936123-7f31-4ddc-b1ca-fd172da9c5a8",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -200
+      ],
+      "parameters": {
+        "width": 440,
+        "content": "## Line AI Chatbot with Groq \nThis workflow automates the process of handling messages from Line Messaging API by sending message to Groq as your AI assistant and reply back to you. In this workflow, you can see that there is no JSON error when sending long and complex message."
+      }
+    },
+    {
+      "id": "0d75416e-58f0-4411-8904-7051f0d1c06a",
+      "name": "Line: Messaging API",
+      "webhookId": "befed026-573c-4d3a-9113-046ea8ae5930",
+      "notes": "This webhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "path": "befed026-573c-4d3a-9113-046ea8ae5930",
+        "options": {},
+        "httpMethod": "POST"
+      }
+    },
+    {
+      "id": "e363c981-acdf-4048-a531-31808cd3edc5",
+      "name": "Get Messages",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        300,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "654c2465-5531-46fb-9b11-74cc23c899a9",
+              "name": "body.events[0].message.text",
+              "type": "string",
+              "value": "={{ $json.body.events[0].message.text }}"
+            },
+            {
+              "id": "be878a5c-f3e2-40c4-b8f2-6c6708b3b2ad",
+              "name": "body.events[0].message.id",
+              "type": "string",
+              "value": "={{ $json.body.events[0].message.id }}"
+            },
+            {
+              "id": "de79a8fe-d9fb-4bf4-a2a7-df3969b194a4",
+              "name": "body.events[0].source.userId",
+              "type": "string",
+              "value": "={{ $json.body.events[0].source.userId }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "6e0b17ab-9f38-4a73-b650-b35bd51657e4",
+      "name": "Groq AI Assistant",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        580,
+        0
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $json.body.events[0].message.text }}\"\n    }\n  ],\n  \"model\": \"llama-3.3-70b-versatile\",\n  \"temperature\": 1,\n  \"max_completion_tokens\": 2500,\n  \"top_p\": 1,\n  \"stream\": null,\n  \"stop\": null\n} ",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "iqHHZfH8mAbuFprI",
+          "name": "Groq Authorization"
+        }
+      }
+    },
+    {
+      "id": "25e929d1-3a38-45e1-a089-1cab0919f49d",
+      "name": "Line: Reply Message",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        860,
+        0
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n  \"replyToken\":\"{{ $('Line: Messaging API').item.json.body.events[0].replyToken }}\",\n  \"messages\":[\n    {\n      \"type\":\"text\",\n      \"text\": {{ JSON.stringify($('Groq AI Assistant).item.json.choices[0].message.content) }}\n    }\n  ]\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "hX58q9WFQLFROFui",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "id": "efcd27d2-a347-4ec4-8190-ccbef6616dd5",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        160
+      ],
+      "parameters": {
+        "width": 260,
+        "content": "## LINE Messaging API \nGet the access token from Line Business {{ $env.WEBHOOK_URL }}"
+      }
+    },
+    {
+      "id": "0c720dac-7c64-4635-9ef0-b92a4886db14",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        220,
+        160
+      ],
+      "parameters": {
+        "content": "## Get Message\nGet message from Line account."
+      }
+    },
+    {
+      "id": "b7afaacd-7d23-44e0-a601-81f7907b7af2",
+      "name": "Sticky Note3",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        500,
+        160
+      ],
+      "parameters": {
+        "content": "## Groq API Key\nApply Groq account and get API key then you should set ```max_completion_tokens``` less than 5000 because of Line message limitation"
+      }
+    },
+    {
+      "id": "e10ae59d-374a-4926-8f38-6baa79f4782b",
+      "name": "Sticky Note4",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        780,
+        160
+      ],
+      "parameters": {
+        "content": "## Reply message\nUse replyToken from Line messaging API and use ```choices[].message.content``` to reply to you."
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,110 @@
+{
+  "active": false,
+  "name": "Manualtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "ffb26ade-7765-40bd-bf07-0d09f6096311",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        400
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "ade77d12-61a6-4f65-ace3-ad36954aaf4f",
+      "name": "Telegram",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        500,
+        400
+      ],
+      "parameters": {
+        "text": "Hello",
+        "chatId": "={{$node[\"SplitInBatches\"].json[\"Chat ID\"]}}",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": null,
+          "name": "telegram-bot"
+        }
+      },
+      "webhookId": "3f03613d-72e5-433a-acdc-2d77f1ec7825"
+    },
+    {
+      "id": "ba5dd47a-c8a7-4583-be97-f9b40fc9e9c0",
+      "name": "Google Sheets",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        120,
+        400
+      ],
+      "parameters": {
+        "range": "A:A",
+        "options": {},
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": null,
+          "name": "google-sheet"
+        }
+      }
+    },
+    {
+      "id": "c98760ad-9c18-4276-b9b9-8dc134ec7a1a",
+      "name": "SplitInBatches",
+      "notes": "This splitInBatches node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        320,
+        400
+      ],
+      "parameters": {
+        "options": {},
+        "batchSize": 30
+      }
+    },
+    {
+      "id": "3a508bb0-ffe3-46af-a917-f5d9c1d70a64",
+      "name": "Wait1",
+      "webhookId": "22fca54c-eac4-44bc-adf7-68b33818695c",
+      "notes": "This wait node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        660,
+        180
+      ],
+      "parameters": {
+        "unit": "seconds",
+        "amount": 30
+      }
+    },
+    {
+      "id": "error-b8bbb029",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

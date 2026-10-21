@@ -1,0 +1,687 @@
+{
+  "active": false,
+  "name": "YT AI News Playlist Creator/AI News Form Updater",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "a871e87e-dc02-4364-83b3-fe378ca60687",
+      "name": "Read Channel Names",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        860,
+        100
+      ],
+      "parameters": {
+        "options": {},
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": 944489068,
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "AI News Channels"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1RNah4ZZsLxflQXvMq8AEn3BFpscOC2ygMZ1dPTlk-Kk",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Media Links"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "LXIVLIr0wD38Xaty",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "bcc83a11-e7e1-4bcb-a054-a2f0cc26c5f0",
+      "name": "Get Videos",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1020,
+        100
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "options": {},
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "part",
+              "value": "snippet"
+            },
+            {
+              "name": "publishedAfter",
+              "value": "={{ $now.minus(1, 'day') }}"
+            },
+            {
+              "name": "maxResults",
+              "value": "5"
+            },
+            {
+              "name": "channel_id",
+              "value": "={{ $('Read Channel Names').item.json['Channel Id'] }}"
+            },
+            {
+              "name": "order",
+              "value": "date"
+            },
+            {
+              "name": "key",
+              "value": "AddYourAPIKeyHere"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "6da4a908-1705-4d3a-8f1a-aa73e36866c7",
+      "name": "Split Out",
+      "notes": "This splitOut node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1160,
+        100
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "items"
+      }
+    },
+    {
+      "id": "1f7ab323-fb52-4a41-bf71-9594e4d1c78d",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        140,
+        0
+      ],
+      "parameters": {
+        "width": 220,
+        "height": 260,
+        "content": "## Initiation\nThis section starts the workflow sets the time."
+      }
+    },
+    {
+      "id": "e17f2b65-3320-46aa-b360-2366691053cd",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        800,
+        0
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 660,
+        "height": 260,
+        "content": "## Getting the Videos\nThis section grabs the videos."
+      }
+    },
+    {
+      "id": "d950c171-0993-4e51-8942-18dca557c70a",
+      "name": "Create Playlist",
+      "notes": "This youTube node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        440,
+        100
+      ],
+      "parameters": {
+        "title": "={{ $today.format('yyLLdd') }} AI News",
+        "options": {},
+        "resource": "playlist",
+        "operation": "create"
+      },
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "alrF3L4QeYVd4Ckn",
+          "name": "YouTube account"
+        }
+      }
+    },
+    {
+      "id": "1d292e23-4efc-4377-aacf-8c5b9c54e524",
+      "name": "Delete Old Playlist",
+      "notes": "This youTube node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        580,
+        -220
+      ],
+      "parameters": {
+        "options": {},
+        "resource": "playlist",
+        "operation": "delete",
+        "playlistId": "={{ $json['New Playlist ID'] }}"
+      },
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "alrF3L4QeYVd4Ckn",
+          "name": "YouTube account"
+        }
+      }
+    },
+    {
+      "id": "26ddb0d4-4ae8-485c-8909-00c70230ce76",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        400,
+        -340
+      ],
+      "parameters": {
+        "color": 3,
+        "width": 380,
+        "height": 280,
+        "content": "## Delete Yesterday's Playlist\nThis section deletes the playlist created yesterday. (do not include this on your first run; or, your workflow will stop)"
+      }
+    },
+    {
+      "id": "c4756eb6-c080-48dd-9941-511fbf405fbe",
+      "name": "Sticky Note3",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        400,
+        0
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 360,
+        "height": 260,
+        "content": "## Create New AI News Playlist\nThis section creates today's playlist."
+      }
+    },
+    {
+      "id": "33308ef0-fb86-4bce-a81f-0c5ddc4215a1",
+      "name": "YouTube",
+      "notes": "This youTube node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        1580,
+        100
+      ],
+      "parameters": {
+        "options": {},
+        "videoId": "={{ $('Split Out').item.json.id.videoId }}",
+        "resource": "playlistItem",
+        "playlistId": "={{ $('Create Playlist').item.json.id }}"
+      },
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "alrF3L4QeYVd4Ckn",
+          "name": "YouTube account"
+        }
+      }
+    },
+    {
+      "id": "2db4a5e2-f177-4c45-a890-8bf140971882",
+      "name": "Sticky Note4",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        0
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 280,
+        "height": 260,
+        "content": "## Add Videos to Playlist\nThis section adds videos to the playlist created today."
+      }
+    },
+    {
+      "id": "7c2945de-9912-4db0-bd4f-6c222b8ebeaf",
+      "name": "Filter Out Upcoming",
+      "notes": "This filter node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1300,
+        100
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "or",
+          "conditions": [
+            {
+              "id": "8884d2e9-b06d-4347-9635-846d7dea168f",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              },
+              "leftValue": "={{ $json.snippet.liveBroadcastContent }}",
+              "rightValue": "upcoming"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "d822a00b-acfc-4838-ae50-37103e581cbf",
+      "name": "Save Playlist ID",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        600,
+        100
+      ],
+      "parameters": {
+        "columns": {
+          "value": {
+            "Playlist Group": "AI News",
+            "New Playlist ID": "={{ $json.id }}"
+          },
+          "schema": [
+            {
+              "id": "Playlist Group",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "Playlist Group",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "New Playlist ID",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "New Playlist ID",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": true,
+              "required": false,
+              "displayName": "row_number",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "Playlist Group"
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {},
+        "operation": "update",
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": 1541621778,
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "PlaylistId"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1RNah4ZZsLxflQXvMq8AEn3BFpscOC2ygMZ1dPTlk-Kk",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Media Links"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "LXIVLIr0wD38Xaty",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "bbbcbe5b-5594-44cb-bb1d-897498b61810",
+      "name": "Google Sheets",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        440,
+        -220
+      ],
+      "parameters": {
+        "options": {},
+        "filtersUI": {
+          "values": [
+            {
+              "lookupValue": "AI News",
+              "lookupColumn": "Playlist Group"
+            }
+          ]
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": 1541621778,
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "PlaylistId"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1RNah4ZZsLxflQXvMq8AEn3BFpscOC2ygMZ1dPTlk-Kk",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Media Links"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "LXIVLIr0wD38Xaty",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "20d814e1-4f1e-4313-949b-961556cd40bf",
+      "name": "Telegram",
+      "webhookId": "5007b956-14f6-4275-ab8d-2c47050b6007",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1880,
+        100
+      ],
+      "parameters": {
+        "text": "Your AI News YT Playlist has been updated.",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "FeG2VD9QbvSMvLxW",
+          "name": "Dinar Newscaster"
+        }
+      }
+    },
+    {
+      "id": "b0cfab69-ad82-4d65-8106-0bd4b23dfdb3",
+      "name": "Sticky Note5",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1820,
+        0
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 280,
+        "height": 260,
+        "content": "## Notification of Completion (optional)"
+      }
+    },
+    {
+      "id": "57ef08c8-b7ca-4af6-963a-67a3d2b80176",
+      "name": "0715 Trigger",
+      "notes": "This scheduleTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        180,
+        100
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7,
+              "triggerAtMinute": 15
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "d3003e8a-aa46-437e-b246-b9030578ea49",
+      "name": "Get Channels",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        800,
+        -640
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "options": {},
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $json['Channel User Name'] }}"
+            },
+            {
+              "name": "type",
+              "value": "channel"
+            },
+            {
+              "name": "maxResults",
+              "value": "1"
+            },
+            {
+              "name": "part",
+              "value": "snippet"
+            },
+            {
+              "name": "key",
+              "value": "YOUR_GOOGLE_API_KEY"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "fde3bac7-77be-4322-9b74-2cb7b9ddd17c",
+      "name": "Update Google Sheet",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1000,
+        -640
+      ],
+      "parameters": {
+        "columns": {
+          "value": {
+            "Link": "={{ $env.WEBHOOK_URL }}{{ $('Read Channel Names1').item.json['Channel User Name'] }}",
+            "Channel Id": "={{ $json.items[0].id.channelId }}",
+            "row_number": "={{ $('Read Channel Names1').item.json.row_number }}",
+            "Channel Name": "={{ $json.items[0].snippet.channelTitle }}"
+          },
+          "schema": [
+            {
+              "id": "Channel Name",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Channel Name",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Link",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Link",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Channel Id",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Channel Id",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Channel User Name",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "required": false,
+              "displayName": "Channel User Name",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": true,
+              "required": false,
+              "displayName": "row_number",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "row_number"
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {},
+        "operation": "update",
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": 944489068,
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "AI News Channels"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1RNah4ZZsLxflQXvMq8AEn3BFpscOC2ygMZ1dPTlk-Kk",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Media Links"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "LXIVLIr0wD38Xaty",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "2b1e067b-436a-4536-ad9f-c55862d496c9",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        440,
+        -640
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "1dd572c5-6762-40a0-88aa-d6a9fa2ca0a3",
+      "name": "Read Channel Names1",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        620,
+        -640
+      ],
+      "parameters": {
+        "options": {},
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": 944489068,
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "AI News Channels"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1RNah4ZZsLxflQXvMq8AEn3BFpscOC2ygMZ1dPTlk-Kk",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Media Links"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "LXIVLIr0wD38Xaty",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "43466e82-dc55-4d4e-a6ff-ff2ed977fb3c",
+      "name": "Sticky Note6",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        380,
+        -740
+      ],
+      "parameters": {
+        "width": 820,
+        "height": 260,
+        "content": "## Create your Channel List\nThis section needs to be put into it's own workflow: this workflow gathers information needed to gather videos for the playlist.  This workflow only needs to be run when a new channel name is added to the Google Sheet."
+      }
+    },
+    {
+      "id": "149373af-ad35-49bc-b751-6ac919d218b0",
+      "name": "Sticky Note7",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        -740
+      ],
+      "parameters": {
+        "width": 820,
+        "height": 700,
+        "content": "## Instructions\n1. To set this up, you need to create a Google Sheet with the following headings in line 1:\n\n   Channel User Name\n   Channel Name\n   Channel Link\n   Channel ID\n\n2. Copy the 'Create your Channel List' into it's own workflow and link the Sheets links to your new sheet.\n\n3. To get the 'Create your Channel List' to work, you need to visit each channel's page that you want included in your playlist; you need to get the \"@\" name of the channel and add it to the 'Channel User Name' column of your Google Sheet.\n\n   For example: if you wanted to include this channel: Recruit Training Videos - Corporal Stock \n   You would look for this name, to add to the next available row of the 'Channel User Name' column: @CorporalStock\n\n4. Once you add all Channel User Names, run the 'Create your Channel list workflow, and it will fill in the remaining details.\n\n5. Now the 'YT Playlist Creator' can be run; but for the first time, disconnect the 'Delete Yesterday's Playlist' leg, or the workflow will error and stop (because there is no 'Yesterday's Playlist'.\n\nNote: this was made to create a playlist every day, delete yesterday's playlist, and only get the last 8 videos posted within the last 24 hours.  I choose to put the date (YYMMDD format) in front of the playlist, to ensure that it doesn't conflict with another playlist.\n\n   Also, I have it notifying me in Telegram, so I know that the new playlist is posted."
+      }
+    }
+  ],
+  "connections": {}
+}

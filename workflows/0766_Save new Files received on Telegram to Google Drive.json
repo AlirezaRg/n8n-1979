@@ -1,0 +1,138 @@
+{
+  "active": false,
+  "name": "Save new Files received on Telegram to Google Drive",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "0fcb072b-ea4b-43b2-ad7c-46ad62b1e2ad",
+      "name": "On new Telegram Message",
+      "webhookId": "1e92584a-dd10-4fec-86a6-3b2691b85bba",
+      "notes": "This telegramTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [
+        900,
+        520
+      ],
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {
+          "download": true
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "EO2PA74ehePPYVFU",
+          "name": "Telegram Notification Bot"
+        }
+      }
+    },
+    {
+      "id": "08e492f8-b969-4de2-b207-17fcd3cb8787",
+      "name": "If Message contains a File",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        520
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "9b876834-1a86-48f1-9890-df60c739c91c",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.message.document }}",
+              "rightValue": ""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "f155a855-0eac-44c0-a52a-93446b9b3455",
+      "name": "Upload File to GDrive",
+      "notes": "This googleDrive node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1500,
+        500
+      ],
+      "parameters": {
+        "name": "={{ $json.message.document.file_name }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "options": {},
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "11gyG2TvG0sqCG202CN-w9rloGW-CzKBc",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Demos"
+        }
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "lFPZxFgMIaEnEtm9",
+          "name": "Google Drive account (automate everything)"
+        }
+      }
+    },
+    {
+      "id": "error-46151ff9",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "On new Telegram Message": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload File to GDrive": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

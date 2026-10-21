@@ -1,0 +1,309 @@
+{
+  "active": false,
+  "name": "Httprequest Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "b9a807c3-5847-477a-a242-2fdf5b15ba7e",
+      "name": "API to Check existing merge request",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "alwaysOutputData": true,
+      "position": [
+        -840,
+        -20
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {
+          "allowUnauthorizedCerts": false
+        },
+        "sendQuery": true,
+        "sendHeaders": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "state",
+              "value": "opened"
+            },
+            {
+              "name": "source_branch",
+              "value": "=sourceBranchName"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "PRIVATE-TOKEN",
+              "value": "=gitlabToken"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "42270a5a-d696-44f3-b2f5-16b2ddb3488c",
+      "name": "Is Exists",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -660,
+        -20
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "d895b8cc-5679-442f-a1bf-d8375174a24b",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "leftValue": "={{ $node[\"API to Check existing merge request\"].data.isEmpty() }}",
+              "rightValue": ""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "d380c943-0525-4976-9e70-c90de1177f0c",
+      "name": "Create New Merge Request",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -440,
+        -200
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "method": "POST",
+        "options": {
+          "allowUnauthorizedCerts": false
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "sendHeaders": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "source_branch",
+              "value": "=sourceBranchName"
+            },
+            {
+              "name": "target_branch",
+              "value": "=targetBranchName"
+            },
+            {
+              "name": "title",
+              "value": "=mergeTitle"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "PRIVATE-TOKEN",
+              "value": "=gitlabToken"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "600a0ed5-cb68-4479-8aee-55b55f0d8630",
+      "name": "Loop Over Items",
+      "notes": "This splitInBatches node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -440,
+        160
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "555643cb-761c-41ec-b983-8e0194851a8d",
+      "name": "API to CLOSE existing Merge Request",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -220,
+        180
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "method": "PUT",
+        "options": {
+          "allowUnauthorizedCerts": false
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "sendHeaders": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "state_event",
+              "value": "close"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "PRIVATE-TOKEN",
+              "value": "=gitlabToken"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "0c94b06a-80e3-4e50-8bac-2bd4015f085e",
+      "name": "Add Custom Notes To Merge Request",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -220,
+        -200
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "method": "POST",
+        "options": {
+          "allowUnauthorizedCerts": false
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "sendHeaders": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "=<mergeComments>"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "PRIVATE-TOKEN",
+              "value": "=gitlabToken"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "8e849f4f-2a52-46ba-9e0a-17126a8d966c",
+      "name": "30 secs wait to approve merge request and pipeline to finish1",
+      "webhookId": "ac7bb2de-2c6f-479a-8807-13a29d8eaf5e",
+      "notes": "This wait node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        140,
+        -200
+      ],
+      "parameters": {
+        "amount": 30
+      }
+    },
+    {
+      "id": "05cca829-b2df-4c1e-9441-56349acc4a0d",
+      "name": "Merge When Pipeline Succeeds",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        -200
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "method": "PUT",
+        "options": {
+          "allowUnauthorizedCerts": false
+        },
+        "jsonBody": "={\n\"merge_when_pipeline_succeeds\": {{ $('setValueForMerge').item.json.merge_when_pipeline_succeeds }},\n  \"should_remove_source_branch\": {{ $('setValueForMerge').item.json.should_remove_source_branch }}\n}",
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "PRIVATE-TOKEN",
+              "value": "=gitlabToken"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "e3ce9cdc-5484-4b4b-8701-6b9089a1f76d",
+      "name": "setValueForMerge",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        460,
+        -200
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a22922c7-0c69-4ac1-bd15-4d289fa57737",
+              "name": "merge_when_pipeline_succeeds",
+              "type": "boolean",
+              "value": false
+            },
+            {
+              "id": "17580668-84d9-4ad6-b93b-e7b6c9c0f8ea",
+              "name": "should_remove_source_branch",
+              "type": "boolean",
+              "value": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "0d49ec98-4806-492e-a6c2-a298ed8bb11a",
+      "name": "Schedule Trigger",
+      "notes": "This scheduleTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1160,
+        -20
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

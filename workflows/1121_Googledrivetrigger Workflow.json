@@ -1,0 +1,55 @@
+{
+  "active": false,
+  "name": "Googledrivetrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "caf7d277-b11e-4a73-9df6-ccf36a490572",
+      "name": "Google Drive Trigger",
+      "notes": "This googleDriveTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        150
+      ],
+      "parameters": {
+        "event": "fileCreated",
+        "options": {},
+        "triggerOn": "specificFolder",
+        "folderToWatch": "1HwOAKkkgveLji8vVpW9Xrg1EsBskwMNb"
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "{{ $credentials.googleDriveOAuth2Api.id }}",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "id": "2ccb8cca-7919-4a9a-b1ea-4d887a170bfd",
+      "name": "Send Email",
+      "notes": "This emailSend node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [
+        450,
+        150
+      ],
+      "parameters": {
+        "text": "=A file in your Google Drive file folder has been created: {{$json[\"name\"]}}",
+        "options": {},
+        "subject": "File Update",
+        "toEmail": "mutedjam@n8n.io",
+        "fromEmail": "mutedjam@n8n.io"
+      },
+      "credentials": {
+        "smtp": {
+          "id": "{{ $credentials.smtp.id }}",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

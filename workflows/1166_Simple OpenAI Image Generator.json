@@ -1,0 +1,150 @@
+{
+  "active": false,
+  "name": "Simple OpenAI Image Generator",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "526c24bc-3bc5-48c3-ae1e-5b0c0352d07f",
+      "name": "Convert to File",
+      "notes": "This convertToFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        440,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "toBinary",
+        "sourceProperty": "data[0].b64_json"
+      }
+    },
+    {
+      "id": "20fdcc11-5e8a-4788-b3a3-e556996b59f7",
+      "name": "Prompt and options",
+      "webhookId": "b749da3f-836f-4996-a8ee-bc26f8677582",
+      "notes": "This formTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "formTitle": "OpenAI Image Generator",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Prompt",
+              "placeholder": "Snow-covered mountain village in the Alps",
+              "requiredField": true
+            },
+            {
+              "fieldType": "dropdown",
+              "fieldLabel": "Image size",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "1024x1024"
+                  },
+                  {
+                    "option": "1024x1536"
+                  },
+                  {
+                    "option": "1536x1024"
+                  }
+                ]
+              },
+              "requiredField": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "eb220b1f-2091-492a-931f-1f2e344b32a6",
+      "name": "OpenAI Image Generation",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "sendBody": true,
+        "sendHeaders": true,
+        "authentication": "{{ $credentials.predefinedCredentialType }}",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "gpt-image-1"
+            },
+            {
+              "name": "prompt",
+              "value": "={{ $json.Prompt }}"
+            },
+            {
+              "name": "n",
+              "value": "={{ 1 }}"
+            },
+            {
+              "name": "size",
+              "value": "={{ $json['Image size'] }}"
+            }
+          ]
+        },
+        "nodeCredentialType": "YOUR_CREDENTIAL_HERE"
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "x1byAha0t8ltLIeW",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "id": "86718927-490e-4d97-9b0c-1118e2ccdcb6",
+      "name": "Return to form",
+      "webhookId": "745af4a8-ab3c-4267-aa8d-a8998cc534e5",
+      "notes": "This form node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        660,
+        0
+      ],
+      "parameters": {
+        "options": {
+          "formTitle": "Result"
+        },
+        "operation": "completion",
+        "respondWith": "returnBinary",
+        "completionTitle": "Result",
+        "completionMessage": "Here is the created image:"
+      }
+    },
+    {
+      "id": "a069f63f-139e-4157-a44a-448224f2c119",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -600,
+        0
+      ],
+      "parameters": {
+        "width": 500,
+        "height": 620,
+        "content": "# Welcome to my Simple OpenAI Image Generator Workflow!\n\nThis workflow creates an image with the new OpenAI image model \"GPT-Image-1\" based on a form input.\n\n## This workflow has the following sequence:\n\n1. Form trigger (image prompt and image size input)\n2. Generate the Image via OpenAI API.\n3. Return the image to the input form for download.\n\n## The following accesses are required for the workflow:\n- OpenAI API access: [Documentation]({{ $env.WEBHOOK_URL }}\n\nYou can contact me via LinkedIn, if you have any questions: {{ $env.WEBHOOK_URL }}"
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,504 @@
+{
+  "active": false,
+  "name": "Calendar_scheduling",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "bd1dae81-daea-4539-bf1d-38eb9a2bd2f0",
+      "name": "Gmail Trigger",
+      "notes": "This gmailTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1,
+      "position": [
+        500,
+        560
+      ],
+      "parameters": {
+        "filters": {
+          "readStatus": "unread",
+          "includeSpamTrash": false
+        },
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y4RWMfx2YG0VDaFJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "id": "a97c3ab1-6fbc-441e-af11-3c746936013b",
+      "name": "Chat OpenAI",
+      "notes": "This lmChatOpenAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        720,
+        740
+      ],
+      "parameters": {
+        "model": "gpt-4",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "wJtZwsVKW5v6R2Iy",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "id": "a1205598-7cd4-4278-ad53-0cfc7c7947ff",
+      "name": "Workflow Tool",
+      "notes": "This toolWorkflow node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1580,
+        759
+      ],
+      "parameters": {
+        "name": "Calendar_Availability",
+        "workflowId": "={{ $workflow.id }}",
+        "description": "Call this tool to get my calendar availability as stringified JSON array."
+      }
+    },
+    {
+      "id": "5ba2c2b0-2218-45d2-a417-f86c80643397",
+      "name": "Chat OpenAI1",
+      "notes": "This lmChatOpenAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1420,
+        759
+      ],
+      "parameters": {
+        "model": "gpt-4",
+        "options": {
+          "temperature": 0
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "wJtZwsVKW5v6R2Iy",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "id": "012835ec-c20a-4b84-bed8-67f6aac30698",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        460,
+        460
+      ],
+      "parameters": {
+        "width": 616.8060552874073,
+        "height": 410.24791575252334,
+        "content": "## Check if incoming email is about appointment\nWe use LLM to check subject and body of the email and determine if it's an appointment request. "
+      }
+    },
+    {
+      "id": "ceaa4f77-acc8-437e-9d61-16cf344a7748",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        460
+      ],
+      "parameters": {
+        "width": 676.1951194231482,
+        "height": 241.70645019745504,
+        "content": "## Get calendar availability and compose a response\nMake sure to update the Workflow ID if you are running this as 2 workflows"
+      }
+    },
+    {
+      "id": "499def23-7dec-4131-91fd-326b1b824762",
+      "name": "Google Calendar",
+      "notes": "This googleCalendar node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1,
+      "position": [
+        680,
+        1120
+      ],
+      "parameters": {
+        "options": {
+          "timeMax": "={{ $now.plus(1, 'month').toISO() }}",
+          "timeMin": "={{ $now.minus(1, 'day').toISO() }}",
+          "singleEvents": true
+        },
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": "your_email@gmail.com",
+          "cachedResultName": "your_email@gmail.com"
+        },
+        "operation": "getAll",
+        "returnAll": true
+      },
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "s95HsHIMB7oK0dAH",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "id": "0f5f43fa-3386-4682-b620-21db35651d3b",
+      "name": "Execute Workflow Trigger",
+      "notes": "This executeWorkflowTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        460,
+        1120
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "8b2b82b9-c11f-4e7f-ab23-16ea5e395e11",
+      "name": "Format response",
+      "notes": "This itemLists node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 3,
+      "position": [
+        1560,
+        1120
+      ],
+      "parameters": {
+        "include": "allFieldsExcept",
+        "options": {},
+        "aggregate": "aggregateAllItemData",
+        "operation": "concatenateItems",
+        "fieldsToExclude": "sort",
+        "destinationFieldName": "response"
+      }
+    },
+    {
+      "id": "ac363d85-5c6e-4a9f-9cfc-ecc15a325b01",
+      "name": "Stringify Response",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        1780,
+        1120
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "response",
+              "value": "={{ JSON.stringify($json.response) }}"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "399c5bc4-c8bd-4d0b-942a-9889447880a9",
+      "name": "Extract start, end and name",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        1120
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "start",
+              "value": "={{ DateTime.fromISO($json.start.dateTime).toLocaleString(DateTime.DATE_HUGE) }}, {{ DateTime.fromISO($json.start.dateTime).toLocaleString(DateTime.TIME_24_WITH_SHORT_OFFSET) }}"
+            },
+            {
+              "name": "end",
+              "value": "={{ DateTime.fromISO($json.end.dateTime).toLocaleString(DateTime.DATE_HUGE) }}, {{ DateTime.fromISO($json.end.dateTime).toLocaleString(DateTime.TIME_24_WITH_SHORT_OFFSET) }}"
+            },
+            {
+              "name": "name",
+              "value": "={{ $json.summary }}"
+            },
+            {
+              "name": "sort",
+              "value": "={{ $json.start.dateTime }}"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "a39b6c7d-fdcc-452d-9ef5-50b038153330",
+      "name": "Filter only confirmed and with set time",
+      "notes": "This filter node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 1,
+      "position": [
+        880,
+        1120
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "value2": "confirmed"
+            }
+          ],
+          "boolean": [
+            {
+              "value1": "={{ $json.start.dateTime }}",
+              "value2": "={{ undefined }}",
+              "operation": "notEqual"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "0e0a2be9-cde7-497d-94c5-180128382bb7",
+      "name": "Is appointment request",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        560
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.is_appointment }}",
+              "value2": "true"
+            }
+          ],
+          "boolean": [
+            {
+              "value1": "={{ $json.is_appointment }}",
+              "value2": true
+            }
+          ]
+        },
+        "combineOperation": "any"
+      }
+    },
+    {
+      "id": "a6e11f63-a56a-4fe0-91c8-0dde2720e905",
+      "name": "Classify appointment",
+      "notes": "This chainLlm node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        720,
+        560
+      ],
+      "parameters": {
+        "prompt": "=Please evaluate the following email to determine if it suggests scheduling a meeting or a call:\nSubject: {{ encodeURI($json.Subject) }}\nSnippet: {{ encodeURI($json.snippet) }}\nIndicate your assessment by responding with \"true\" if it suggests a meeting or call, or \"false\" otherwise. Use lowercase for your response.\n"
+      }
+    },
+    {
+      "id": "b6411b14-67f6-4195-a834-60a4dc5e4851",
+      "name": "Structured Output Parser",
+      "notes": "This outputParserStructured node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        880,
+        740
+      ],
+      "parameters": {
+        "jsonSchema": "{\n \"type\": \"object\",\n \"properties\": {\n \"is_appointment\": {\n \"type\": \"boolean\"\n }\n }\n}"
+      }
+    },
+    {
+      "id": "96248431-290b-4fb1-94a3-714e7c0008d4",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        640,
+        1058.6115582634225
+      ],
+      "parameters": {
+        "width": 810.4923211935056,
+        "height": 224.60561166142082,
+        "content": "### Get all query google events for the next month and extract relevant data"
+      }
+    },
+    {
+      "id": "48bc7c0c-0b74-418e-8c5c-6a6faf24722c",
+      "name": "Sticky Note3",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1513,
+        1060
+      ],
+      "parameters": {
+        "width": 444.4130232558142,
+        "height": 220.42397542781927,
+        "content": "### Wrap the result in `response` object and return "
+      }
+    },
+    {
+      "id": "a68f7b27-1891-46c7-92b2-650cc17f94d6",
+      "name": "Sort",
+      "notes": "This itemLists node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 3,
+      "position": [
+        1320,
+        1120
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "sort",
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "sort"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "2b5b5855-6d3f-4405-9f48-5d6c4ee2475b",
+      "name": "Mark as read",
+      "notes": "This gmail node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1840,
+        739
+      ],
+      "parameters": {
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "operation": "markAsRead"
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y4RWMfx2YG0VDaFJ",
+          "name": "Gmail account"
+        }
+      },
+      "webhookId": "bff5d3a1-e3cd-46df-b1ba-da93157d7fce"
+    },
+    {
+      "id": "accbe2df-367a-4bd3-a383-12ee79062e12",
+      "name": "Send Reply",
+      "notes": "This gmail node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [
+        1840,
+        539
+      ],
+      "parameters": {
+        "message": "={{ $json.output }}",
+        "options": {
+          "replyToSenderOnly": true
+        },
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "operation": "reply"
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y4RWMfx2YG0VDaFJ",
+          "name": "Gmail account"
+        }
+      },
+      "webhookId": "e84ff0d9-59ae-4e6b-8c66-f32b5ffe3b63"
+    },
+    {
+      "id": "66d62337-d0c1-4744-b169-8e95c1d1492a",
+      "name": "Agent",
+      "notes": "This agent node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1400,
+        539
+      ],
+      "parameters": {
+        "text": "=Sender: {{ $('Gmail Trigger').item.json.From }}\\nSubject: {{ $('Gmail Trigger').item.json.Subject }}\\nEmail Text: {{ $('Gmail Trigger').item.json.snippet }}",
+        "options": {
+          "systemMessage": "=You are an email scheduling assistant. Based on the received email, check my availability and propose an appropriate response. \nAim to get a specific time, rather than just a day. When checking my availability, make sure that there's enough time in between meetings.\nIf I'm not available, ALWAYS propose a new time based on my availability. When proposing a new time, always leave 15 minutes buffer from previous meeting.\nToday date and time is: {{ $now.toISO() }}."
+        }
+      }
+    },
+    {
+      "id": "error-641efc3f",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Chat OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat OpenAI1": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

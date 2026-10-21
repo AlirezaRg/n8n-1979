@@ -1,0 +1,308 @@
+{
+  "active": false,
+  "name": "Amazon keywords",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "ac4b8cad-b8a3-4cc0-a848-1b6976c1d78a",
+      "name": "Clean Keywords",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        380,
+        620
+      ],
+      "parameters": {
+        "options": {
+          "ignoreConversionErrors": true
+        },
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fb95058f-0c20-4249-8a45-7b935fde1874",
+              "name": "Keywords",
+              "type": "array",
+              "value": "={{ $json.value }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "62575572-e4d2-43e8-9339-d4737961883e",
+      "name": "Get airtable data",
+      "notes": "This airtable node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -220,
+        620
+      ],
+      "parameters": {
+        "id": "={{ $json.query.q }}",
+        "base": {
+          "__rl": true,
+          "mode": "list",
+          "value": "appGZ14ny5J2PYbq8",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Amazon keyword"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "tblvK8Nq4Jqb2Ubun",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Table 1"
+        },
+        "options": {}
+      },
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "FV1F34pRcGoKZ8GY",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "id": "e165df91-c212-4c47-8b79-2e637d0fcb7b",
+      "name": "Get Amazon keywords",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        0,
+        620
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "49fca0c4-7d1b-4369-9274-2c0b2bb81c8b",
+      "name": "Format output",
+      "notes": "This splitOut node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        200,
+        620
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "suggestions"
+      }
+    },
+    {
+      "id": "cb00c467-49dd-4504-b5bb-d512baf55bfd",
+      "name": "Aggregate keywords",
+      "notes": "This aggregate node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        600,
+        620
+      ],
+      "parameters": {
+        "options": {},
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "Keywords"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "0b04d232-488d-4420-b991-d12b511d5fde",
+      "name": "Combine into string",
+      "notes": "This code node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        620
+      ],
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    keywords: items[0].json.Keywords.join(\", \")\n  }\n}];"
+      }
+    },
+    {
+      "id": "dae32617-6d15-4f30-a27f-894787c137e2",
+      "name": "Save keywords",
+      "notes": "This airtable node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1000,
+        620
+      ],
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "mode": "list",
+          "value": "appGZ14ny5J2PYbq8",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Amazon keyword"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "tblvK8Nq4Jqb2Ubun",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Table 1"
+        },
+        "columns": {
+          "value": {
+            "id": "={{ $('Get airtable data').item.json.id }}",
+            "Keyword output": "YOUR_CREDENTIAL_HERE"
+          },
+          "schema": [
+            {
+              "id": "id",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": true,
+              "required": false,
+              "displayName": "id",
+              "defaultMatch": true
+            },
+            {
+              "id": "Keyword",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Keyword",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Trigger",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": true,
+              "required": false,
+              "displayName": "Trigger",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Keyword output",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Keyword output",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "id"
+          ]
+        },
+        "options": {},
+        "operation": "update"
+      },
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "FV1F34pRcGoKZ8GY",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "id": "aa451c9b-cfc7-4a9a-9ab5-1e6690039eb6",
+      "name": "Receive Keyword",
+      "webhookId": "e1df17af-e8b8-4261-ba45-aba7106c65bd",
+      "notes": "This webhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        -460,
+        620
+      ],
+      "parameters": {
+        "path": "e1df17af-e8b8-4261-ba45-aba7106c65bd",
+        "options": {},
+        "responseMode": "lastNode"
+      }
+    },
+    {
+      "id": "8dc19b86-ac56-487d-9678-04c9f8306786",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        140
+      ],
+      "parameters": {
+        "width": 589.0376569037658,
+        "height": 163.2468619246862,
+        "content": "## How to build your own Amazon keywords tool with n8n (For free and no coding)\n\nThis workflow gives you Amazon keywords for your Amazon FBA business.\n\n[?? You can read more about this workflow here]({{ $env.WEBHOOK_URL }}"
+      }
+    },
+    {
+      "id": "c1341984-f1a7-4c7e-8a23-46adea6d2afe",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        420
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 239.99999999999977,
+        "height": 389.08073541167073,
+        "content": "## Send keywords \nYou need to send the workflow a keyword through webhook. You can get my airtable example to see how to send keyword.\n[Download airtable here.]({{ $env.WEBHOOK_URL }}"
+      }
+    },
+    {
+      "id": "17c13b36-a350-4031-bb9b-a6f8dabd1b90",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        418.41726618705036
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 218.65707434052769,
+        "height": 386.2350119904079,
+        "content": "## Send to Amazon\nAmazon has a completion API that gives you keyword data."
+      }
+    },
+    {
+      "id": "3deef28b-90b9-4357-a46d-78d750126b65",
+      "name": "Sticky Note3",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        960,
+        400
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 181.6626698641084,
+        "height": 389.08073541167073,
+        "content": "## Save keywords \nDownload my airtable example to save the keywords.\n[Download airtable here.]({{ $env.WEBHOOK_URL }}"
+      }
+    }
+  ],
+  "connections": {}
+}

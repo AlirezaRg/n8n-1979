@@ -1,0 +1,335 @@
+{
+  "active": false,
+  "name": "On new Stripe Invoice Payment update Hubspot and notify the team in Slack",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "17a26229-e09d-4df9-918e-608d824da585",
+      "name": "When Invoice Paid",
+      "webhookId": "47727266-5233-48e5-b7f7-e47252840a4e",
+      "notes": "This stripeTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stripeTrigger",
+      "typeVersion": 1,
+      "position": [
+        400,
+        460
+      ],
+      "parameters": {
+        "events": [
+          "invoice.payment_succeeded"
+        ]
+      },
+      "credentials": {
+        "stripeApi": {
+          "id": "{{ $credentials.stripeApi.id }}",
+          "name": "Stripe account"
+        }
+      }
+    },
+    {
+      "id": "9a7ee4d8-14e5-4385-9b44-08781f8f9ff6",
+      "name": "Update Deal to Paid",
+      "notes": "This hubspot node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 1,
+      "position": [
+        1240,
+        500
+      ],
+      "parameters": {
+        "dealId": "={{$json[\"id\"]}}",
+        "operation": "update",
+        "updateFields": {
+          "customPropertiesUi": {
+            "customPropertiesValues": [
+              {
+                "value": "Yes",
+                "property": "paid"
+              }
+            ]
+          }
+        },
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "hubspotOAuth2Api": {
+          "id": "{{ $credentials.hubspotOAuth2Api.id }}",
+          "name": "Hubspot account 2"
+        }
+      }
+    },
+    {
+      "id": "b82c1f2d-2e07-4d2c-91b4-cb938b655c89",
+      "name": "Find Deal based on PO Number",
+      "notes": "This hubspot node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "position": [
+        820,
+        480
+      ],
+      "parameters": {
+        "operation": "search",
+        "filterGroupsUi": {
+          "filterGroupsValues": [
+            {
+              "filtersUi": {
+                "filterValues": [
+                  {
+                    "value": "={{$json[\"data\"][\"object\"][\"custom_fields\"][0][\"value\"]}}",
+                    "propertyName": "po_number"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {}
+      },
+      "credentials": {
+        "hubspotApi": {
+          "id": "{{ $credentials.hubspotApi.id }}",
+          "name": "Hubspot account"
+        }
+      }
+    },
+    {
+      "id": "2485fd64-faa0-4fc3-9379-9a8d33ff3ca8",
+      "name": "If no PO Number",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        600,
+        460
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"data\"][\"object\"][\"custom_fields\"]}}",
+              "operation": "isEmpty"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "085e5123-d88a-43ea-a629-6acbc013d14e",
+      "name": "If no deal found for PO",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1020,
+        480
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"id\"]}}",
+              "operation": "isEmpty"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "bedc3a79-99c9-46d2-bb52-481937f9a9ec",
+      "name": "Send invoice paid message",
+      "notes": "This slack node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        1420,
+        500
+      ],
+      "parameters": {
+        "text": ":sparkles: An invoice has been paid :sparkles:",
+        "channel": "team-accounts",
+        "blocksUi": {
+          "blocksValues": []
+        },
+        "attachments": [
+          {
+            "color": "#00FF04",
+            "fields": {
+              "item": [
+                {
+                  "short": true,
+                  "title": "Amount",
+                  "value": "={{$node[\"When Invoice Paid\"].json[\"data\"][\"object\"][\"amount_paid\"]/100}}"
+                },
+                {
+                  "short": true,
+                  "title": "Currency",
+                  "value": "={{$node[\"When Invoice Paid\"].json[\"data\"][\"object\"][\"currency\"]}}"
+                },
+                {
+                  "short": false,
+                  "title": "Customer Name",
+                  "value": "={{$node[\"When Invoice Paid\"].json[\"data\"][\"object\"][\"customer_name\"]}}"
+                },
+                {
+                  "short": false,
+                  "title": "Customer Email",
+                  "value": "={{$node[\"When Invoice Paid\"].json[\"data\"][\"object\"][\"customer_email\"]}}"
+                },
+                {
+                  "short": true,
+                  "title": "PO Number",
+                  "value": "={{$node[\"When Invoice Paid\"].json[\"data\"][\"object\"][\"custom_fields\"][0][\"value\"]}}"
+                },
+                {
+                  "short": true,
+                  "title": "",
+                  "value": "="
+                }
+              ]
+            },
+            "footer": "=*Transaction ID:* {{$node[\"When Invoice Paid\"].json[\"id\"]}}"
+          }
+        ],
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": {
+          "id": "{{ $credentials.slackApi.id }}",
+          "name": "Slack Access Token"
+        }
+      }
+    },
+    {
+      "id": "cf7fe800-cedd-46f3-99cd-24b7befd0c71",
+      "name": "Send no PO Message",
+      "notes": "This slack node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        800,
+        240
+      ],
+      "parameters": {
+        "text": ":x: Stripe Payment with no PO Number :x:",
+        "channel": "team-accounts",
+        "blocksUi": {
+          "blocksValues": []
+        },
+        "attachments": [
+          {
+            "color": "#FF3C00",
+            "fields": {
+              "item": [
+                {
+                  "short": true,
+                  "title": "Amount",
+                  "value": "={{$json[\"data\"][\"object\"][\"amount_paid\"] / 100}}"
+                },
+                {
+                  "short": true,
+                  "title": "Currency",
+                  "value": "={{$json[\"data\"][\"object\"][\"currency\"]}}"
+                },
+                {
+                  "short": false,
+                  "title": "Customer Name",
+                  "value": "={{$json[\"data\"][\"object\"][\"customer_name\"]}}"
+                },
+                {
+                  "short": false,
+                  "title": "Customer Email",
+                  "value": "={{$json[\"data\"][\"object\"][\"customer_email\"]}}"
+                }
+              ]
+            },
+            "footer": "=*Transaction ID:* {{$json[\"id\"]}}"
+          }
+        ],
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": {
+          "id": "{{ $credentials.slackApi.id }}",
+          "name": "Slack Access Token"
+        }
+      }
+    },
+    {
+      "id": "0aba6c94-43d5-45dd-80fa-df5dbf25bd31",
+      "name": "Send Deal not found message",
+      "notes": "This slack node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        1180,
+        240
+      ],
+      "parameters": {
+        "text": ":x: Unable to find Deal for the below payment :x:",
+        "channel": "team-accounts",
+        "blocksUi": {
+          "blocksValues": []
+        },
+        "attachments": [
+          {
+            "color": "#FF3C00",
+            "fields": {
+              "item": [
+                {
+                  "short": true,
+                  "title": "Amount",
+                  "value": "={{$node[\"When Invoice Paid\"].json[\"data\"][\"object\"][\"amount_paid\"]/100}}"
+                },
+                {
+                  "short": true,
+                  "title": "Currency",
+                  "value": "={{$node[\"When Invoice Paid\"].json[\"data\"][\"object\"][\"currency\"]}}"
+                },
+                {
+                  "short": false,
+                  "title": "Customer Name",
+                  "value": "={{$node[\"When Invoice Paid\"].json[\"data\"][\"object\"][\"customer_name\"]}}"
+                },
+                {
+                  "short": false,
+                  "title": "Customer Email",
+                  "value": "={{$node[\"When Invoice Paid\"].json[\"data\"][\"object\"][\"customer_email\"]}}"
+                },
+                {
+                  "short": true,
+                  "title": "PO Number",
+                  "value": "={{$node[\"When Invoice Paid\"].json[\"data\"][\"object\"][\"custom_fields\"][0][\"value\"]}}"
+                }
+              ]
+            },
+            "footer": "=*Transaction ID:* {{$node[\"When Invoice Paid\"].json[\"id\"]}}"
+          }
+        ],
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": {
+          "id": "{{ $credentials.slackApi.id }}",
+          "name": "Slack Access Token"
+        }
+      }
+    },
+    {
+      "id": "error-fd7b10df",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

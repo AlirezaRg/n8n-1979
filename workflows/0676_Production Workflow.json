@@ -1,0 +1,55 @@
+{
+  "active": false,
+  "name": "Production Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-c999c01a",
+      "name": "PostHog",
+      "type": "n8n-nodes-base.postHog",
+      "typeVersion": 1,
+      "position": [
+        640,
+        280
+      ],
+      "parameters": {
+        "eventName": "={{$json[\"query\"][\"event\"]}}",
+        "distinctId": "n8n",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "postHogApi": "PostHog Credentials"
+      }
+    },
+    {
+      "id": "node-c93d0470",
+      "name": "Webhook",
+      "webhookId": "f6d0071e-3cf9-49fd-8bbd-afdbea6b0c67",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        440,
+        280
+      ],
+      "parameters": {
+        "path": "f6d0071e-3cf9-49fd-8bbd-afdbea6b0c67",
+        "options": {}
+      }
+    },
+    {
+      "id": "error-383539bb",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

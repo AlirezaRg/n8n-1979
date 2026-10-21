@@ -1,0 +1,190 @@
+{
+  "active": false,
+  "name": "Scrape Today's Github Trend 13 Top Repositories",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "e2981cad-c09b-46ee-b2db-cb007a95c4a1",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "990de0c9-f540-4a10-8a1a-63a0526444ff",
+      "name": "Extract Box",
+      "notes": "This html node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        440,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "cssSelector": "div.Box",
+              "returnValue": "html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "7f7968ce-3935-488e-98f9-7ddd270d14b0",
+      "name": "Request to Github Trend",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "87cd7fa1-d896-49a3-9336-17663ca522aa",
+      "name": "Turn to a list",
+      "notes": "This splitOut node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        880,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "repositories"
+      }
+    },
+    {
+      "id": "bed61dad-0066-45de-bcf2-79fd143e360c",
+      "name": "Set Result Variables",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1320,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0e76646-60d7-44a6-af77-33f27fb465cb",
+              "name": "author",
+              "type": "string",
+              "value": "={{ $json.repository.split('/')[0].trim() }}"
+            },
+            {
+              "id": "a2bd790a-784e-4d72-9a4e-92be22edea8f",
+              "name": "title",
+              "type": "string",
+              "value": "={{ $json.repository.split('/')[1].trim() }}"
+            },
+            {
+              "id": "22f1518a-7081-4417-ab9d-88f26a7b5cfe",
+              "name": "repository",
+              "type": "string",
+              "value": "={{ $json.repository }}"
+            },
+            {
+              "id": "baff9a9f-020a-4968-bb80-a4a91a94144a",
+              "name": "url",
+              "type": "string",
+              "value": "={{ $env.WEBHOOK_URL }}{{ $json.repository.replaceAll(' ','') }}"
+            },
+            {
+              "id": "f5c48a02-b55d-4167-a823-53ac1d851ee5",
+              "name": "created_at",
+              "type": "string",
+              "value": "={{$now}}"
+            },
+            {
+              "id": "27a44ce9-4b5b-44b2-94d9-eb5b2ae81dcd",
+              "name": "description",
+              "type": "string",
+              "value": "={{ $json.description }}"
+            }
+          ]
+        },
+        "includeOtherFields": "="
+      }
+    },
+    {
+      "id": "d7b39e99-38df-4025-9afd-a602c4bd01cf",
+      "name": "Extract repository data",
+      "notes": "This html node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        1100,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "extractHtmlContent",
+        "dataPropertyName": "repositories",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "cssSelector": "a.Link"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "cssSelector": "span.d-inline-block"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "cssSelector": "p"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "382e7a3b-f65f-4a79-a69f-2818f09f5daa",
+      "name": "Extract all repositories",
+      "notes": "This html node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        660,
+        0
+      ],
+      "parameters": {
+        "options": {
+          "trimValues": true,
+          "cleanUpText": true
+        },
+        "operation": "extractHtmlContent",
+        "dataPropertyName": "box",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "cssSelector": "article.Box-row",
+              "returnArray": true,
+              "returnValue": "html"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

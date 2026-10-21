@@ -1,0 +1,84 @@
+{
+  "active": false,
+  "name": "Production Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-b610e42e",
+      "name": "Asana",
+      "type": "n8n-nodes-base.asana",
+      "typeVersion": 1,
+      "position": [
+        450,
+        500
+      ],
+      "parameters": {
+        "name": "={{$json[\"query\"][\"parameter\"]}}",
+        "workspace": "",
+        "authentication": "{{ $credentials.oAuth2 }}",
+        "otherProperties": {
+          "projects": [
+            ""
+          ]
+        }
+      },
+      "credentials": {
+        "asanaOAuth2Api": ""
+      }
+    },
+    {
+      "id": "node-a542ebdd",
+      "name": "Webhook",
+      "webhookId": "b43ae7e2-a058-4738-8d49-ac76db6e8166",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        250,
+        500
+      ],
+      "parameters": {
+        "path": "asana",
+        "options": {
+          "responsePropertyName": "response"
+        },
+        "responseMode": "lastNode"
+      }
+    },
+    {
+      "id": "node-9925f0ba",
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        650,
+        500
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "response",
+              "value": "=Created Asana Task:  {{$json[\"permalink_url\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "error-aab22760",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

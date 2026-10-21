@@ -1,0 +1,113 @@
+{
+  "active": false,
+  "name": "Splitout Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "19f32c25-df26-426d-8e28-f1d29c8571b1",
+      "name": "Split Out",
+      "notes": "This splitOut node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        -240
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "data"
+      }
+    },
+    {
+      "id": "7360c3f9-2e11-4839-b105-ecab66a39af2",
+      "name": "HTTP Request1",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        20,
+        -240
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "49cb0c7b-c9d8-4bf1-afa5-5afab9e7967e",
+      "name": "Read/Write Files from Disk2",
+      "notes": "This readWriteFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        460,
+        -240
+      ],
+      "parameters": {
+        "options": {},
+        "fileName": "test.pdf",
+        "operation": "write"
+      }
+    },
+    {
+      "id": "05ef1b18-481d-40f8-a6b3-712bb9ba2b6f",
+      "name": "Read/Write Files from Disk3",
+      "notes": "This readWriteFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        680,
+        -240
+      ],
+      "parameters": {
+        "options": {},
+        "fileSelector": "test.pdf"
+      }
+    },
+    {
+      "id": "c8f0971c-e1e0-4add-83cb-932902f80b56",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        -240
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "b83c51ea-9afc-411a-baad-429776e843f3",
+      "name": "PDF Array",
+      "notes": "This code node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -420,
+        -240
+      ],
+      "parameters": {
+        "jsCode": "return { data: [\n  \"{{ $env.WEBHOOK_URL }}\", \"{{ $env.WEBHOOK_URL }}\"\n]}"
+      }
+    },
+    {
+      "id": "b122b6e4-2dfa-4f1f-8547-36ba91ca93f9",
+      "name": "Merge PDF",
+      "notes": "This mergePdfs node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        240,
+        -240
+      ],
+      "parameters": {},
+      "credentials": {
+        "customJsApi": {
+          "id": "BFGbk0a71fKWY967",
+          "name": "CustomJS account"
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

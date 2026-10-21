@@ -1,0 +1,60 @@
+{
+  "active": false,
+  "name": "NetSuite Rest API workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "f7f90fb4-e29f-4bbf-a99d-ee2fde45cd06",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -380,
+        -40
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "9fcc1ce7-e9bf-4592-8bcd-7c77272a9c59",
+      "name": "NetSuite",
+      "notes": "This netsuite node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-netsuite.netsuite",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -180
+      ],
+      "parameters": {
+        "query": "={{ $json.query.suiteql }}",
+        "options": {},
+        "operation": "runSuiteQL"
+      },
+      "credentials": {
+        "netsuite": {
+          "id": "ro6Rl1oWY4KkFUYn",
+          "name": "NetSuite account"
+        }
+      }
+    },
+    {
+      "id": "1d615309-2cb0-4383-9698-2f80da0d4bf5",
+      "name": "Webhook",
+      "webhookId": "249328cc-587a-4269-b266-96fe60cfaeb9",
+      "notes": "This webhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -380,
+        -280
+      ],
+      "parameters": {
+        "path": "249328cc-587a-4269-b266-96fe60cfaeb9",
+        "options": {},
+        "responseData": "allEntries",
+        "responseMode": "lastNode"
+      }
+    }
+  ],
+  "connections": {}
+}

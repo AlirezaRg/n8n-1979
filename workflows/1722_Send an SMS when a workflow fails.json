@@ -1,0 +1,53 @@
+{
+  "active": false,
+  "name": "Send an SMS when a workflow fails",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "1986a7c5-dddf-4297-94a4-4d0da3442306",
+      "name": "Error Trigger",
+      "notes": "This errorTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        550,
+        260
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "41ce67be-a294-414f-9f86-5c1ffa88435e",
+      "name": "Twilio",
+      "notes": "This twilio node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        750,
+        260
+      ],
+      "parameters": {
+        "to": "",
+        "from": "",
+        "message": "=Your workflow with ID: {{$node[\"Error Trigger\"].json[\"workflow\"][\"id\"]}} and name: {{$node[\"Error Trigger\"].json[\"workflow\"][\"name\"]}} failed to execute."
+      },
+      "credentials": {
+        "twilioApi": "twilio-credentials"
+      }
+    },
+    {
+      "id": "error-e687565f",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

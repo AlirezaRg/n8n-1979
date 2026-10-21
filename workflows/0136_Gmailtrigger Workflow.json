@@ -1,0 +1,241 @@
+{
+  "active": false,
+  "name": "Gmailtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "c8481fc0-4cc2-4662-b008-e81eaeb4840b",
+      "name": "Gmail Trigger",
+      "notes": "This gmailTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -340,
+        0
+      ],
+      "parameters": {
+        "simple": false,
+        "filters": {
+          "sender": "ray.thomas@charter.com",
+          "readStatus": "unread"
+        },
+        "options": {
+          "downloadAttachments": true,
+          "dataPropertyAttachmentsPrefixName": "attachment_"
+        },
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "egorWvqjkdIG2ovh",
+          "name": "Gmail account - rthomascharter"
+        }
+      }
+    },
+    {
+      "id": "fd82d244-dfab-46db-af8e-e674501db75d",
+      "name": "Google Drive",
+      "notes": "This googleDrive node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        540,
+        0
+      ],
+      "parameters": {
+        "name": "={{ $binary.values()[0].fileName }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "options": {},
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "0BwqhgrfUUaOuM2x1NXhxLUlGVEE",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "misc"
+        },
+        "inputDataFieldName": "={{ $binary.keys()[0] }}"
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "fwkvLJni8GfLNqBZ",
+          "name": "Google Drive account - rthomascharter"
+        }
+      }
+    },
+    {
+      "id": "5686e523-e12c-41b1-818d-03545122ad6f",
+      "name": "Split Out",
+      "notes": "This splitOut node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "$binary"
+      }
+    },
+    {
+      "id": "1774a0d8-2909-49e4-b0f7-1c3e343602b1",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        420,
+        -360
+      ],
+      "parameters": {
+        "width": 380,
+        "height": 820,
+        "content": "## Reference \"Single\" Binary Using Expressions\nThis contains examples of how to reference a single binary in each input item **regardless of its key name.**"
+      }
+    },
+    {
+      "id": "204fe711-c5f3-4243-be3b-829419a07c82",
+      "name": "Switch",
+      "notes": "This switch node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        100,
+        0
+      ],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "outputKey": "YOUR_CREDENTIAL_HERE",
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "operator": {
+                      "type": "number",
+                      "operation": "gt"
+                    },
+                    "leftValue": "={{ $binary.values()[0].fileSize.split(' ')[0].toNumber() }}",
+                    "rightValue": 300
+                  }
+                ]
+              },
+              "renameOutput": true
+            },
+            {
+              "outputKey": "YOUR_CREDENTIAL_HERE",
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "27a59343-5f2a-43b0-a74d-ddb0a988c0cb",
+                    "operator": {
+                      "type": "number",
+                      "operation": "gt"
+                    },
+                    "leftValue": "={{ $binary.values()[0].fileSize.split(' ')[0].toNumber() }}",
+                    "rightValue": 10
+                  }
+                ]
+              },
+              "renameOutput": true
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      }
+    },
+    {
+      "id": "1e00cb68-fed2-4f88-be84-4860c26c8a3b",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        -240
+      ],
+      "parameters": {
+        "width": 260,
+        "height": 460,
+        "content": "## Split Multiple Binary Files\nThis uses the `$binary` name (not expression var) to make individual items for each attachment binary.\n* Note: This still doesn't homogenize the name of each binary."
+      }
+    },
+    {
+      "id": "1089eb84-51d3-4669-8a5a-fd1d0855ca41",
+      "name": "Send \" Too Big\" Notification (for example)",
+      "notes": "This noOp node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        540,
+        -200
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "29c83742-72b6-40ec-a5fc-aab5ef1d5149",
+      "name": "Ignore Little Graphics / Icons (for example)",
+      "notes": "This noOp node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        540,
+        220
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "error-47040b41",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

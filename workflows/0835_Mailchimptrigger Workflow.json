@@ -1,0 +1,48 @@
+{
+  "active": false,
+  "name": "Mailchimptrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "83679c47-1393-4c7e-8108-7607d8f2bd8e",
+      "name": "Mailchimp Trigger",
+      "notes": "This mailchimpTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.mailchimpTrigger",
+      "typeVersion": 1,
+      "position": [
+        870,
+        370
+      ],
+      "parameters": {
+        "list": "0a5a4ca5de",
+        "events": [
+          "subscribe"
+        ],
+        "sources": [
+          "api",
+          "admin",
+          "user"
+        ]
+      },
+      "credentials": {
+        "mailchimpApi": "mailchimp_creds"
+      },
+      "webhookId": "fa1b4f61-e4d3-4c2b-b5f6-f4be1f76a417"
+    },
+    {
+      "id": "error-41d2f36b",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

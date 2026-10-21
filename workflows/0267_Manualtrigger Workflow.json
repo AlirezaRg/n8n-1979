@@ -1,0 +1,142 @@
+{
+  "active": false,
+  "name": "Manualtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "41ce128f-e9e5-478f-8954-c94019884721",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        240
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "3a3b3212-2eb3-411e-981e-37bd3f3e46fe",
+      "name": "HTTP Request",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        680,
+        240
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "sendHeaders": true,
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "file",
+              "value": "={{ $json.url_to_file }}"
+            }
+          ]
+        },
+        "genericAuthType": "httpQueryAuth",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/octet-stream"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "WdAklDMod8fBEMRk",
+          "name": "Query Auth account"
+        }
+      }
+    },
+    {
+      "id": "987ec4b3-3241-4cb6-b735-04754ead8ef8",
+      "name": "Read/Write Files from Disk",
+      "notes": "This readWriteFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        240
+      ],
+      "parameters": {
+        "options": {},
+        "fileName": "document.pdf",
+        "operation": "write",
+        "dataPropertyName": "=data"
+      }
+    },
+    {
+      "id": "d99ed058-ab0c-4310-8e75-3d4b073c234b",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        540,
+        40
+      ],
+      "parameters": {
+        "width": 372,
+        "height": 383,
+        "content": "## Authentication\nConversion requests must be authenticated. Please create \n[ConvertAPI account to get authentication secret]({{ $env.API_BASE_URL }}\n\nCreate a query auth credential with `secret` as name and your secret from the convertAPI dashboard as value"
+      }
+    },
+    {
+      "id": "3e4f5f45-36c8-4a71-b053-6b5beafa3025",
+      "name": "Config",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        220,
+        240
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "25315146-5709-49d4-9c01-27dd5eeba879",
+              "name": "url_to_file",
+              "type": "string",
+              "value": "{{ $env.API_BASE_URL }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "895324aa-e373-4049-8b4b-aefed7a61239",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        100,
+        40
+      ],
+      "parameters": {
+        "width": 353,
+        "height": 375,
+        "content": "## Configuration \nChange the `url_to_file` parameter here to the file you want to convert"
+      }
+    }
+  ],
+  "connections": {}
+}

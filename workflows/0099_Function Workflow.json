@@ -1,0 +1,105 @@
+{
+  "active": false,
+  "name": "Function Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "trigger-47dcf425",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        100
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "60f469d1-bf73-4346-9e57-5de9af65457f",
+      "name": "Data 1",
+      "notes": "This function node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        602,
+        350
+      ],
+      "parameters": {
+        "functionCode": "items[0].json = {\n\"data\": [\n{\n\"pointer\": \"12345\",\n\"panel\": \"234234\",\n\"subject\": \"Blah Blah\",\n\"note\": \"\",\n\"interviewers\": [\n{\n\"id\": \"111222333\",\n\"name\": \"Bobby Johnson\",\n\"email\": \"bobbyj@example.com\"\n}\n],\n\"timezone\": \"America/Los_Angeles\",\n},\n{\n\"pointer\": \"98754\",\n\"panel\": \"3243234\",\n\"subject\": \"Yadda Yadda\",\n\"note\": \"\",\n\"interviewers\": [\n{\n\"id\": \"444555666\",\n\"name\": \"Billy Johnson\",\n\"email\": \"billyj@example.com\"\n}\n],\n\"timezone\": \"America/Los_Angeles\",\n},\n],\n\"hasNext\": false\n};\nreturn items;\n"
+      }
+    },
+    {
+      "id": "7da09e9b-b88a-4529-8b31-f1fcfcf6c2f8",
+      "name": "Data 2",
+      "notes": "This function node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        602,
+        550
+      ],
+      "parameters": {
+        "functionCode": "items[0].json = [\n{\n\"name\": \"test\",\n\"fields\": {\n\"FirstName\": \"Bobby\",\n\"LastName\": \"Johnson\",\n\"JobTitleDescription\": \"Recruiter\",\n\"HomeDepartmentDescription\": \"Recruiting Team\",\n\"Photo\": [\n{\n\"x\": \"attPuc6gAIHUOHjsY\",\n\"url\": \"{{ $env.WEBHOOK_URL }}\",\n\"filename\": \"photo.jpg\",\n\"size\": 28956,\n\"type\": \"image/jpeg\"\n}\n],\n\"eid\": \"111222333\"\n},\n\"createdTime\": \"2019-09-23T04:06:48.000Z\"\n},\n{\n\"name\": \"test2\",\n\"fields\": {\n\"FirstName\": \"Billy\",\n\"LastName\": \"Johnson\",\n\"JobTitleDescription\": \"CEO\",\n\"HomeDepartmentDescription\": \"Boss Team\",\n\"Photo\": [\n{\n\"x\": \"attPuc6gAIHUOHjsY\",\n\"url\": \"{{ $env.WEBHOOK_URL }}\",\n\"filename\": \"photo.jpg\",\n\"size\": 28956,\n\"type\": \"image/jpeg\"\n}\n],\n\"eid\": \"444555666\"\n},\n\"createdTime\": \"2019-09-23T04:06:48.000Z\"\n}\n,\n{\n\"name\": \"test3\",\n\"fields\": {\n\"FirstName\": \"Susan\",\n\"LastName\": \"Smith\",\n\"JobTitleDescription\": \"CFO\",\n\"HomeDepartmentDescription\": \"Boss Team\",\n\"Photo\": [\n{\n\"x\": \"attPuc6gAIHUOHjsY\",\n\"url\": \"{{ $env.WEBHOOK_URL }}\",\n\"filename\": \"photo.jpg\",\n\"size\": 28956,\n\"type\": \"image/jpeg\"\n}\n],\n\"eid\": \"777888999\"\n},\n\"createdTime\": \"2019-09-23T04:06:48.000Z\"\n}\n];\nreturn items;"
+      }
+    },
+    {
+      "id": "863adff0-f519-4b8a-b07e-dafc340cdcb1",
+      "name": "Convert Data 1",
+      "notes": "This function node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        752,
+        350
+      ],
+      "parameters": {
+        "functionCode": "const newItems = [];\n\nfor (const item of items[0].json.data) {\n  newItems.push({ json: item });\n}\n\nreturn newItems;"
+      }
+    },
+    {
+      "id": "55ba4759-b1d5-4295-b927-44506921f884",
+      "name": "Convert Data 2",
+      "notes": "This function node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        752,
+        550
+      ],
+      "parameters": {
+        "functionCode": "const newItems = [];\n\nfor (const item of items[0].json) {\n  newItems.push({ json: item });\n}\n\nreturn newItems;"
+      }
+    },
+    {
+      "id": "8c12ec7b-eb58-4bc4-93b8-c7d5cef85e8d",
+      "name": "Merge",
+      "notes": "This merge node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 1,
+      "position": [
+        990,
+        430
+      ],
+      "parameters": {
+        "mode": "mergeByKey",
+        "propertyName1": "interviewers[0].id",
+        "propertyName2": "fields.eid"
+      }
+    },
+    {
+      "id": "error-020ebde4",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

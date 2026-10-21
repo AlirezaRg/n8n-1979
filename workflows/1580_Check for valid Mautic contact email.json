@@ -1,0 +1,153 @@
+{
+  "active": false,
+  "name": "Check for valid Mautic contact email",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-043eeaca",
+      "name": "If is not new contact",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        780,
+        460
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"mautic.lead_post_save_new\"]}}",
+              "operation": "isEmpty"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-81143f3f",
+      "name": "On Contact Identified",
+      "webhookId": "a3ee0f93-2870-44e2-bb2f-0175433263b3",
+      "type": "n8n-nodes-base.mauticTrigger",
+      "typeVersion": 1,
+      "position": [
+        600,
+        460
+      ],
+      "parameters": {
+        "events": [
+          "mautic.lead_post_save_new"
+        ],
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "mauticOAuth2Api": {
+          "id": "{{ $credentials.mauticOAuth2Api.id }}",
+          "name": "Mautic account"
+        }
+      }
+    },
+    {
+      "id": "node-ce3546ad",
+      "name": "extract information",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        980,
+        480
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "mautic.lead_post_save_new"
+      }
+    },
+    {
+      "id": "node-db988646",
+      "name": "validate email",
+      "type": "n8n-nodes-base.oneSimpleApi",
+      "typeVersion": 1,
+      "position": [
+        1180,
+        480
+      ],
+      "parameters": {
+        "resource": "utility",
+        "emailAddress": "={{$json[\"lead\"][\"fields\"][\"core\"][\"email\"][\"value\"]}}"
+      },
+      "credentials": {
+        "oneSimpleApi": {
+          "id": "{{ $credentials.oneSimpleApi.id }}",
+          "name": "One Simple account"
+        }
+      }
+    },
+    {
+      "id": "node-839c8bf9",
+      "name": "If the email is suspicious",
+      "notes": "IF\ndeliverability is not good\nOR\nDomain is not valid\nOR\nEmail is Disposable",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        480
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"deliverability\"]}}",
+              "value2": "GOOD",
+              "operation": "notEqual"
+            }
+          ],
+          "boolean": [
+            {
+              "value1": "={{$json[\"is_domain_valid\"]}}"
+            },
+            {
+              "value1": "={{$json[\"is_email_disposable\"]}}",
+              "value2": true
+            }
+          ]
+        },
+        "combineOperation": "any"
+      }
+    },
+    {
+      "id": "node-3d2d2c73",
+      "name": "Send to Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        460
+      ],
+      "parameters": {
+        "text": "=:warning: New Contact with Suspicious Email :warning:\n*Name: * {{$node[\"extract information\"].json[\"contact\"][\"fields\"][\"core\"][\"firstname\"][\"normalizedValue\"]}} {{$node[\"extract information\"].json[\"contact\"][\"fields\"][\"core\"][\"lastname\"][\"normalizedValue\"]}}\n*Email: * {{$node[\"extract information\"].json[\"contact\"][\"fields\"][\"core\"][\"email\"][\"normalizedValue\"]}}\n*Link: * https://mautic.my.domain.com/s/contacts/view/{{$node[\"extract information\"].json[\"contact\"][\"id\"]}}\n*Creator: * {{$node[\"extract information\"].json[\"contact\"][\"createdByUser\"]}}",
+        "channel": "#mautic-alerts",
+        "attachments": [],
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": {
+          "id": "{{ $credentials.slackApi.id }}",
+          "name": "Slack Access Token"
+        }
+      }
+    },
+    {
+      "id": "error-d7ef652e",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

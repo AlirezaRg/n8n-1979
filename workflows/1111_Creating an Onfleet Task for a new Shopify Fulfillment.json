@@ -1,0 +1,64 @@
+{
+  "active": false,
+  "name": "Creating an Onfleet Task for a new Shopify Fulfillment",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "d363331a-ed1b-4cd8-a0d6-c9d9f1c7be92",
+      "name": "Shopify Trigger",
+      "webhookId": "576e8785-bbb4-426b-a922-da671efced68",
+      "notes": "This shopifyTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.shopifyTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        440
+      ],
+      "parameters": {
+        "topic": "fulfillments/create"
+      },
+      "credentials": {
+        "shopifyApi": {
+          "id": "{{ $credentials.shopifyApi.id }}",
+          "name": "Shopify account"
+        }
+      }
+    },
+    {
+      "id": "2bf6900f-b888-4518-bfd6-35ad916033ac",
+      "name": "Onfleet",
+      "notes": "This onfleet node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.onfleet",
+      "typeVersion": 1,
+      "position": [
+        460,
+        440
+      ],
+      "parameters": {
+        "operation": "create",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "onfleetApi": {
+          "id": "{{ $credentials.onfleetApi.id }}",
+          "name": "Onfleet API Key"
+        }
+      }
+    },
+    {
+      "id": "error-edecdaa0",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

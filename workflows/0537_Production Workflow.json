@@ -1,0 +1,363 @@
+{
+  "active": false,
+  "name": "Production Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-c19887e3",
+      "name": "Cron",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        440,
+        440
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {}
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-d51d5ed0",
+      "name": "Airtable2",
+      "notesInFlow": true,
+      "notes": "Grab our list of chats from Airtable to send a random recipe",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        660,
+        440
+      ],
+      "parameters": {
+        "table": "Table 1",
+        "operation": "list",
+        "application": "your_sheet_id",
+        "additionalOptions": {}
+      },
+      "credentials": {
+        "airtableApi": {
+          "id": "{{ $credentials.airtableApi.id }}",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "id": "node-d5dd8b47",
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        860,
+        600
+      ],
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "chatid",
+              "value": "={{$node[\"Airtable2\"].json[\"fields\"][\"chatid\"]}}"
+            }
+          ],
+          "string": []
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "node-ae5be3e9",
+      "name": "Recipe Photo",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "continueOnFail": true,
+      "position": [
+        1240,
+        440
+      ],
+      "parameters": {
+        "file": "={{$node[\"Get recipes from API\"].json[\"recipes\"][0][\"image\"]}}",
+        "chatId": "={{$node[\"Set\"].json[\"chatid\"]}}",
+        "operation": "sendPhoto",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "{{ $credentials.telegramApi.id }}",
+          "name": "Telegram account"
+        }
+      },
+      "webhookId": "c8eddc6a-a633-4596-a7d2-9e2cd37ec9b8"
+    },
+    {
+      "id": "node-77408ef9",
+      "name": "Recipe URL",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "continueOnFail": true,
+      "position": [
+        1420,
+        440
+      ],
+      "parameters": {
+        "text": "=\n{{$node[\"Get recipes from API\"].json[\"recipes\"][0][\"title\"]}}\n\n{{$node[\"Get recipes from API\"].json[\"recipes\"][0][\"sourceUrl\"]}}",
+        "chatId": "={{$node[\"Set\"].json[\"chatid\"]}}",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "{{ $credentials.telegramApi.id }}",
+          "name": "Telegram account"
+        }
+      },
+      "webhookId": "b7652877-d99c-4140-a341-04f5b97b4b3b"
+    },
+    {
+      "id": "node-c4937b88",
+      "name": "IF",
+      "notesInFlow": true,
+      "notes": "If the chat ID isn't in our airtable, we add it. This is to send a new recipe daily. ",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        860,
+        -80
+      ],
+      "parameters": {
+        "conditions": {
+          "number": [],
+          "string": [
+            {
+              "value1": "= {{$node[\"Airtable1\"].parameter[\"fields\"][1]}}",
+              "value2": "= {{$node[\"Airtable1\"].parameter[\"fields\"][0]}}",
+              "operation": "notEqual"
+            }
+          ],
+          "boolean": []
+        }
+      }
+    },
+    {
+      "id": "node-ab550197",
+      "name": "Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        620,
+        -80
+      ],
+      "parameters": {
+        "table": "Table 1",
+        "operation": "list",
+        "application": "your_sheet_id",
+        "additionalOptions": {}
+      },
+      "credentials": {
+        "airtableApi": {
+          "id": "{{ $credentials.airtableApi.id }}",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "id": "node-5faf12a0",
+      "name": "Airtable1",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        -100
+      ],
+      "parameters": {
+        "table": "Table 1",
+        "fields": [
+          "chatid",
+          "={{$node[\"Telegram Trigger - people join bot\"].json[\"message\"][\"chat\"][\"id\"]}}",
+          "Name",
+          "={{$node[\"Telegram Trigger - people join bot\"].json[\"message\"][\"from\"][\"first_name\"]}}"
+        ],
+        "options": {},
+        "operation": "append",
+        "application": "your_sheet_id",
+        "addAllFields": false
+      },
+      "credentials": {
+        "airtableApi": {
+          "id": "{{ $credentials.airtableApi.id }}",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "id": "node-a8fb1bab",
+      "name": "Telegram Recipe Image",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        980,
+        180
+      ],
+      "parameters": {
+        "file": "={{$node[\"Get recipes\"].json[\"recipes\"][0][\"image\"]}}",
+        "chatId": "={{$node[\"Telegram Trigger - people join bot\"].json[\"message\"][\"chat\"][\"id\"]}}",
+        "operation": "sendPhoto",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "{{ $credentials.telegramApi.id }}",
+          "name": "Telegram account"
+        }
+      },
+      "webhookId": "ccee7058-47c7-4f95-ad3e-2302ee264720"
+    },
+    {
+      "id": "node-7d7a84a2",
+      "name": "Telegram Recipe URL",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1180,
+        180
+      ],
+      "parameters": {
+        "text": "=\n{{$node[\"Get recipes\"].json[\"recipes\"][0][\"title\"]}}\n\n{{$node[\"Get recipes\"].json[\"recipes\"][0][\"sourceUrl\"]}}",
+        "chatId": "={{$node[\"Telegram Trigger - people join bot\"].json[\"message\"][\"chat\"][\"id\"]}}",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "{{ $credentials.telegramApi.id }}",
+          "name": "Telegram account"
+        }
+      },
+      "webhookId": "2211b016-0fba-4928-8d15-df4329750cd7"
+    },
+    {
+      "id": "node-2a929885",
+      "name": "Set1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        -100
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "chatid",
+              "value": "={{$node[\"Telegram Trigger - people join bot\"].json[\"message\"][\"chat\"][\"id\"]}}"
+            },
+            {
+              "name": "Name",
+              "value": "={{$node[\"Telegram Trigger - people join bot\"].json[\"message\"][\"from\"][\"first_name\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "node-c960a1bc",
+      "name": "Get recipes from API",
+      "notes": "https://spoonacular.com/food-api/docs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        440
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {
+          "fullResponse": false
+        },
+        "queryParametersUi": {
+          "parameter": []
+        }
+      }
+    },
+    {
+      "id": "node-335ceb1e",
+      "name": "Get recipes",
+      "notes": "https://spoonacular.com/food-api/docs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        800,
+        180
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {
+          "fullResponse": false
+        },
+        "queryParametersUi": {
+          "parameter": []
+        }
+      }
+    },
+    {
+      "id": "node-db59182e",
+      "name": "Telegram Trigger - people join bot",
+      "webhookId": "your_bot_id",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [
+        420,
+        140
+      ],
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "{{ $credentials.telegramApi.id }}",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "node-ee6931fe",
+      "name": "Telegram - Welcome Message",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        620,
+        180
+      ],
+      "parameters": {
+        "text": "=Welcome! This bot will send you one vegan recipe a day. Here is your first recipe!",
+        "chatId": "={{$node[\"Telegram Trigger - people join bot\"].json[\"message\"][\"chat\"][\"id\"]}}",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "{{ $credentials.telegramApi.id }}",
+          "name": "Telegram account"
+        }
+      },
+      "webhookId": "2385b524-612e-4782-a85b-fc23d5d1a3e4"
+    },
+    {
+      "id": "error-621ac5b4",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

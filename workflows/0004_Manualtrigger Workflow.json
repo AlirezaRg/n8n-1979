@@ -1,0 +1,60 @@
+{
+  "active": false,
+  "name": "Manualtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "a7eeebb8-a67d-4ffa-8615-c1757c870e0e",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        680,
+        400
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "7bbb769c-4a3b-4670-8d23-70032e673ac4",
+      "name": "Read Binary File",
+      "notes": "This readBinaryFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        880,
+        400
+      ],
+      "parameters": {
+        "filePath": "/data/pdf.pdf"
+      }
+    },
+    {
+      "id": "31f574ef-73c5-4a24-8819-4b55553705f4",
+      "name": "Read PDF",
+      "notes": "This readPDF node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.readPDF",
+      "typeVersion": 1,
+      "position": [
+        1090,
+        400
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "error-acd039e9",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

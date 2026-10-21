@@ -1,0 +1,192 @@
+{
+  "active": false,
+  "name": "Emailreadimap Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "trigger-5d687ed0",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        100
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "1c7b05e0-d82b-4851-a1ec-713093cdf489",
+      "name": "Email Trigger (IMAP)",
+      "notes": "This emailReadImap node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2,
+      "position": [
+        540,
+        660
+      ],
+      "parameters": {
+        "format": "resolved",
+        "options": {
+          "forceReconnect": 60,
+          "customEmailConfig": "[\"UNSEEN\"]"
+        }
+      }
+    },
+    {
+      "id": "734424e6-d292-47d7-abb9-9630bdc00e35",
+      "name": "Telegram",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        1140,
+        660
+      ],
+      "parameters": {
+        "text": "=?? <b>You've got mail!</b>\n\nA new email has arrived from this address: <code>{{ $node[\"Email Trigger (IMAP)\"].json[\"from\"][\"value\"][\"0\"][\"address\"] }}</code>\n\n?? A secert HTML page has been created for it, where you can preview the message by following the link below ??",
+        "chatId": "<Your Chat ID Here>",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "={{ $('Github Gist').item.json.files[\"email.html\"].filename }}",
+                    "additionalFields": {
+                      "url": "{{ $env.BASE_URL }}"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "parse_mode": "HTML",
+          "appendAttribution": true,
+          "disable_web_page_preview": true
+        }
+      },
+      "webhookId": "f01649a9-9f9d-49ed-8b3d-bd9d51336f50"
+    },
+    {
+      "id": "260c6ba6-1922-4bcb-bd5e-20b307ac638d",
+      "name": "Github Gist",
+      "notesInFlow": true,
+      "notes": "Save HTML content",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        840,
+        660
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        },
+        "jsonBody": "={\n  \"description\": \"{{ $json.date }} - from {{ JSON.stringify($json.from.value[0].address).slice(1, -1) }} - to {{ JSON.stringify($json.to.value[0].address).slice(1, -1) }}\",\n  \"public\": false,\n  \"files\": {\n    \"email.html\": {\n      \"content\": \"{{ JSON.stringify($json.html).slice(1, -1) }}\"\n    }\n  }\n}",
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "authentication": "{{ $credentials.predefinedCredentialType }}",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            }
+          ]
+        },
+        "nodeCredentialType": "YOUR_CREDENTIAL_HERE"
+      }
+    },
+    {
+      "id": "0a77d236-e387-4458-a9cc-9ff7977ba4aa",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        460,
+        440
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 872,
+        "height": 626.9128738621571,
+        "content": "## Simple Conversion of Emails into HTML Webpages\nTo-do:\n* Configure your GitHub credentials through `Predefined Credential Type` => `GitHub API`.\n* Add your Telegram credentials by providing your `Chat ID`.\n* [**Optional**] You can host this [small project]({{ $env.WEBHOOK_URL }} on your own domain using GitHub Pages.\n\n ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ?  ? ? ?  ? ? ? ? ? ? ? ? ? ? ? ![image]({{ $env.WEBHOOK_URL }}\n\n\n\n\n\n\n\n ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ?  ? ? ?  ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ![image]({{ $env.WEBHOOK_URL }}"
+      }
+    },
+    {
+      "id": "f69cf395-0050-44b3-a713-61f0cc5977ad",
+      "name": "Wait",
+      "webhookId": "c5202512-f84e-44b4-b357-9ee2124bd507",
+      "notesInFlow": true,
+      "notes": "Delete within 3h",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        540,
+        900
+      ],
+      "parameters": {
+        "amount": 3
+      }
+    },
+    {
+      "id": "c6067792-4fc2-4ced-bb04-6c5449a533ab",
+      "name": "Telegram ?",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        1140,
+        900
+      ],
+      "parameters": {
+        "chatId": "<Your Chat ID Here>",
+        "messageId": "={{ $('Telegram').item.json.result.message_id }}",
+        "operation": "deleteMessage"
+      },
+      "webhookId": "7edc9116-fb5e-457b-b409-7fee8637133f"
+    },
+    {
+      "id": "ebfe89fb-b0a3-4826-a72b-3fb8baa473c4",
+      "name": "Github Gist ?",
+      "notesInFlow": true,
+      "notes": "Remove HTML content",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        840,
+        900
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "method": "DELETE",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        },
+        "sendHeaders": true,
+        "authentication": "{{ $credentials.predefinedCredentialType }}",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            }
+          ]
+        },
+        "nodeCredentialType": "YOUR_CREDENTIAL_HERE"
+      }
+    }
+  ],
+  "connections": {}
+}

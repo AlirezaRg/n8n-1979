@@ -1,0 +1,140 @@
+{
+  "active": false,
+  "name": "Telegramtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "0b4eb8e4-e98b-4f67-b134-914a5aa46b4d",
+      "name": "Telegram Trigger",
+      "webhookId": "9c8b833c-7aa7-430d-8fc0-47936f695ddf",
+      "notes": "This telegramTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        960,
+        400
+      ],
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "4lzd2F9cNrnR7j0j",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "339246f2-76cb-44c4-8828-da0cb5d3ad5e",
+      "name": "OpenAI Chat Model",
+      "notes": "This lmChatOpenAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        600
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "m3YyjGXFLLWwcnk7",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "id": "70a981e2-7833-473b-a27a-fedf860901cb",
+      "name": "AI Agent",
+      "notes": "This agent node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.2,
+      "position": [
+        1200,
+        400
+      ],
+      "parameters": {
+        "text": "=Respond to this as a helpful assistant with emojis: {{ $json.message.text }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "fb6ff65b-56b4-44c4-978a-b9a5c3d535d6",
+      "name": "Telegram",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        1560,
+        400
+      ],
+      "parameters": {
+        "text": "={{ $json.output }}",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "4lzd2F9cNrnR7j0j",
+          "name": "Telegram account"
+        }
+      },
+      "webhookId": "c95c4f82-532f-4e3b-931e-d4e756bf9ab3"
+    },
+    {
+      "id": "error-692e9617",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

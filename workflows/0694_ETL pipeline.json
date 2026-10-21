@@ -1,0 +1,204 @@
+{
+  "active": false,
+  "name": "ETL pipeline",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "8ed05ff3-22a9-492c-b7cc-edcbdfe8f429",
+      "name": "Twitter",
+      "notes": "This twitter node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 1,
+      "position": [
+        300,
+        300
+      ],
+      "parameters": {
+        "limit": 3,
+        "operation": "search",
+        "searchText": "=#OnThisDay",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "twitterOAuth1Api": "twitter_api"
+      }
+    },
+    {
+      "id": "4efb62bd-f023-4bc8-8077-02d93f9cec65",
+      "name": "Postgres",
+      "notes": "This postgres node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        300
+      ],
+      "parameters": {
+        "table": "tweets",
+        "columns": "text, score, magnitude",
+        "returnFields": "=*"
+      },
+      "credentials": {
+        "postgres": "postgres"
+      }
+    },
+    {
+      "id": "62ad0b28-d5d9-44e2-8e45-0adf538e509b",
+      "name": "MongoDB",
+      "notes": "This mongoDb node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1,
+      "position": [
+        500,
+        300
+      ],
+      "parameters": {
+        "fields": "text",
+        "options": {},
+        "operation": "insert",
+        "collection": "tweets"
+      },
+      "credentials": {
+        "mongoDb": "mongodb"
+      }
+    },
+    {
+      "id": "d4c814de-ade5-4159-a9a5-c70a94137fab",
+      "name": "Slack",
+      "notes": "This slack node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        200
+      ],
+      "parameters": {
+        "text": "=?? NEW TWEET with sentiment score {{$json[\"score\"]}} and magnitude {{$json[\"magnitude\"]}} ??\n{{$json[\"text\"]}}",
+        "channel": "tweets",
+        "attachments": [],
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": "slack"
+      }
+    },
+    {
+      "id": "df72509b-4b78-4f1c-90cf-4122d8c3bd62",
+      "name": "If Node",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json[\"score\"]}}",
+              "operation": "larger"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "73018c00-7302-4f58-b341-d41069af2f08",
+      "name": "NoOp",
+      "notes": "This noOp node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        400
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "426cef5c-c8d8-41f8-b7d8-84acc8f1e143",
+      "name": "Google Cloud Natural Language",
+      "notes": "This googleCloudNaturalLanguage node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleCloudNaturalLanguage",
+      "typeVersion": 1,
+      "position": [
+        700,
+        300
+      ],
+      "parameters": {
+        "content": "={{$node[\"MongoDB\"].json[\"text\"]}}",
+        "options": {}
+      },
+      "credentials": {
+        "googleCloudNaturalLanguageOAuth2Api": "google_nlp"
+      }
+    },
+    {
+      "id": "ff4ccda1-d4f4-4037-b60d-cbd2ee9e94d1",
+      "name": "Set",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        900,
+        300
+      ],
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "score",
+              "value": "={{$json[\"documentSentiment\"][\"score\"]}}"
+            },
+            {
+              "name": "magnitude",
+              "value": "={{$json[\"documentSentiment\"][\"magnitude\"]}}"
+            }
+          ],
+          "string": [
+            {
+              "name": "text",
+              "value": "={{$node[\"Twitter\"].json[\"text\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "d4566ac9-47d3-41eb-9797-f498fe62640e",
+      "name": "Cron",
+      "notes": "This cron node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        100,
+        300
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 6
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "error-a9e70423",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

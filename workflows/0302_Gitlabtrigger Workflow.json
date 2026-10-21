@@ -1,0 +1,44 @@
+{
+  "active": false,
+  "name": "Gitlabtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "5e702f2a-48ad-4791-abec-daa3f835cae3",
+      "name": "Gitlab Trigger",
+      "webhookId": "0e855b27-6465-42be-9610-c61b2e09cef9",
+      "notes": "This gitlabTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gitlabTrigger",
+      "typeVersion": 1,
+      "position": [
+        460,
+        480
+      ],
+      "parameters": {
+        "owner": "n8n-io",
+        "events": [
+          "*"
+        ],
+        "repository": "n8n-docs"
+      },
+      "credentials": {
+        "gitlabApi": "gitlab_creds"
+      }
+    },
+    {
+      "id": "error-d891b97b",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

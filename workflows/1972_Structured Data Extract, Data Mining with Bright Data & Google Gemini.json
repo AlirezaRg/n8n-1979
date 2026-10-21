@@ -1,0 +1,388 @@
+{
+  "active": false,
+  "name": "Structured Data Extract, Data Mining with Bright Data & Google Gemini",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "1e9038e6-9ebc-4460-bee2-3faea3b38f4c",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -420
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "fd4ace46-7261-4380-8b65-1e00bb574f27",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -780
+      ],
+      "parameters": {
+        "width": 400,
+        "height": 300,
+        "content": "## Note\n\nThis workflow deals with the structured data extraction by utilizing Bright Data Web Unlocker Product.\n\nThe Basic LLM Chain, Information Extraction, are being used to demonstrate the usage of the N8N AI capabilities.\n\n**Please make sure to set the web URL of your interest within the \"Set URL and Bright Data Zone\" node and update the Webhook Notification URL**"
+      }
+    },
+    {
+      "id": "1c1dd10f-beb2-4cc7-9118-77efd3172651",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        620,
+        -780
+      ],
+      "parameters": {
+        "width": 480,
+        "height": 300,
+        "content": "## LLM Usages\n\nGoogle Gemini Flash Exp model is being used.\n\nBasic LLM Chain Data Extractor.\n\nInformation Extraction is being used for the handling the custom sentiment analysis with the structured response."
+      }
+    },
+    {
+      "id": "9795ac80-6ded-465d-bfcf-0c6ce120452f",
+      "name": "Markdown to Textual Data Extractor",
+      "notes": "This chainLlm node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.6,
+      "position": [
+        860,
+        -420
+      ],
+      "parameters": {
+        "text": "=You need to analyze the below markdown and convert to textual data. Please do not output with your own thoughts. Make sure to output with textual data only with no links, scripts, css etc.\n\n{{ $json.data }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are a markdown expert"
+            }
+          ]
+        },
+        "promptType": "define"
+      }
+    },
+    {
+      "id": "b6a8cc64-c0c7-40dc-b7c1-0571baf3a0a9",
+      "name": "Set URL and Bright Data Zone",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        420,
+        -420
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3aedba66-f447-4d7a-93c0-8158c5e795f9",
+              "name": "url",
+              "type": "string",
+              "value": "{{ $env.WEBHOOK_URL }}"
+            },
+            {
+              "id": "4e7ee31d-da89-422f-8079-2ff2d357a0ba",
+              "name": "zone",
+              "type": "string",
+              "value": "web_unlocker1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "8d15dca1-3014-405f-ac35-78d64eda1d07",
+      "name": "Initiate a Webhook Notification for Markdown to Textual Data Extraction",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1314,
+        -720
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}",
+        "options": {},
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "={{ $json.text }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "fff9e2d1-f3e2-47c3-8c3a-f9de8dbdee6a",
+      "name": "Initiate a Webhook Notification for AI Sentiment Analyzer",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1612,
+        80
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}",
+        "options": {},
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "summary",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "40c82a76-1710-4e57-8123-9c9fbc729110",
+      "name": "Google Gemini Chat Model for Data Extract",
+      "notes": "This lmChatGoogleGemini node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        948,
+        -200
+      ],
+      "parameters": {
+        "options": {},
+        "modelName": "models/gemini-2.0-flash-exp"
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YeO7dHZnuGBVQKVZ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "id": "0c1da174-9b9c-4067-9b2c-fa0cc8c33dc8",
+      "name": "Google Gemini Chat Model for Sentiment Analyzer",
+      "notes": "This lmChatGoogleGemini node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1324,
+        200
+      ],
+      "parameters": {
+        "options": {},
+        "modelName": "models/gemini-2.0-flash-exp"
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YeO7dHZnuGBVQKVZ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "id": "7fae589c-854d-429e-9e67-527a002fcabf",
+      "name": "Perform Bright Data Web Request",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        -420
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "sendBody": true,
+        "sendHeaders": true,
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "zone",
+              "value": "={{ $json.zone }}"
+            },
+            {
+              "name": "url",
+              "value": "={{ $json.url }}?product=unlocker&method=api"
+            },
+            {
+              "name": "format",
+              "value": "raw"
+            },
+            {
+              "name": "data_format",
+              "value": "markdown"
+            }
+          ]
+        },
+        "genericAuthType": "httpHeaderAuth",
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "kdbqXuxIR8qIxF7y",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "id": "e15fb9ba-ea8f-41f0-9b99-437d14a98a7d",
+      "name": "Topic Extractor with the structured response",
+      "notes": "This informationExtractor node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1236,
+        -20
+      ],
+      "parameters": {
+        "text": "=Perform the topic analysis on the below content and output with the structured information.\n\nHere's the content:\n\n{{ $('Perform Bright Data Web Request').item.json.data }}",
+        "options": {
+          "systemPromptTemplate": "You are an expert data analyst."
+        },
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"$schema\": \"{{ $env.WEBHOOK_URL }}\",\n  \"title\": \"TopicModelingResponseArray\",\n  \"type\": \"array\",\n  \"items\": {\n    \"type\": \"object\",\n    \"properties\": {\n      \"topic\": {\n        \"type\": \"string\",\n        \"description\": \"The identified topic or theme derived from the input text.\"\n      },\n      \"score\": {\n        \"type\": \"number\",\n        \"minimum\": 0,\n        \"maximum\": 1,\n        \"description\": \"Confidence score representing how strongly this topic is reflected in the content.\"\n      },\n      \"summary\": {\n        \"type\": \"string\",\n        \"description\": \"Brief explanation of the topic's context within the text.\"\n      },\n      \"keywords\": {\n        \"type\": \"array\",\n        \"description\": \"List of keywords associated with the topic.\",\n        \"items\": {\n          \"type\": \"string\"\n        }\n      }\n    },\n    \"required\": [\"topic\", \"score\", \"summary\", \"keywords\"],\n    \"additionalProperties\": false\n  }\n}\n"
+      }
+    },
+    {
+      "id": "e7f2b2c5-89ba-45c4-b7a4-297a159f8b39",
+      "name": "Trends by location and category with the structured response",
+      "notes": "This informationExtractor node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1236,
+        -520
+      ],
+      "parameters": {
+        "text": "=Perform the data analysis on the below content and output with the structured information by clustering the emerging trends by location and category\n\nHere's the content:\n\n{{ $('Perform Bright Data Web Request').item.json.data }}",
+        "options": {
+          "systemPromptTemplate": "You are an expert data analyst."
+        },
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"$schema\": \"{{ $env.WEBHOOK_URL }}\",\n  \"title\": \"EmergingTrendsClusteredByLocationAndCategory\",\n  \"type\": \"array\",\n  \"items\": {\n    \"type\": \"object\",\n    \"properties\": {\n      \"location\": {\n        \"type\": \"string\",\n        \"description\": \"Geographical region or city where the trend is observed.\"\n      },\n      \"category\": {\n        \"type\": \"string\",\n        \"description\": \"Domain or industry related to the trend (e.g., Technology, Finance, Healthcare).\"\n      },\n      \"trends\": {\n        \"type\": \"array\",\n        \"items\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"trend\": {\n              \"type\": \"string\",\n              \"description\": \"A concise label for the emerging trend.\"\n            },\n            \"score\": {\n              \"type\": \"number\",\n              \"minimum\": 0,\n              \"maximum\": 1,\n              \"description\": \"Confidence or prominence score of the trend.\"\n            },\n            \"summary\": {\n              \"type\": \"string\",\n              \"description\": \"Short explanation describing the context and impact of the trend.\"\n            },\n            \"mentions\": {\n              \"type\": \"array\",\n              \"items\": {\n                \"type\": \"string\"\n              },\n              \"description\": \"Keywords or phrases that commonly co-occur with the trend.\"\n            }\n          },\n          \"required\": [\"trend\", \"score\", \"summary\", \"mentions\"],\n          \"additionalProperties\": false\n        }\n      }\n    },\n    \"required\": [\"location\", \"category\", \"trends\"],\n    \"additionalProperties\": false\n  }\n}\n"
+      }
+    },
+    {
+      "id": "92203e9f-cf13-435e-bf78-3c39a6e1e6f6",
+      "name": "Google Gemini Chat Model",
+      "notes": "This lmChatGoogleGemini node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1324,
+        -300
+      ],
+      "parameters": {
+        "options": {},
+        "modelName": "models/gemini-2.0-flash-exp"
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YeO7dHZnuGBVQKVZ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "id": "1a252b74-6768-41a6-99dd-090e35c47065",
+      "name": "Initiate a Webhook Notification for trends by location and category",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1612,
+        -320
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}",
+        "options": {},
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "summary",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "c952ab41-66af-4b41-b04e-407816074c87",
+      "name": "Create a binary file for topics",
+      "notes": "This function node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1612,
+        -120
+      ],
+      "parameters": {
+        "functionCode": "items[0].binary = {\n  data: {\n    data: new Buffer(JSON.stringify(items[0].json, null, 2)).toString('base64')\n  }\n};\nreturn items;"
+      }
+    },
+    {
+      "id": "2cf80339-0927-4f48-a13a-c610eaf4edca",
+      "name": "Write the topics file to disk",
+      "notes": "This readWriteFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1820,
+        -120
+      ],
+      "parameters": {
+        "options": {},
+        "fileName": "d:\\topics.json",
+        "operation": "write"
+      }
+    },
+    {
+      "id": "cf1da0ee-bb78-4ea7-bb2d-f2f82f728b12",
+      "name": "Write the trends file to disk",
+      "notes": "This readWriteFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1832,
+        -520
+      ],
+      "parameters": {
+        "options": {},
+        "fileName": "d:\\trends.json",
+        "operation": "write"
+      }
+    },
+    {
+      "id": "d38ca005-6ba3-4105-9fcd-058602ba16ce",
+      "name": "Create a binary data for tends",
+      "notes": "This function node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1612,
+        -520
+      ],
+      "parameters": {
+        "functionCode": "items[0].binary = {\n  data: {\n    data: new Buffer(JSON.stringify(items[0].json, null, 2)).toString('base64')\n  }\n};\nreturn items;"
+      }
+    }
+  ],
+  "connections": {}
+}

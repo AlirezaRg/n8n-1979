@@ -1,0 +1,288 @@
+{
+  "active": false,
+  "name": "Notion to Linkedin",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "d922cf0c-f1c2-40ff-927c-d0d3e2fb7f27",
+      "name": "Merge",
+      "notes": "This merge node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        2140,
+        460
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {},
+        "combinationMode": "mergeByPosition"
+      }
+    },
+    {
+      "id": "8c5f68d8-f11d-4b37-b0d8-3abd1b681b56",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        780,
+        440
+      ],
+      "parameters": {
+        "color": 4,
+        "height": 141.4092845296238,
+        "content": "## Start the flow every day at the same time"
+      }
+    },
+    {
+      "id": "d10de4f3-6e90-474f-bd68-25aae2037b7b",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1240,
+        312.5835468325357
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 367.12018536439575,
+        "height": 382.294335406698,
+        "content": "## Fetch the day's post from my Notion database"
+      }
+    },
+    {
+      "id": "a63bcc85-ec8b-424f-a53c-e4c07db3c7c8",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1642.6949426092506,
+        313.81962236044654
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 627.4768047417825,
+        "height": 380.3367219655605,
+        "content": "## Process and format the post"
+      }
+    },
+    {
+      "id": "d7c0f13c-ebbe-4000-bd8f-d1180d65d02a",
+      "name": "Schedule Trigger",
+      "notes": "This scheduleTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        1060,
+        460
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 15
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "7bebcb2d-1642-48ce-a511-bb0f561ca5cf",
+      "name": "Filter the table for the day's post",
+      "notes": "This notion node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1280,
+        460
+      ],
+      "parameters": {
+        "filters": {
+          "conditions": [
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "date": "={{ $today.format(\"yyyy/mM/dd\") }}",
+              "condition": "equals"
+            }
+          ]
+        },
+        "options": {},
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "f09dc21b-1070-4d5a-bf7f-a9ab3dbb69fb",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Postagens"
+        },
+        "filterType": "manual"
+      },
+      "credentials": {
+        "notionApi": {
+          "id": "faERNMuBrkAfVaJR",
+          "name": "Notion Weck"
+        }
+      }
+    },
+    {
+      "id": "ee61bc59-164b-45b4-8b49-57cdba7d298b",
+      "name": "Fetch the content on the page",
+      "notes": "This notion node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1480,
+        460
+      ],
+      "parameters": {
+        "blockId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "={{ $json.url }}"
+        },
+        "resource": "block",
+        "operation": "getAll",
+        "returnAll": true
+      },
+      "credentials": {
+        "notionApi": {
+          "id": "faERNMuBrkAfVaJR",
+          "name": "Notion Weck"
+        }
+      }
+    },
+    {
+      "id": "52d1ffef-11e8-4635-bbb8-05e915034379",
+      "name": "Aggregate the Notion blocks",
+      "notes": "This aggregate node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        460
+      ],
+      "parameters": {
+        "options": {},
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "content"
+            },
+            {
+              "fieldToAggregate": "image.file.url"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "8617c530-382b-402b-9c0b-aeb4df2bb920",
+      "name": "Format the post",
+      "notes": "This code node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1900,
+        360
+      ],
+      "parameters": {
+        "jsCode": "const notionData = items[0].json.content;\n\nlet formattedText = notionData[0] \n\nfor (let i = 1; i < notionData.length; i++) {\n    if (notionData[i].startsWith('-')) {\n        formattedText += '\\n\\n' + notionData[i];\n    } else {\n        formattedText += '\\n' + notionData[i];\n    }\n}\n\nreturn [{ formattedText: formattedText }];\n"
+      }
+    },
+    {
+      "id": "0f226cfe-eb31-469a-8e7c-a21192adbd4c",
+      "name": "Download image",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1900,
+        560
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "81a1e39c-c7ea-4635-84fc-a8ae05cfd8f3",
+      "name": "Publish on LinkedIn",
+      "notes": "This linkedIn node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        2360,
+        460
+      ],
+      "parameters": {
+        "text": "={{ $json.formattedText }}",
+        "person": "CcS-_lLyzG",
+        "additionalFields": {},
+        "shareMediaCategory": "IMAGE"
+      },
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "HZbihVPNwXzWRzgU",
+          "name": "LinkedIn account"
+        }
+      }
+    },
+    {
+      "id": "61b92eb8-1bf8-4e57-9e07-1a39e457ecfb",
+      "name": "Update post status in notion database",
+      "notes": "This notion node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2620,
+        460
+      ],
+      "parameters": {
+        "pageId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "={{ $('Filter the table for the day\\'s post').item.json.url }}"
+        },
+        "options": {},
+        "resource": "databasePage",
+        "operation": "update",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "selectValue": "Published"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "notionApi": {
+          "id": "faERNMuBrkAfVaJR",
+          "name": "Notion Weck"
+        }
+      }
+    },
+    {
+      "id": "397f3772-bb2b-4e58-99f8-2b62cc514b7a",
+      "name": "Sticky Note3",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        760,
+        120
+      ],
+      "parameters": {
+        "color": 3,
+        "width": 567.6073693795047,
+        "height": 137.6834217043934,
+        "content": "## 1. Setup\nSet up your Notion and LinkedIn credentials.\nAttention to the LinkedIn credential: to post on your personal or company profile, you need to have a company page assigned to your profile. After that, you can choose where you want to post."
+      }
+    }
+  ],
+  "connections": {}
+}

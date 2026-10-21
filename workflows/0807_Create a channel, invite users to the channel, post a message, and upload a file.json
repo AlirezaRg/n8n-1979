@@ -1,0 +1,143 @@
+{
+  "active": false,
+  "name": "Create a channel, invite users to the channel, post a message, and upload a file",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-f2d6391b",
+      "name": "On clicking 'execute'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        250
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-f6d75bfd",
+      "name": "Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        450,
+        250
+      ],
+      "parameters": {
+        "resource": "channel",
+        "channelId": "n8n-docs",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "slackApi": "Slack Bot Access Token"
+      }
+    },
+    {
+      "id": "node-e4a466b3",
+      "name": "Slack1",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        650,
+        250
+      ],
+      "parameters": {
+        "userIds": [
+          "U01797FGD6J"
+        ],
+        "resource": "channel",
+        "channelId": "={{$node[\"Slack\"].json[\"id\"]}}",
+        "operation": "invite"
+      },
+      "credentials": {
+        "slackApi": {
+          "id": null,
+          "name": "Slack Bot Access Token"
+        }
+      }
+    },
+    {
+      "id": "node-218560ea",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        250
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "responseFormat": "file"
+      }
+    },
+    {
+      "id": "node-fd067464",
+      "name": "Slack2",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        850,
+        250
+      ],
+      "parameters": {
+        "text": "Welcome to the channel!",
+        "as_user": true,
+        "channel": "={{$node[\"Slack\"].json[\"id\"]}}",
+        "attachments": [
+          {
+            "title": "Logo",
+            "image_url": "{{ $env.BASE_URL }}"
+          }
+        ],
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": {
+          "id": null,
+          "name": "Slack Bot Access Token"
+        }
+      }
+    },
+    {
+      "id": "node-cc9a41cd",
+      "name": "Slack3",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        1250,
+        250
+      ],
+      "parameters": {
+        "options": {
+          "channelIds": [
+            "C01FZ3TJR5L"
+          ]
+        },
+        "resource": "file",
+        "binaryData": true
+      },
+      "credentials": {
+        "slackApi": {
+          "id": null,
+          "name": "Slack Bot Access Token"
+        }
+      }
+    },
+    {
+      "id": "error-aba44051",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

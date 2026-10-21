@@ -1,0 +1,164 @@
+{
+  "active": false,
+  "name": "Httprequest Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "a4c46baf-ff6d-489f-9c77-a5e4cfe6b580",
+      "name": "Fetch Github Repo Releases",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        240
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "aba391ad-eedc-4cf7-a770-646eba11e3fe",
+      "name": "Split Out Content",
+      "notes": "This splitOut node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        140
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "body"
+      }
+    },
+    {
+      "id": "ea29ed9d-5b34-46f2-87c6-2bacf4b7d7bf",
+      "name": "Convert Markdown to HTML",
+      "notes": "This markdown node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        140
+      ],
+      "parameters": {
+        "mode": "markdownToHtml",
+        "options": {},
+        "markdown": "={{ $json.body }}",
+        "destinationKey": "YOUR_CREDENTIAL_HERE"
+      }
+    },
+    {
+      "id": "53bf597d-3f64-4375-9632-c8aed38e88df",
+      "name": "Daily Trigger",
+      "notes": "This scheduleTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        380,
+        240
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      }
+    },
+    {
+      "id": "14bf72aa-167b-44e4-ba6c-f20f1c366b93",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        540,
+        140
+      ],
+      "parameters": {
+        "width": 288,
+        "height": 300,
+        "content": "Change **url** for Github Repo here"
+      }
+    },
+    {
+      "id": "c80704a9-f103-4977-b604-f07994d1d1f8",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1420,
+        60
+      ],
+      "parameters": {
+        "width": 288,
+        "height": 300,
+        "content": "Change **to Email** here"
+      }
+    },
+    {
+      "id": "5b9ea851-df78-4366-a3e0-b5afb563e5ae",
+      "name": "Send Email",
+      "notes": "This emailSend node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1520,
+        140
+      ],
+      "parameters": {
+        "html": "={{ $json.html }}",
+        "options": {},
+        "subject": "New n8n release",
+        "toEmail": "email@example.com",
+        "fromEmail": "email@example.com"
+      },
+      "credentials": {
+        "smtp": {
+          "id": "ybCScjWtYAxhpByf",
+          "name": "SMTP account - internal use only"
+        }
+      },
+      "webhookId": "baffca25-6e9a-4752-8463-468bb2215a68"
+    },
+    {
+      "id": "775c38ba-7d29-4956-a913-a2136c317591",
+      "name": "If new release in the last day",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        860,
+        240
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "77d364d3-a340-49d2-abf8-e38d7dceb8d6",
+              "operator": {
+                "type": "dateTime",
+                "operation": "after"
+              },
+              "leftValue": "={{ $json.published_at.toDateTime() }}",
+              "rightValue": "={{ DateTime.utc().minus(1, 'days') }}"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

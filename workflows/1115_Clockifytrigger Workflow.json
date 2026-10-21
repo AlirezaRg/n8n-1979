@@ -1,0 +1,46 @@
+{
+  "active": false,
+  "name": "Clockifytrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "0979ef09-53cb-4c68-a6d2-e584327467a6",
+      "name": "Clockify Trigger",
+      "notes": "This clockifyTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.clockifyTrigger",
+      "typeVersion": 1,
+      "position": [
+        450,
+        480
+      ],
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "workspaceId": "5f115b31e3f0ad7f90326b39"
+      },
+      "credentials": {
+        "clockifyApi": "clockify_creds"
+      }
+    },
+    {
+      "id": "error-cddcc900",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

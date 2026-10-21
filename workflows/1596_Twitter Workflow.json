@@ -1,0 +1,78 @@
+{
+  "active": false,
+  "name": "Twitter Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "8c187e0b-a9f2-47be-a172-4d205e0fdc01",
+      "name": "Twitter",
+      "notes": "This twitter node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 1,
+      "position": [
+        720,
+        -220
+      ],
+      "parameters": {
+        "text": "=Hey there, my design is now on a new product ?\nVisit my {{$json[\"vendor\"]}} shop to get this cool{{$json[\"title\"]}} (and check out more {{$json[\"product_type\"]}}) ???",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "twitterOAuth1Api": "twitter"
+      }
+    },
+    {
+      "id": "f31b896d-c6de-4b08-9144-2b9ee98ca6bc",
+      "name": "Telegram",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        720,
+        -20
+      ],
+      "parameters": {
+        "text": "=Hey there, my design is now on a new product!\nVisit my {{$json[\"vendor\"]}} shop to get this cool{{$json[\"title\"]}} (and check out more {{$json[\"product_type\"]}})",
+        "chatId": "123456",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": "telegram_habot"
+      },
+      "webhookId": "e3935fca-b44d-462b-b3e5-4cf57b9df80c"
+    },
+    {
+      "id": "6f1afddb-4110-4107-9ce4-cdbfea1d6da4",
+      "name": "product created",
+      "webhookId": "2a7e0e50-8f09-4a2b-bf54-a849a6ac4fe0",
+      "notes": "This shopifyTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.shopifyTrigger",
+      "typeVersion": 1,
+      "position": [
+        540,
+        -110
+      ],
+      "parameters": {
+        "topic": "products/create"
+      },
+      "credentials": {
+        "shopifyApi": "shopify_nodeqa"
+      }
+    },
+    {
+      "id": "error-3398f40c",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

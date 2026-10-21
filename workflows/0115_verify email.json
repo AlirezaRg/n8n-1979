@@ -1,0 +1,88 @@
+{
+  "active": false,
+  "name": "verify email",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "1281eaa3-fd45-426b-9d17-d7c560e962bb",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        440,
+        510
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "9659c568-7d05-47b7-983b-1a61ad49fb04",
+      "name": "Create Email Item",
+      "notes": "This functionItem node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.functionItem",
+      "typeVersion": 1,
+      "position": [
+        640,
+        510
+      ],
+      "parameters": {
+        "functionCode": "item.email = \"mcolomer@gmail.com\";\nreturn item;"
+      }
+    },
+    {
+      "id": "4b80e0d0-504c-401e-9cd2-aa5163e0a91d",
+      "name": "Check Email Exists",
+      "notes": "This uproc node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.uproc",
+      "typeVersion": 1,
+      "position": [
+        850,
+        510
+      ],
+      "parameters": {
+        "tool": "checkEmailExists",
+        "email": "={{$node[\"Create Email Item\"].json[\"email\"]}}",
+        "additionalOptions": {}
+      },
+      "credentials": {
+        "uprocApi": "miquel-uproc"
+      }
+    },
+    {
+      "id": "cae285c7-a532-47bc-ad05-80a5513ac715",
+      "name": "Email Exists?",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        510
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$node[\"Check Email Exists\"].json[\"message\"][\"response\"]}}",
+              "value2": "deliverable"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "error-6ae7be9d",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,419 @@
+{
+  "active": false,
+  "name": "Automate Etsy Data Mining with Bright Data Scrape & Google Gemini",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "f369feaf-4782-4411-9d08-fe91b9ffd97e",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -555
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "231bae3c-c27e-49fc-b878-2d5cc1e14c5a",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -1020
+      ],
+      "parameters": {
+        "width": 400,
+        "height": 300,
+        "content": "## Note\n\nDeals with the Esty web scraping by utilizing the Bright Data Web Unlocker Product.\n\nThe Information Extraction node being used to demonstrate the usage of the N8N AI capabilities.\n\n**Please make sure to set the Indeed search query and update the Webhook Notification URL**"
+      }
+    },
+    {
+      "id": "f568de40-b389-41f9-afe9-5e09a291c367",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        640,
+        -1020
+      ],
+      "parameters": {
+        "width": 480,
+        "height": 300,
+        "content": "## LLM Usages\n\nGoogle Gemini Flash Exp model is being used.\n\nBasic LLM Chain Data Extractor."
+      }
+    },
+    {
+      "id": "4f1db865-a0cb-4978-9c7d-fde448bd978a",
+      "name": "Set Esty Search Query",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        420,
+        -555
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3aedba66-f447-4d7a-93c0-8158c5e795f9",
+              "name": "url",
+              "type": "string",
+              "value": "{{ $env.WEBHOOK_URL }}"
+            },
+            {
+              "id": "4e7ee31d-da89-422f-8079-2ff2d357a0ba",
+              "name": "zone",
+              "type": "string",
+              "value": "web_unlocker1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "4cb51368-bb69-4d99-a0b6-e8e8013f1dfd",
+      "name": "Perform Esty Web Request",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        -680
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "sendBody": true,
+        "sendHeaders": true,
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "zone",
+              "value": "={{ $json.zone }}"
+            },
+            {
+              "name": "url",
+              "value": "={{ $json.url }}?product=unlocker&method=api"
+            },
+            {
+              "name": "format",
+              "value": "raw"
+            },
+            {
+              "name": "data_format",
+              "value": "markdown"
+            }
+          ]
+        },
+        "genericAuthType": "httpHeaderAuth",
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "kdbqXuxIR8qIxF7y",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "id": "9fb7bdc5-ba64-4df4-89b4-a3207e7f6d0e",
+      "name": "Google Gemini Chat Model",
+      "notes": "This lmChatGoogleGemini node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        948,
+        -460
+      ],
+      "parameters": {
+        "options": {},
+        "modelName": "models/gemini-2.0-flash-exp"
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YeO7dHZnuGBVQKVZ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "id": "1f95576d-e243-481d-9d5f-308764d8ea4b",
+      "name": "Loop Over Items",
+      "notes": "This splitInBatches node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1460,
+        -680
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "47f23aa1-63ee-49e3-a465-283c7ab71b76",
+      "name": "Perform Esty web request over the loop",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1680,
+        -560
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "sendBody": true,
+        "sendHeaders": true,
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "zone",
+              "value": "=web_unlocker1"
+            },
+            {
+              "name": "url",
+              "value": "={{ $json.url }}&product=unlocker"
+            },
+            {
+              "name": "format",
+              "value": "raw"
+            },
+            {
+              "name": "data_format",
+              "value": "markdown"
+            }
+          ]
+        },
+        "genericAuthType": "httpHeaderAuth",
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "kdbqXuxIR8qIxF7y",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "id": "0b5ea206-a5a0-49b5-8f53-10b4dec5806c",
+      "name": "Initiate a Webhook Notification for the extracted data",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2320,
+        -560
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}",
+        "options": {},
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "summary",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "a164b90b-f44c-4862-b010-d515926774c7",
+      "name": "Extract Item List with the Product Info",
+      "notes": "This informationExtractor node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1920,
+        -560
+      ],
+      "parameters": {
+        "text": "=Extract the product info in JSON\n\n{{ $json.data }}",
+        "options": {},
+        "schemaType": "fromJson",
+        "jsonSchemaExample": "[{\n    \"image\": \"{{ $env.WEBHOOK_URL }}\",\n    \"name\": \"Custom Coffee Mug with Photo\",\n    \"url\": \"{{ $env.WEBHOOK_URL }}\",\n    \"brand\": {\n        \"@type\": \"Brand\",\n        \"name\": \"TheGiftBucks\"\n    },\n    \"offers\": {\n        \"@type\": \"Offer\",\n        \"price\": \"14.99\",\n        \"priceCurrency\": \"USD\"\n    }\n}]"
+      }
+    },
+    {
+      "id": "c3798c64-ac53-44c8-ba91-8fe33377113d",
+      "name": "Google Gemini Chat Model for product info",
+      "notes": "This lmChatGoogleGemini node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        -300
+      ],
+      "parameters": {
+        "options": {},
+        "modelName": "models/gemini-2.0-flash-exp"
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YeO7dHZnuGBVQKVZ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "id": "11e4ae42-d2e1-4a4b-adcf-382f9e494431",
+      "name": "Extract Paginated Resultset",
+      "notes": "This informationExtractor node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        860,
+        -680
+      ],
+      "parameters": {
+        "text": "=Analyze and Extract the below content. Make sure to produce a unique resultset. Exclude page_numbers which are not numbers.\n\n {{ $json.data }}",
+        "options": {},
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"$schema\": \"{{ $env.WEBHOOK_URL }}\",\n  \"title\": \"PagedResultSetSchema\",\n  \"type\": \"array\",\n  \"items\": {\n    \"type\": \"object\",\n    \"properties\": {\n      \"page_number\": {\n        \"type\": \"string\",\n        \"description\": \"Page number, typically a string (e.g., '1', '2', 'next').\"\n      },\n      \"url\": {\n        \"type\": \"string\",\n        \"format\": \"uri\",\n        \"description\": \"URL pointing to the page.\"\n      }\n    },\n    \"required\": [\"page_number\", \"url\"],\n    \"additionalProperties\": false\n  }\n}\n"
+      }
+    },
+    {
+      "id": "28c1822b-d51c-4f8e-b98e-2e12324397be",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1400,
+        -780
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 1340,
+        "height": 620,
+        "content": "## Loop and Perform Paginated Esty Data Extraction\n"
+      }
+    },
+    {
+      "id": "d4f18f2b-9825-4320-addb-c02bfdc4da97",
+      "name": "Write the scraped content to disk",
+      "notes": "This readWriteFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        2560,
+        -760
+      ],
+      "parameters": {
+        "options": {},
+        "fileName": "=d:\\Esty-Scraped-Content-{{ $('Loop Over Items').item.json.page_number }}.json",
+        "operation": "write"
+      }
+    },
+    {
+      "id": "5555407d-c7dd-4e5c-83ab-ef6ba9c46da3",
+      "name": "Create a binary data",
+      "notes": "This function node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        2360,
+        -760
+      ],
+      "parameters": {
+        "functionCode": "items[0].binary = {\n  data: {\n    data: new Buffer(JSON.stringify(items[0].json, null, 2)).toString('base64')\n  }\n};\nreturn items;"
+      }
+    },
+    {
+      "id": "2f7a5fab-a2f4-422e-8f83-ce50fbe2a738",
+      "name": "Split Out",
+      "notes": "This splitOut node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1240,
+        -680
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "output"
+      }
+    },
+    {
+      "id": "3d7a8992-b8d4-4a86-b60b-a92a7d63e31b",
+      "name": "Extract Paginated Resultset With OpenAI",
+      "notes": "This informationExtractor node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        880,
+        -120
+      ],
+      "parameters": {
+        "text": "=Analyze and Extract the below content. Make sure to produce a unique resultset. Exclude page_numbers which are not numbers.\n\n {{ $json.data }}",
+        "options": {},
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"$schema\": \"{{ $env.WEBHOOK_URL }}\",\n  \"title\": \"PagedResultSetSchema\",\n  \"type\": \"array\",\n  \"items\": {\n    \"type\": \"object\",\n    \"properties\": {\n      \"page_number\": {\n        \"type\": \"string\",\n        \"description\": \"Page number, typically a string (e.g., '1', '2', 'next').\"\n      },\n      \"url\": {\n        \"type\": \"string\",\n        \"format\": \"uri\",\n        \"description\": \"URL pointing to the page.\"\n      }\n    },\n    \"required\": [\"page_number\", \"url\"],\n    \"additionalProperties\": false\n  }\n}\n"
+      }
+    },
+    {
+      "id": "aa42d335-67bc-4dc5-a68a-4ce93e05464a",
+      "name": "OpenAI Chat Model",
+      "notes": "This lmChatOpenAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        80
+      ],
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "vPKynKbDzJ5ZU4cU",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "id": "82df0ccc-3065-4bb5-a48e-90e4dbf2162f",
+      "name": "Sticky Note3",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        640,
+        -260
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 660,
+        "height": 460,
+        "content": "## Open AI Extraction (Optional)\nNote - Replace the above workflow with the Open AI Chat Model if needed\nPlease make sure to set the OpenAI Chat Model -> Credential to connect with **OpenAi Account**"
+      }
+    }
+  ],
+  "connections": {}
+}

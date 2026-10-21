@@ -1,0 +1,98 @@
+{
+  "active": false,
+  "name": "New WooCommerce product to Slack",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "44322593-b23f-4455-91e1-0ce2011ac41e",
+      "name": "Product Created",
+      "webhookId": "267c4855-6227-4d33-867e-74600097473e",
+      "notes": "This wooCommerceTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.wooCommerceTrigger",
+      "typeVersion": 1,
+      "position": [
+        320,
+        500
+      ],
+      "parameters": {
+        "event": "product.created"
+      },
+      "credentials": {
+        "wooCommerceApi": {
+          "id": "{{ $credentials.wooCommerceApi.id }}",
+          "name": "WooCommerce account"
+        }
+      }
+    },
+    {
+      "id": "7c125a9f-1ea1-4b02-9da7-6fef1ab2dc55",
+      "name": "Send to Slack",
+      "notes": "This slack node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        540,
+        500
+      ],
+      "parameters": {
+        "text": ":new: A new product has been added! :new:",
+        "channel": "woo-commerce",
+        "blocksUi": {
+          "blocksValues": []
+        },
+        "attachments": [
+          {
+            "color": "#66FF00",
+            "fields": {
+              "item": [
+                {
+                  "short": false,
+                  "title": "Name",
+                  "value": "={{$json[\"name\"]}}"
+                },
+                {
+                  "short": true,
+                  "title": "Price",
+                  "value": "={{$json[\"regular_price\"]}}"
+                },
+                {
+                  "short": true,
+                  "title": "Sale Price",
+                  "value": "={{$json[\"sale_price\"]}}"
+                },
+                {
+                  "short": false,
+                  "title": "Link",
+                  "value": "={{$json[\"permalink\"]}}"
+                }
+              ]
+            },
+            "footer": "=Added: {{$json[\"date_created\"]}}"
+          }
+        ],
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": {
+          "id": "{{ $credentials.slackApi.id }}",
+          "name": "Slack Access Token"
+        }
+      }
+    },
+    {
+      "id": "error-feb7e29f",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

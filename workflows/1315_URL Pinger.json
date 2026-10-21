@@ -1,0 +1,86 @@
+{
+  "active": false,
+  "name": "URL Pinger",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "5b3b5251-d460-4eae-a931-e4772749a927",
+      "name": "Split Out",
+      "notes": "This splitOut node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        900,
+        460
+      ],
+      "parameters": {
+        "options": {
+          "destinationFieldName": "url"
+        },
+        "fieldToSplitOut": "urls"
+      }
+    },
+    {
+      "id": "b19bec9b-de09-42a7-8576-2cef3e0f9288",
+      "name": "Schedule Trigger",
+      "notes": "This scheduleTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        460,
+        460
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "584a4340-7053-4afd-ae3e-f0c1f2de2586",
+      "name": "HTTP Request",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "onError": "continueRegularOutput",
+      "position": [
+        1100,
+        460
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "d53b8c24-7408-4e09-8360-f13ecfa5deca",
+      "name": "URLs List",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        680,
+        460
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9e5e8792-c5ee-4ce2-9a9a-0b3ad274cae6",
+              "name": "urls",
+              "type": "array",
+              "value": "={{ ['{{ $env.WEBHOOK_URL }}', '{{ $env.WEBHOOK_URL }}', '{{ $env.WEBHOOK_URL }}'] }}"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

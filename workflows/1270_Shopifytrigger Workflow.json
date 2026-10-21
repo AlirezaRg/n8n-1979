@@ -1,0 +1,84 @@
+{
+  "active": false,
+  "name": "Shopifytrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "a5f74e05-acea-4ff4-b3b2-5997850be036",
+      "name": "On new customer",
+      "webhookId": "8efd263c-73fb-481b-90d8-8ae0db929548",
+      "notes": "This shopifyTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.shopifyTrigger",
+      "typeVersion": 1,
+      "position": [
+        180,
+        420
+      ],
+      "parameters": {
+        "topic": "customers/create",
+        "authentication": "{{ $credentials.accessToken }}"
+      },
+      "credentials": {
+        "shopifyAccessTokenApi": {
+          "id": "{{ $credentials.shopifyAccessTokenApi.id }}",
+          "name": "[UPDATE ME]"
+        }
+      }
+    },
+    {
+      "id": "5b4a9e71-3aa7-40d8-a439-79a504c60a46",
+      "name": "Create contact",
+      "notes": "This mautic node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.mautic",
+      "typeVersion": 1,
+      "position": [
+        400,
+        420
+      ],
+      "parameters": {
+        "email": "={{$node[\"On new customer\"].json[\"email\"]}}",
+        "options": {},
+        "lastName": "={{$node[\"On new customer\"].json[\"last_name\"]}}",
+        "firstName": "={{$node[\"On new customer\"].json[\"first_name\"]}}",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "mauticApi": {
+          "id": "{{ $credentials.mauticApi.id }}",
+          "name": "[UPDATE ME]"
+        }
+      }
+    },
+    {
+      "id": "4b7b306e-1b4c-464f-b8f0-373167ded16f",
+      "name": "Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        400,
+        600
+      ],
+      "parameters": {
+        "width": 332,
+        "height": 116,
+        "content": "### Add more fields to Mautic\nBy default, the first name, last name and email are pushed to Mautic. If you require more fields, add it in the `Create contact` node."
+      }
+    },
+    {
+      "id": "error-3d044756",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

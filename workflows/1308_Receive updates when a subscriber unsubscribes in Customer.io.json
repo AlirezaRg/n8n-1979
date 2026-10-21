@@ -1,0 +1,42 @@
+{
+  "active": false,
+  "name": "Receive updates when a subscriber unsubscribes in Customer.io",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "b3488ce5-7664-4b32-8a1a-44a3c2f25c69",
+      "name": "Customer.io Trigger",
+      "webhookId": "88092579-1b8d-4d44-98d5-f24b3579cbc2",
+      "notes": "This customerIoTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.customerIoTrigger",
+      "typeVersion": 1,
+      "position": [
+        650,
+        260
+      ],
+      "parameters": {
+        "events": [
+          "customer.unsubscribed"
+        ]
+      },
+      "credentials": {
+        "customerIoApi": "customerIO"
+      }
+    },
+    {
+      "id": "error-dda25192",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

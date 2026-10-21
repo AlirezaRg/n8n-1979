@@ -1,0 +1,52 @@
+{
+  "active": false,
+  "name": "Manualtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "a6b8d8bc-1779-456c-a504-ccc1a563a7dd",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "5f5a3035-3a63-468f-80b4-de7366df7bcb",
+      "name": "Postgres",
+      "notes": "This postgres node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "query": "SELECT * from sometable;",
+        "operation": "executeQuery"
+      },
+      "credentials": {
+        "postgres": "postgres-creds"
+      }
+    },
+    {
+      "id": "error-b9f007c8",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

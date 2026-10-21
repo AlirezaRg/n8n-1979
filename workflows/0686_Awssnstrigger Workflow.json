@@ -1,0 +1,40 @@
+{
+  "active": false,
+  "name": "Awssnstrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "1303a8d9-7eee-453d-999e-672d0c8c9fa8",
+      "name": "AWS-SNS-Trigger",
+      "notes": "This awsSnsTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.awsSnsTrigger",
+      "typeVersion": 1,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "topic": "arn:aws:sns:ap-south-1:100558637562:n8n-rocks"
+      },
+      "credentials": {
+        "aws": "amudhan-aws"
+      },
+      "webhookId": "25c26b25-003d-40b1-b4a2-9be0c1283027"
+    },
+    {
+      "id": "error-03c407d3",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

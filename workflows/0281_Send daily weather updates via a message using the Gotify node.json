@@ -1,0 +1,79 @@
+{
+  "active": false,
+  "name": "Send daily weather updates via a message using the Gotify node",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "3643c879-8708-463e-912d-9a890e6b7175",
+      "name": "Cron",
+      "notes": "This cron node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        490,
+        340
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 9
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ee318374-86c4-4ea3-90aa-293944e0cf94",
+      "name": "OpenWeatherMap",
+      "notes": "This openWeatherMap node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.openWeatherMap",
+      "typeVersion": 1,
+      "position": [
+        690,
+        340
+      ],
+      "parameters": {
+        "cityName": "berlin"
+      },
+      "credentials": {
+        "openWeatherMapApi": "owm"
+      }
+    },
+    {
+      "id": "ab8fc9dd-3343-4d49-8d38-87ee3af3be4b",
+      "name": "Gotify",
+      "notes": "This gotify node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gotify",
+      "typeVersion": 1,
+      "position": [
+        890,
+        340
+      ],
+      "parameters": {
+        "message": "=Hey! The temperature outside is {{$node[\"OpenWeatherMap\"].json[\"main\"][\"temp\"]}}�C.",
+        "additionalFields": {
+          "title": "Today's Weather Update"
+        }
+      },
+      "credentials": {
+        "gotifyApi": "gotify-credentials"
+      }
+    },
+    {
+      "id": "error-07b1082f",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

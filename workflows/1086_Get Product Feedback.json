@@ -1,0 +1,150 @@
+{
+  "active": false,
+  "name": "Get Product Feedback",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "3fb18885-cf24-4f69-9114-eb9477e845ac",
+      "name": "Typeform Trigger",
+      "webhookId": "0cf82c15-eeb8-4b24-bd67-5f4b54a58b6d",
+      "notes": "This typeformTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.typeformTrigger",
+      "typeVersion": 1,
+      "position": [
+        170,
+        260
+      ],
+      "parameters": {
+        "formId": ""
+      },
+      "credentials": {
+        "typeformApi": "typeform-harshil"
+      }
+    },
+    {
+      "id": "7e896f4c-4623-4779-afbd-e6784f799b4a",
+      "name": "Set",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        370,
+        260
+      ],
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "Score",
+              "value": "={{$node[\"Typeform Trigger\"].json[\"What score would you like to give?\"]}}"
+            }
+          ],
+          "string": [
+            {
+              "name": "Name",
+              "value": "={{$node[\"Typeform Trigger\"].json[\"What is your name?\"]}}"
+            },
+            {
+              "name": "Email",
+              "value": "={{$node[\"Typeform Trigger\"].json[\"What is your email address?\"]}}"
+            },
+            {
+              "name": "Description",
+              "value": "={{$node[\"Typeform Trigger\"].json[\"Anything else you want to share?\"]}}"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "70f3f468-7596-4a0e-9271-e064be6b2568",
+      "name": "Airtable",
+      "notes": "This airtable node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        570,
+        260
+      ],
+      "parameters": {
+        "table": "Feedback",
+        "options": {},
+        "operation": "append",
+        "application": ""
+      },
+      "credentials": {
+        "airtableApi": "airtable-harshil"
+      }
+    },
+    {
+      "id": "cfe70645-36d5-4cc8-84c5-48e1926eb29f",
+      "name": "If Node",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        770,
+        260
+      ],
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$node[\"Set\"].json[\"Score\"]}}",
+              "value2": 7
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "d633b136-ba25-43f9-8ed7-6ae62dabe793",
+      "name": "Trello",
+      "notes": "This trello node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        970,
+        160
+      ],
+      "parameters": {
+        "name": "=[{{$node[\"IF\"].json[\"fields\"][\"Score\"]}}] {{$node[\"IF\"].json[\"fields\"][\"Name\"]}}",
+        "listId": "5fbb9e2eb1d5cc0a8a7ab8ac",
+        "description": "=Name: {{$node[\"IF\"].json[\"fields\"][\"Name\"]}}\nEmail: {{$node[\"IF\"].json[\"fields\"][\"Email\"]}}\nScore: {{$node[\"IF\"].json[\"fields\"][\"Score\"]}}\nDescription: {{$node[\"IF\"].json[\"fields\"][\"Description\"]}}",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "trelloApi": "Trello Credentials"
+      }
+    },
+    {
+      "id": "536a65c8-7fe2-4bfb-ae38-7a05ec968d79",
+      "name": "NoOp",
+      "notes": "This noOp node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        970,
+        360
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "error-cc5303f5",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

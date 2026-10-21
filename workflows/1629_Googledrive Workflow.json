@@ -1,0 +1,767 @@
+{
+  "active": false,
+  "name": "Googledrive Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "cb62c9a5-2f43-4328-af94-84c2cb731d9c",
+      "name": "Base Image",
+      "notes": "This googleDrive node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        260,
+        660
+      ],
+      "parameters": {
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.base }}"
+        },
+        "options": {
+          "binaryPropertyName": "data_1"
+        },
+        "operation": "download"
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "yOwz41gMQclOadgu",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "id": "b1c304cc-9949-441a-ac2a-275c8d4c51fc",
+      "name": "Google Gemini Chat Model",
+      "notes": "This lmChatGoogleGemini node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        900
+      ],
+      "parameters": {
+        "options": {},
+        "modelName": "models/gemini-1.5-pro-latest"
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "dSxo6ns5wn658r8N",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "id": "964d94bf-be2a-424e-ab0e-c1c1fe260ebd",
+      "name": "Structured Output Parser",
+      "notes": "This outputParserStructured node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.2,
+      "position": [
+        1320,
+        900
+      ],
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"array\",\n  \"items\": {\n    \"type\": \"object\",\n\t\"properties\": {\n\t\t\"type\": {\n    \t\t\"type\": \"string\",\n            \"description\": \"type of regression. One of text, number, image, color or position.\"\n  \t\t},\n\t\t\"description\": { \"type\": \"string\" },\n        \"previous_state\": { \"type\": \"string\" },\n        \"current_state\": { \"type\": \"string\" }\n\t}\n  }\n}"
+      }
+    },
+    {
+      "id": "67195eb2-1729-42b0-8275-bdd6128b81aa",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2340,
+        20
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 405.95003875719203,
+        "height": 180.74812634463558,
+        "content": "### Part A. Generate Base Images\nBefore we can run our visual regression tests, we must generate a series of base screenshots to compare against. This part of the workflow uses an external website screenshotting service, [Apify.com]({{ $env.API_BASE_URL }} to achieve this. This part of the workflow should only be run when we want to update our base screenshots."
+      }
+    },
+    {
+      "id": "85f9b371-1710-4c9c-a0ed-210d9c0e5d64",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        162.7495769165307,
+        500
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 702.1744987652204,
+        "height": 548.4621171664835,
+        "content": "## 5. Download Base and Generate new Webpage Screenshot\n[Learn more about Apify.com]({{ $env.API_BASE_URL }}\n\nLooping for each webpage, we'll do 2 tasks (1) download the base screenshot for the url and (2) and use our [Apify.com]({{ $env.API_BASE_URL }} webpage screenshot actor again to generate a fresh screenshot."
+      }
+    },
+    {
+      "id": "8bff4efc-d9f9-485c-b51d-a8edc29d1105",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        900,
+        500
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 759.5372282495247,
+        "height": 548.702446115556,
+        "content": "## 6. Compare Screenshots using Vision Model\n[Read more about the basic LLM chain]({{ $env.WEBHOOK_URL }}\n\nTo carry out our visual regression test, we need to send both screenshots simultaneously to our Vision model. This is easily achieved using n8n's built-in basic LLM chain where we can define two user messages of the binary type. For our vision model, we'll use Google's Gemini but any capable vision model will also do the job. A Structured Output Parser is used here to return the AI's response in JSON format, this is for easier formatting purposes which we'll get to in the next step."
+      }
+    },
+    {
+      "id": "a92d11e5-0985-4a8f-bc43-8bc0ca48e744",
+      "name": "Sticky Note3",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        397.518987341772,
+        93.8157360237642
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 885.2402868841493,
+        "height": 388.92815062755926,
+        "content": "## 7. Create Report In Linear\n[Learn more about integrating with Linear.app]({{ $env.WEBHOOK_URL }}\n\nFor the final step, we'll generate a simple report which will capture any changes detected in our webpages list. Let's do this by first combining our webpages with their test results and filter out any in the page where no changes were detected. Next, we'll aggregate all changes into the Linear.app node which will be formatted into a markdown snippet and used to create a new issue in Linear. If you don't use Linear, feel free to swap this out for JIRA or even Slack."
+      }
+    },
+    {
+      "id": "3f52c006-6c0a-456d-ab3c-ee5a16726299",
+      "name": "Loop Over Items",
+      "notes": "This splitInBatches node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1680,
+        580
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "478ee25d-3f0f-4f6c-bf34-add1dc14c3cb",
+      "name": "Wait",
+      "webhookId": "f06eab66-30a7-48ad-90ee-cb3394eb2edb",
+      "notes": "This wait node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1240,
+        820
+      ],
+      "parameters": {
+        "amount": 2
+      }
+    },
+    {
+      "id": "64b5f755-a85e-4ae5-ad81-113c1ef9b64c",
+      "name": "Download Screenshot",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1260,
+        360
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "8f99ef1f-1cdc-4d80-b858-e9960a805dd4",
+      "name": "Upload to Drive",
+      "notes": "This googleDrive node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1080,
+        360
+      ],
+      "parameters": {
+        "name": "={{ $('Merge').item.json.url.urlEncode() }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "options": {
+          "simplifyOutput": true
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1lAFxJPWcA_sOcjr3UUKKfFfoTwd4Stkh",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "base_images"
+        }
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "yOwz41gMQclOadgu",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "id": "5e253123-89ba-42d5-b743-60bfd1ebae5b",
+      "name": "Update Base Image",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -900,
+        360
+      ],
+      "parameters": {
+        "columns": {
+          "value": {
+            "url": "{{ $env.BASE_URL }}",
+            "base": "={{ $json.id }}"
+          },
+          "schema": [
+            {
+              "id": "service",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "service",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "url",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "url",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "base",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "base",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "url"
+          ]
+        },
+        "options": {},
+        "operation": "appendOrUpdate",
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Sheet1"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1RbobwHCJiYKnic6T-VA3kPr-Grd4Y_ZSQXqy2st_T84",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Visual Regression List"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "LXIVLIr0wD38Xaty",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "fa7339b7-b7dd-4ecd-8dc2-f42f6549adb6",
+      "name": "Merge",
+      "notes": "This merge node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -1440,
+        360
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {},
+        "combineBy": "combineByPosition"
+      }
+    },
+    {
+      "id": "47845df9-a50e-429e-b81e-5eefd996d5c7",
+      "name": "Schedule Trigger",
+      "notes": "This scheduleTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -560,
+        380
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "63492aa4-3535-4832-a9d0-0a949e46ec81",
+      "name": "Get URLs with Missing Base Images",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -1980,
+        480
+      ],
+      "parameters": {
+        "options": {},
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Sheet1"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1RbobwHCJiYKnic6T-VA3kPr-Grd4Y_ZSQXqy2st_T84",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Visual Regression List"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "LXIVLIr0wD38Xaty",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "8907f3b9-0613-4057-8adb-fd5c4e25cf72",
+      "name": "Run Webpage Screenshot",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1420,
+        820
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={{\n{\n    \"delay\": 0,\n    \"format\": \"png\",\n    \"proxy\": {\n        \"useApifyProxy\": true\n    },\n    \"scrollToBottom\": false,\n    \"urls\": [\n        {\n            \"url\": $json.url\n        }\n    ],\n    \"viewportWidth\": 1280,\n    \"waitUntil\": \"domcontentloaded\",\n    \"waitUntilNetworkIdleAfterScroll\": false\n}\n}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "genericAuthType": "httpQueryAuth"
+      },
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "cO2w8RDNOZg8DRa8",
+          "name": "Apify API"
+        }
+      }
+    },
+    {
+      "id": "3dc45b2d-4c4a-44d5-9b45-3e2144479603",
+      "name": "Run Webpage Screenshot1",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        273,
+        833
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={{\n{\n    \"delay\": 0,\n    \"format\": \"png\",\n    \"proxy\": {\n        \"useApifyProxy\": true\n    },\n    \"scrollToBottom\": false,\n    \"urls\": [\n        {\n            \"url\": $json.url\n        }\n    ],\n    \"viewportWidth\": 1280,\n    \"waitUntil\": \"domcontentloaded\",\n    \"waitUntilNetworkIdleAfterScroll\": false\n}\n}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "genericAuthType": "httpQueryAuth"
+      },
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "cO2w8RDNOZg8DRa8",
+          "name": "Apify API"
+        }
+      }
+    },
+    {
+      "id": "672d64fb-7782-427e-8779-953e51118fbc",
+      "name": "Has Changes",
+      "notes": "This filter node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        680,
+        300
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "20b18a7e-bf98-4f39-baa9-4d965097526a",
+              "operator": {
+                "type": "array",
+                "operation": "lengthGt",
+                "rightType": "number"
+              },
+              "leftValue": "={{ $json.output }}",
+              "rightValue": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "efa168ec-ff05-471b-869f-cee5a222594a",
+      "name": "Combine Row and Result",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        300
+      ],
+      "parameters": {
+        "mode": "raw",
+        "options": {},
+        "jsonOutput": "={{\n{\n  ...$('Get Webpages List').item.json,\n  output: $json.output\n}\n}}\n"
+      }
+    },
+    {
+      "id": "1fe901dc-f460-41b8-8042-0fcb0474092f",
+      "name": "Wait1",
+      "webhookId": "6bbf2e65-bed1-4efc-bb31-09d12c644dc5",
+      "notes": "This wait node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1580,
+        900
+      ],
+      "parameters": {
+        "amount": 1
+      }
+    },
+    {
+      "id": "7891f052-4073-4746-a04b-27c7c4fa1e63",
+      "name": "Aggregate",
+      "notes": "This aggregate node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        860,
+        300
+      ],
+      "parameters": {
+        "options": {},
+        "aggregate": "aggregateAllItemData"
+      }
+    },
+    {
+      "id": "ef2b2ddb-51f9-4576-bd99-9efa39be5163",
+      "name": "Create Report",
+      "notes": "This linear node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.linear",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        300
+      ],
+      "parameters": {
+        "title": "=Visual Regression Report {{ $now.format('yyyy-MM-dd') }}",
+        "teamId": "1c721608-321d-4132-ac32-6e92d04bb487",
+        "additionalFields": {
+          "description": "=Visual Regression Workflow picked up the following changes:\n\n{{\n$json.data.map(row =>\n`### ${row.url}\n${row.output.map(issue =>\n`* **${issue.description}** - expected \"${issue.previous_state}\" but got \"${issue.current_state}\"`\n).join('\\n')}`\n).join('\\n');\n}}"
+        }
+      },
+      "credentials": {
+        "linearApi": {
+          "id": "Nn0F7T9FtvRUtEbe",
+          "name": "Linear account"
+        }
+      }
+    },
+    {
+      "id": "477b89f7-00ca-4001-a246-0887bcb553eb",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2180,
+        480
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "eb7f6310-5465-4638-b702-5ecbd98a0199",
+      "name": "Get Webpages List",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -360,
+        380
+      ],
+      "parameters": {
+        "options": {},
+        "filtersUI": {
+          "values": [
+            {
+              "lookupValue": "2",
+              "lookupColumn": "=row_number"
+            }
+          ]
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Sheet1"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1RbobwHCJiYKnic6T-VA3kPr-Grd4Y_ZSQXqy2st_T84",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Visual Regression List"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "LXIVLIr0wD38Xaty",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "6c0f7341-14c9-48c2-9447-edab0ad18df7",
+      "name": "For Each Webpage...",
+      "notes": "This splitInBatches node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -40,
+        440
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "62e13166-458d-4c63-8911-740f9ceaeb54",
+      "name": "Sticky Note4",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -660,
+        160
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 561.2038065501644,
+        "height": 408.0284015307624,
+        "content": "## 4. Trigger Visual Regression Test Run\n[Read more about the Schedule Trigger]({{ $env.WEBHOOK_URL }}\n\nOnce we've generated our base images to compare with in Part A, we can now run our Visual Regression Tests. These tests are intended to check for unexpected changes to a webpage by using some form of image detection. To trigger Part B, we'll start with a schedule trigger and pull a list of webpages to test from Google Sheets."
+      }
+    },
+    {
+      "id": "8d958f44-fd2c-49b4-adbd-d8a99b2614c8",
+      "name": "Sticky Note5",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2340,
+        218.0216140230686
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 626.9985071319608,
+        "height": 487.40071048786325,
+        "content": "## 1. Get List of Webpages to Generate Base Images\n[Learn more about using Google Sheets]({{ $env.WEBHOOK_URL }}\n\nThis workflow is split into 2 parts: Part A will generate the \"base\" screenshots to compare new screenshots against. To capture these base screenshots, we'll use Google Sheets to hold our list of webpages and their screenshot references (we'll come on to that later).\n\nExample Sheet: {{ $env.WEBHOOK_URL }}"
+      }
+    },
+    {
+      "id": "ee776b4d-4532-4c08-ac38-35d40afbd8ad",
+      "name": "Sticky Note6",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1480,
+        580
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 653.369086691465,
+        "height": 443.1120543367141,
+        "content": "## 2. Generate Webpage Screenshot via Apify\n[Learn more about Apify.com]({{ $env.API_BASE_URL }}\n\nTo generate a screenshot of the webpage, we'll need a third party service since this functionality is outside the scope of n8n. Feel free to pick whichever internal or external service works for you but I've had great experience using [Apify.com]({{ $env.API_BASE_URL }} - a popular webscraping SaaS who offer a generous free plan and require very little configuration to get started.\n\nThe Apify \"actor\" (ie. a type of scraper) we'll be using is specifically designed to take webpage screenshots."
+      }
+    },
+    {
+      "id": "3d90e103-2829-4075-b3d4-5ba848af4843",
+      "name": "Sticky Note7",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1520,
+        160
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 808.188722669735,
+        "height": 397.73072497123115,
+        "content": "## 3. Upload Screenshot to Google Drive\n[Read more about using the Google Drive node]({{ $env.WEBHOOK_URL }}\n\nOnce we have our screenshots, we'll download them from Apify and upload them to our Google Drive for safe keeping. After uploading, we'll capture the new Google Drive IDs for the images into our Google Sheet, this will allow us to reference them again when we perform the visual regression testing."
+      }
+    },
+    {
+      "id": "e47d14ec-ad78-42c8-a294-301dcd581a67",
+      "name": "Download New Screenshot",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        453,
+        833
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "data_2"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "8ca118bc-3d19-48ac-9d9c-0892993da736",
+      "name": "Combine Screenshots",
+      "notes": "This merge node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        660,
+        660
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {},
+        "combineBy": "combineByPosition"
+      }
+    },
+    {
+      "id": "03359cbb-d7af-4118-a32a-3fe24062dc9f",
+      "name": "Sticky Note8",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -660,
+        20
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 394.03359370567625,
+        "height": 111.52173490405977,
+        "content": "### Part B. Run Visual Regression Test\nIn this part of the workflow, we'll retrieve our list of webpages to test with our AI vision model. This part can be run as many times as required."
+      }
+    },
+    {
+      "id": "a78c0f92-aa61-483b-95bf-dd60958f182d",
+      "name": "Sticky Note9",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2920,
+        220
+      ],
+      "parameters": {
+        "width": 553.2963720930223,
+        "height": 473.4987906976746,
+        "content": "## Try It Out!\n\n### This workflow implements an approach to Visual Regression Testing - a means to test websites for defects - using AI Vision Models.\n\nThis workflow uses a Google Sheet to track a list of webpages to test and is split into 2 parts; Part A generates the base screenshots of the list and Part B runs the visual regression testing.\n\nThe example spreadsheet can be found here: {{ $env.WEBHOOK_URL }}\n\n**[Apify.com]({{ $env.API_BASE_URL }} is the screenshot generator of choice and a free account with $5 in credit is available via this [link]({{ $env.API_BASE_URL }}\n\n\n### Need Help?\nJoin the [Discord]({{ $env.WEBHOOK_URL }} or ask in the [Forum]({{ $env.WEBHOOK_URL }}"
+      }
+    },
+    {
+      "id": "a0b257e5-99f8-409a-bc67-2468db377d6c",
+      "name": "Visual Regression Agent",
+      "notes": "This chainLlm node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.4,
+      "position": [
+        1120,
+        740
+      ],
+      "parameters": {
+        "text": "Identify changes between the base image and test image.",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You help with visual regression testing for websites. Identify changes to text content, images, colors, position and layouts of the elements in the screenshots. Ignore text styling or casing changes.\nThe first image will be the base image and the second image will be the test. Note all changes to the test image which differ from the base. If there are no changes, it is okay to return an empty array."
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "messageType": "imageBinary",
+              "binaryImageDataKey": "YOUR_CREDENTIAL_HERE"
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "messageType": "imageBinary",
+              "binaryImageDataKey": "YOUR_CREDENTIAL_HERE"
+            }
+          ]
+        },
+        "promptType": "define",
+        "hasOutputParser": true
+      }
+    }
+  ],
+  "connections": {}
+}

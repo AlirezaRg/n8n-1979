@@ -1,0 +1,116 @@
+{
+  "active": false,
+  "name": "Production Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-bbdb8284",
+      "name": "AWS SQS",
+      "type": "n8n-nodes-base.awsSqs",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        360
+      ],
+      "parameters": {
+        "queue": "",
+        "options": {}
+      },
+      "credentials": {
+        "aws": "AWS SQS Credentials"
+      }
+    },
+    {
+      "id": "node-668239f4",
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        850,
+        360
+      ],
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "Latitude",
+              "value": "={{$node[\"HTTP Request\"].json[\"0\"][\"latitude\"]}}"
+            },
+            {
+              "name": "Longitude",
+              "value": "={{$node[\"HTTP Request\"].json[\"0\"][\"longitude\"]}}"
+            },
+            {
+              "name": "Timestamp",
+              "value": "={{$node[\"HTTP Request\"].json[\"0\"][\"timestamp\"]}}"
+            }
+          ],
+          "string": [
+            {
+              "name": "Name",
+              "value": "={{$node[\"HTTP Request\"].json[\"0\"][\"name\"]}}"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "node-a76850e1",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        650,
+        360
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "queryParametersUi": {
+          "parameter": [
+            {
+              "name": "timestamps",
+              "value": "={{Date.now();}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-efe19ce4",
+      "name": "Cron",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        450,
+        360
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "error-bbc0adf6",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

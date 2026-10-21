@@ -1,0 +1,98 @@
+{
+  "active": false,
+  "name": "Manualtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "912b4f51-23fd-4569-ba43-4b524745b05f",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        230,
+        320
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "2880a69c-1479-4c8f-8a95-d250b31bb804",
+      "name": "Git",
+      "notes": "This git node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.git",
+      "typeVersion": 1,
+      "position": [
+        430,
+        320
+      ],
+      "parameters": {
+        "operation": "add",
+        "pathsToAdd": "README.md"
+      }
+    },
+    {
+      "id": "75a45dd1-bd59-409a-a914-94f73359d6b3",
+      "name": "Git1",
+      "notes": "This git node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.git",
+      "typeVersion": 1,
+      "position": [
+        630,
+        320
+      ],
+      "parameters": {
+        "message": "? First commit from n8n",
+        "options": {},
+        "operation": "commit",
+        "repositoryPath": "={{$node[\"Git\"].parameter[\"repositoryPath\"]}}"
+      }
+    },
+    {
+      "id": "98cbdfb7-95ef-49b3-b93e-00bea13ab632",
+      "name": "Git2",
+      "notes": "This git node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.git",
+      "typeVersion": 1,
+      "position": [
+        830,
+        320
+      ],
+      "parameters": {
+        "options": {},
+        "repositoryPath": "={{$node[\"Git\"].parameter[\"repositoryPath\"]}}"
+      }
+    },
+    {
+      "id": "5731a853-3127-4148-8a19-47132315a12a",
+      "name": "Git3",
+      "notes": "This git node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.git",
+      "typeVersion": 1,
+      "executeOnce": false,
+      "position": [
+        1030,
+        320
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "push",
+        "repositoryPath": "={{$node[\"Git\"].parameter[\"repositoryPath\"]}}"
+      }
+    },
+    {
+      "id": "error-6dae884b",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

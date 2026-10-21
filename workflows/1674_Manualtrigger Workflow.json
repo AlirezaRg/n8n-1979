@@ -1,0 +1,114 @@
+{
+  "active": false,
+  "name": "Manualtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "aecce7a8-24f6-48c0-a7f0-f48a421d1d8c",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        540,
+        400
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "66822f20-83a9-4272-920c-5d8c9140f912",
+      "name": "Read From File",
+      "notes": "This readBinaryFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        740,
+        400
+      ],
+      "parameters": {
+        "filePath": "/home/node/.n8n/concerts-2023.csv"
+      }
+    },
+    {
+      "id": "9b469774-7c1d-41a3-9bfe-18fc3527f96e",
+      "name": "Convert To Spreadsheet",
+      "notes": "This spreadsheetFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 1,
+      "position": [
+        940,
+        400
+      ],
+      "parameters": {
+        "options": {
+          "rawData": true,
+          "readAsString": true
+        }
+      }
+    },
+    {
+      "id": "a10bd105-16f7-47c8-b5a0-a5a10e51ae10",
+      "name": "Insert into MySQL",
+      "notes": "This mySql node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        400
+      ],
+      "parameters": {
+        "table": {
+          "__rl": true,
+          "mode": "name",
+          "value": "concerts_2023_csv"
+        },
+        "columns": "Date, Band, ConcertName, Country, City, Location, LocationAddress",
+        "options": {}
+      },
+      "credentials": {
+        "mySql": {
+          "id": "{{ $credentials.mySql.id }}",
+          "name": "MySQL n8n articles"
+        }
+      }
+    },
+    {
+      "id": "error-a81d0d58",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Read From File": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert To Spreadsheet": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

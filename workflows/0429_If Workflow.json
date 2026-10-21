@@ -1,0 +1,175 @@
+{
+  "active": false,
+  "name": "If Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "acf47a04-1f3f-448a-b571-a94c84004c45",
+      "name": "Current won time Not Equal to Previous",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        140,
+        260
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json[\"current\"].won_time}}",
+              "value2": "={{ $json[\"previous\"].won_time}}",
+              "operation": "notEqual"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "452a0208-be12-4aac-8c1a-9101ab79f8fb",
+      "name": "On deal updated",
+      "webhookId": "af0f5626-e92f-4e29-bdc8-8e13c9c9cf99",
+      "notes": "This pipedriveTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.pipedriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        260
+      ],
+      "parameters": {
+        "action": "updated",
+        "object": "deal"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "{{ $credentials.pipedriveApi.id }}",
+          "name": "Pipedrive account"
+        }
+      }
+    },
+    {
+      "id": "202b9a47-2f00-43ec-bbab-ba82f94e4174",
+      "name": "Get organisation details",
+      "notes": "This pipedrive node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 1,
+      "position": [
+        380,
+        240
+      ],
+      "parameters": {
+        "resource": "organization",
+        "operation": "get",
+        "organizationId": "={{ $json[\"current\"].org_id }}",
+        "resolveProperties": true
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "{{ $credentials.pipedriveApi.id }}",
+          "name": "Pipedrive account"
+        }
+      }
+    },
+    {
+      "id": "b88e18a3-1514-424f-ba96-c8bb94c14cb3",
+      "name": "Search customer",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        600,
+        100
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "options": {},
+        "authentication": "{{ $credentials.predefinedCredentialType }}",
+        "queryParametersUi": {
+          "parameter": [
+            {
+              "name": "query",
+              "value": "=name:'{{ $json[\"Name\"] }}'"
+            }
+          ]
+        },
+        "nodeCredentialType": "YOUR_CREDENTIAL_HERE"
+      },
+      "credentials": {
+        "stripeApi": {
+          "id": "{{ $credentials.stripeApi.id }}",
+          "name": "Stripe account"
+        }
+      }
+    },
+    {
+      "id": "b4a4491e-8d69-41b6-83a4-128f228108e3",
+      "name": "Customer does not exist",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        860,
+        100
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ JSON.stringify($json[\"data\"]) }}",
+              "value2": "[]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "6aeaa043-ce4b-4665-a1eb-9fe66d86202f",
+      "name": "Continue with organisation data",
+      "notes": "This merge node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        220
+      ],
+      "parameters": {
+        "mode": "passThrough",
+        "output": "input2"
+      }
+    },
+    {
+      "id": "21bc3b5a-72eb-4015-957a-7facfce371e0",
+      "name": "Create customer",
+      "notes": "This stripe node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stripe",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        220
+      ],
+      "parameters": {
+        "name": "={{ $json[\"Name\"] }}",
+        "resource": "customer",
+        "operation": "create",
+        "additionalFields": {
+          "address": {
+            "details": {
+              "city": "={{ $json[\"City/town/village/locality\"] }}",
+              "line1": "={{ $json[\"Street/road name\"] }} {{ $json[\"House number\"] }}",
+              "state": "={{ $json[\"State/county\"] }}",
+              "country": "={{ $json[\"Country\"] }}",
+              "postal_code": "={{ $json[\"ZIP/Postal code\"] }}"
+            }
+          }
+        }
+      },
+      "credentials": {
+        "stripeApi": {
+          "id": "{{ $credentials.stripeApi.id }}",
+          "name": "Stripe account"
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

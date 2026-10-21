@@ -1,0 +1,490 @@
+{
+  "active": false,
+  "name": "Plex Automatic Throttler",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-88a5ce00",
+      "name": "Webhook",
+      "webhookId": "72a05ff6-05f5-4e7a-9eee-54a350bb6a47",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        60,
+        440
+      ],
+      "parameters": {
+        "path": "72a05ff6-05f5-4e7a-9eee-54a350bb6a47",
+        "options": {},
+        "httpMethod": "POST"
+      }
+    },
+    {
+      "id": "node-4146aa2a",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        640,
+        580
+      ],
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "value2": "media.resume",
+              "operation": "contains"
+            },
+            {
+              "output": 1,
+              "value2": "media.play",
+              "operation": "contains"
+            },
+            {
+              "output": 2,
+              "value2": "media.pause",
+              "operation": "contains"
+            },
+            {
+              "output": 3,
+              "value2": "media.stop",
+              "operation": "contains"
+            }
+          ]
+        },
+        "value1": "={{$node[\"Webhook\"].json[\"body\"][\"payload\"]}}",
+        "dataType": "string"
+      }
+    },
+    {
+      "id": "node-e0d9f60d",
+      "name": "Resume",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        860,
+        280
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-533100b0",
+      "name": "Check if Local",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        460,
+        440
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"body\"][\"payload\"]}}",
+              "value2": "\"local\":false",
+              "operation": "contains"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-2e3e34fd",
+      "name": "Play",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        860,
+        440
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-c51d4816",
+      "name": "Don't Do Anything",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        660,
+        220
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-a754cd05",
+      "name": "Pause",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        860,
+        680
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-de86b5e8",
+      "name": "Stop",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        860,
+        840
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-b09fcd47",
+      "name": "Get QB Cookie",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        360
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {
+          "fullResponse": true
+        },
+        "responseFormat": "string",
+        "queryParametersUi": {
+          "parameter": [
+            {
+              "name": "username",
+              "value": "={{$node[\"Global Variables\"].json[\"qbittorent\"][\"username\"]}}"
+            },
+            {
+              "name": "password",
+              "value": "={{$node[\"Global Variables\"].json[\"qbittorent\"][\"password\"]}}"
+            }
+          ]
+        },
+        "headerParametersUi": {
+          "parameter": [
+            {
+              "name": "Referer",
+              "value": "=http://localhost:{{$node[\"Global Variables\"].json[\"qbittorent\"][\"port\"]}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-70aa62c0",
+      "name": "Get QB Cookie1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        760
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {
+          "fullResponse": true
+        },
+        "responseFormat": "string",
+        "queryParametersUi": {
+          "parameter": [
+            {
+              "name": "username",
+              "value": "={{$node[\"Global Variables\"].json[\"qbittorent\"][\"username\"]}}"
+            },
+            {
+              "name": "password",
+              "value": "={{$node[\"Global Variables\"].json[\"qbittorent\"][\"password\"]}}"
+            }
+          ]
+        },
+        "headerParametersUi": {
+          "parameter": [
+            {
+              "name": "Referer",
+              "value": "=http://localhost:{{$node[\"Global Variables\"].json[\"qbittorent\"][\"port\"]}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-e1267492",
+      "name": "Global Variables",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        280,
+        440
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "qbittorent.username",
+              "value": "yourusername"
+            },
+            {
+              "name": "qbittorent.password",
+              "value": "yourpassword"
+            },
+            {
+              "name": "qbittorent.internalIP",
+              "value": "192.168.1.218"
+            },
+            {
+              "name": "qbittorent.port",
+              "value": "2020"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "node-0dfcc9c1",
+      "name": "Check Throttle State",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1460,
+        360
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {
+          "fullResponse": true
+        },
+        "requestMethod": "POST",
+        "queryParametersUi": {
+          "parameter": [
+            {
+              "name": "Cookie",
+              "value": "={{$node[\"Get QB Cookie\"].json[\"headers\"][\"set-cookie\"][0].match(/[^;]*/).toString()}}"
+            }
+          ]
+        },
+        "headerParametersUi": {
+          "parameter": [
+            {
+              "name": "Referer",
+              "value": "=http://localhost:{{$node[\"Global Variables\"].json[\"qbittorent\"][\"port\"]}}"
+            },
+            {
+              "name": "Cookie",
+              "value": "={{$node[\"Get QB Cookie\"].json[\"headers\"][\"set-cookie\"][0].match(/[^;]*/).toString()}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-25e3634e",
+      "name": "Check if Throttled",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        360
+      ],
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json[\"body\"]}}",
+              "value2": 1,
+              "operation": "equal"
+            }
+          ],
+          "string": []
+        }
+      }
+    },
+    {
+      "id": "node-9ff0c123",
+      "name": "Do Nothing",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1900,
+        260
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-cc4f16f4",
+      "name": "Check Throttle State2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1460,
+        760
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {
+          "fullResponse": true
+        },
+        "requestMethod": "POST",
+        "queryParametersUi": {
+          "parameter": [
+            {
+              "name": "Cookie",
+              "value": "={{$node[\"Get QB Cookie1\"].json[\"headers\"][\"set-cookie\"][0].match(/[^;]*/).toString()}}"
+            }
+          ]
+        },
+        "headerParametersUi": {
+          "parameter": [
+            {
+              "name": "Referer",
+              "value": "=http://localhost:{{$node[\"Global Variables\"].json[\"qbittorent\"][\"port\"]}}"
+            },
+            {
+              "name": "Cookie",
+              "value": "={{$node[\"Get QB Cookie1\"].json[\"headers\"][\"set-cookie\"][0].match(/[^;]*/).toString()}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-35e92d51",
+      "name": "Check if Throttled1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1660,
+        760
+      ],
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json[\"body\"]}}",
+              "value2": 1,
+              "operation": "equal"
+            }
+          ],
+          "string": []
+        }
+      }
+    },
+    {
+      "id": "node-44c95d09",
+      "name": "Do Nothing1",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1900,
+        860
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-9cad5eca",
+      "name": "Throttle Connection",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        360
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-e06ca1af",
+      "name": "Resume Downloads",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        760
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-16f3927b",
+      "name": "Disable Throttle",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1900,
+        660
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "requestMethod": "POST",
+        "queryParametersUi": {
+          "parameter": [
+            {
+              "name": "Cookie",
+              "value": "={{$node[\"Get QB Cookie1\"].json[\"headers\"][\"set-cookie\"][0].match(/[^;]*/).toString()}}"
+            }
+          ]
+        },
+        "headerParametersUi": {
+          "parameter": [
+            {
+              "name": "Referer",
+              "value": "=http://localhost:{{$node[\"Global Variables\"].json[\"qbittorent\"][\"port\"]}}"
+            },
+            {
+              "name": "Cookie",
+              "value": "={{$node[\"Get QB Cookie1\"].json[\"headers\"][\"set-cookie\"][0].match(/[^;]*/).toString()}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-b6a9d8f7",
+      "name": "Enable Throttle",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1900,
+        440
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "requestMethod": "POST",
+        "queryParametersUi": {
+          "parameter": [
+            {
+              "name": "Cookie",
+              "value": "={{$node[\"Get QB Cookie\"].json[\"headers\"][\"set-cookie\"][0].match(/[^;]*/).toString()}}"
+            }
+          ]
+        },
+        "headerParametersUi": {
+          "parameter": [
+            {
+              "name": "Referer",
+              "value": "=http://localhost:{{$node[\"Global Variables\"].json[\"qbittorent\"][\"port\"]}}"
+            },
+            {
+              "name": "Cookie",
+              "value": "={{$node[\"Get QB Cookie\"].json[\"headers\"][\"set-cookie\"][0].match(/[^;]*/).toString()}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "error-bee779b6",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

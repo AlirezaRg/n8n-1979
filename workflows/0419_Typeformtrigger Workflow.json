@@ -1,0 +1,61 @@
+{
+  "active": false,
+  "name": "Typeformtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "1223881e-7eaf-4616-9ff4-8b5c7fe6ad41",
+      "name": "Typeform Trigger",
+      "webhookId": "1cbca674-78fb-402e-b225-2aa6f92b5338",
+      "notes": "This typeformTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.typeformTrigger",
+      "typeVersion": 1,
+      "position": [
+        510,
+        260
+      ],
+      "parameters": {
+        "formId": ""
+      },
+      "credentials": {
+        "typeformApi": "Typeform Burner Account"
+      }
+    },
+    {
+      "id": "69a9af47-885f-4edd-be13-5aee9b6a5076",
+      "name": "Demio",
+      "notes": "This demio node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.demio",
+      "typeVersion": 1,
+      "position": [
+        710,
+        260
+      ],
+      "parameters": {
+        "email": "={{$json[\"What's your email address?\"]}}",
+        "eventId": 357191,
+        "firstName": "={{$json[\"Let's start with your name.\"]}}",
+        "operation": "register",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "demioApi": "Demio API Credentials"
+      }
+    },
+    {
+      "id": "error-f1230cd0",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

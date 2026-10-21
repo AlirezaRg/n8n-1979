@@ -1,0 +1,230 @@
+{
+  "active": false,
+  "name": "Httprequest Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "78d5f452-5ba1-4d59-9d52-8f32512d2c25",
+      "name": "List scheduled events from Discord",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1940,
+        1000
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "sendQuery": true,
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "genericAuthType": "httpHeaderAuth",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "with_user_count",
+              "value": "true"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "fxbcosIH3MYkufX8",
+          "name": "FILL ME"
+        }
+      }
+    },
+    {
+      "id": "af149917-0d46-4a40-b377-69c088a4a7b9",
+      "name": "On schedule",
+      "notes": "This scheduleTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        1420,
+        1000
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      }
+    },
+    {
+      "id": "619c149f-f954-4f5d-a160-01a8b85f3eb7",
+      "name": "Update event details",
+      "notes": "This googleCalendar node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1,
+      "position": [
+        2600,
+        900
+      ],
+      "parameters": {
+        "eventId": "={{ $json.id }}",
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": "[UPDATE ME]",
+          "cachedResultName": "Events"
+        },
+        "operation": "update",
+        "updateFields": {
+          "end": "={{ $('List scheduled events from Discord').item.json.scheduled_end_time }}",
+          "start": "={{ $('List scheduled events from Discord').item.json.scheduled_start_time }}",
+          "summary": "={{ $('List scheduled events from Discord').item.json.name }}",
+          "location": "={{ $('List scheduled events from Discord').item.json.entity_metadata.location }}",
+          "description": "={{ $('List scheduled events from Discord').item.json.description }}"
+        }
+      },
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "dRGPTy0BjDpAYjYl",
+          "name": "FILL ME"
+        }
+      }
+    },
+    {
+      "id": "56e60042-d345-46f2-b1c6-4e21825cb5c9",
+      "name": "Create event",
+      "notes": "This googleCalendar node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1,
+      "position": [
+        2600,
+        1100
+      ],
+      "parameters": {
+        "end": "={{ $('List scheduled events from Discord').item.json.scheduled_end_time }}",
+        "start": "={{ $('List scheduled events from Discord').item.json.scheduled_start_time }}",
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": "[UPDATE ME]",
+          "cachedResultName": "Events"
+        },
+        "additionalFields": {
+          "id": "={{ $('List scheduled events from Discord').item.json.id }}",
+          "summary": "={{ $('List scheduled events from Discord').item.json.name }}",
+          "location": "={{ $('List scheduled events from Discord').item.json.entity_metadata.location }}",
+          "description": "={{ $('List scheduled events from Discord').item.json.description }}"
+        }
+      },
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "dRGPTy0BjDpAYjYl",
+          "name": "FILL ME"
+        }
+      }
+    },
+    {
+      "id": "afb05bee-eb5f-453f-8e95-277296ce94b8",
+      "name": "Get events",
+      "notes": "This googleCalendar node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1,
+      "alwaysOutputData": false,
+      "continueOnFail": true,
+      "position": [
+        2160,
+        1000
+      ],
+      "parameters": {
+        "eventId": "={{ $json.id }}",
+        "options": {},
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": "[UPDATE ME]",
+          "cachedResultName": "Events"
+        },
+        "operation": "get"
+      },
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "dRGPTy0BjDpAYjYl",
+          "name": "FILL ME"
+        }
+      }
+    },
+    {
+      "id": "56b731bd-4676-4b77-bafa-7120a51bf75d",
+      "name": "Create or update?",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        2380,
+        1000
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.id }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "12e40b0e-3740-47db-8647-eff8c0c959df",
+      "name": "Configure",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        1000
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "guild_id",
+              "value": "447359847986495498"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "4160a727-6a50-40ce-a7f2-0abbd5a6b1bc",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        940
+      ],
+      "parameters": {
+        "width": 254.7946768060834,
+        "height": 296.7300380228139,
+        "content": "### Configuration\n\n\n\n\n\n\n\n\n\n\n\n\n\n__`guild_id`__: the server ID in Discord. See how to get that [from this Wikipedia tutorial]({{ $env.WEBHOOK_URL }}"
+      }
+    },
+    {
+      "id": "ac717afe-1d30-4994-a134-0d535d04b932",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        920,
+        760
+      ],
+      "parameters": {
+        "width": 420.45280925604845,
+        "height": 639.1273068962362,
+        "content": "## Sync Discord scheduled events to Google Calendar\nThis workflow syncs Discord scheduled events to Google Calendar. On a specified schedule, a request to Discord's API is made to get the scheduled events on a particular server. Only the events that have not been created or have recently been updated will be sent to Google Calendar.\n\n### Setup\nYou will need to create a Discord bot. See how to do that [here]({{ $env.WEBHOOK_URL }} Once you have created your bot, create **Header Auth** in `List scheduled events from Discord` node. Your header auth fields should be:\n\nName: Authorization\nValue: Bot _<your token>_ \n(i.e. Bot MTEzMTgw...uQdg)\n\n### How it works\n1. Triggers off on the `On schedule` node.\n2. Gets the scheduled events from Discord.\n3. The IDs of the Discord scheduled events are used to get the events from Google Calendar, since the IDs are the same on creation of the Google Calendar event.\n4. We can now determine which events are new or have been updated.\n5. The new or updated events are created or updated in Google Calendar."
+      }
+    }
+  ],
+  "connections": {}
+}

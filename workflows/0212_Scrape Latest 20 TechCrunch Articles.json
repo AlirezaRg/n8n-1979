@@ -1,0 +1,252 @@
+{
+  "active": false,
+  "name": "Scrape Latest 20 TechCrunch Articles",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "f757df19-a2b0-42c5-b75e-e4af51696059",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        160
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "1311d3be-cf2e-42ca-ae69-8ebfeb71eefb",
+      "name": "Request Techcrunsh Latest Page",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -220,
+        160
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "c7807fdf-3b0b-40f8-b912-214475501861",
+      "name": "Parse a posts box",
+      "notes": "This html node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        -40,
+        160
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "cssSelector": "ul.wp-block-post-template",
+              "returnValue": "html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "4f6720e2-32ee-41dd-a369-a05bb06b4441",
+      "name": "Parse all posts",
+      "notes": "This html node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        120,
+        160
+      ],
+      "parameters": {
+        "options": {
+          "trimValues": true
+        },
+        "operation": "extractHtmlContent",
+        "dataPropertyName": "box",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "cssSelector": "li.wp-block-post",
+              "returnArray": true,
+              "returnValue": "html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "2d4f5589-1c27-4fa0-9c64-34d02fb091cf",
+      "name": "split out the posts",
+      "notes": "This splitOut node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        300,
+        160
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "posts"
+      }
+    },
+    {
+      "id": "bf35ac63-554a-4039-9636-78016110f615",
+      "name": "Parse each post in detail",
+      "notes": "This html node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        520,
+        160
+      ],
+      "parameters": {
+        "options": {
+          "trimValues": true
+        },
+        "operation": "extractHtmlContent",
+        "dataPropertyName": "posts",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "attribute": "src",
+              "cssSelector": "img",
+              "returnValue": "attribute"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "cssSelector": "h3.loop-card__title"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "attribute": "data-destinationlink",
+              "cssSelector": "h3>a",
+              "returnValue": "attribute"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "attribute": "datetime",
+              "cssSelector": "time",
+              "returnValue": "attribute"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "2aedd43b-5c04-410e-be37-7e84b798e551",
+      "name": "Request a post detail page",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        160
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "e0d9eb9c-096c-47de-b39a-d72083d403de",
+      "name": "Parse a post's content and metadata",
+      "notes": "This html node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "executeOnce": false,
+      "position": [
+        940,
+        160
+      ],
+      "parameters": {
+        "options": {
+          "trimValues": true,
+          "cleanUpText": true
+        },
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "cssSelector": "div.entry-content"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "cssSelector": "h1.wp-block-post-title"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "attribute": "src",
+              "cssSelector": "img.attachment-post-thumbnail",
+              "returnValue": "attribute"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "attribute": "datetime",
+              "cssSelector": "time",
+              "returnValue": "attribute"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "513c616e-9362-4246-a420-70c93863ad6e",
+      "name": "Save the values",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1120,
+        160
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "411666fc-c934-4cfe-93c8-dd2ba426fa46",
+              "name": "url",
+              "type": "string",
+              "value": "={{ $('Parse each post in detail').item.json.url }}"
+            },
+            {
+              "id": "251700fe-bfee-46a6-b157-c0d029edb594",
+              "name": "created_at",
+              "type": "string",
+              "value": "={{ $('Parse each post in detail').item.json.created_at }}"
+            },
+            {
+              "id": "296f4201-06a3-4d81-b85f-5d0b045e09bd",
+              "name": "image",
+              "type": "string",
+              "value": "={{ $('Parse each post in detail').item.json.image }}"
+            },
+            {
+              "id": "1af47c5f-1b6e-4894-b7c5-9a037a328a0d",
+              "name": "content",
+              "type": "string",
+              "value": "={{ $json.content }}"
+            },
+            {
+              "id": "5595be9f-7d2a-43c5-8b40-839f787e9ace",
+              "name": "title",
+              "type": "string",
+              "value": "={{ $json.title }}"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

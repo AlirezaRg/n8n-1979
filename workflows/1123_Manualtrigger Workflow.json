@@ -1,0 +1,52 @@
+{
+  "active": false,
+  "name": "Manualtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "35d6b14e-7200-4d13-8eab-037f5e28abb9",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        750,
+        360
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "38d733f0-42e1-4875-950e-18ac3bf7d5f0",
+      "name": "Cockpit",
+      "notes": "This cockpit node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.cockpit",
+      "typeVersion": 1,
+      "position": [
+        950,
+        360
+      ],
+      "parameters": {
+        "options": {},
+        "collection": "samplecollection"
+      },
+      "credentials": {
+        "cockpitApi": "cockpit api"
+      }
+    },
+    {
+      "id": "error-e05120a7",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,45 @@
+{
+  "active": false,
+  "name": "Receive updates when a new account is added by an admin in ActiveCampaign",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "fd48629a-cf31-40ae-949e-88709ffb5003",
+      "name": "ActiveCampaign Trigger",
+      "notes": "This activeCampaignTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.activeCampaignTrigger",
+      "typeVersion": 1,
+      "position": [
+        700,
+        250
+      ],
+      "parameters": {
+        "events": [
+          "account_add"
+        ],
+        "sources": [
+          "admin"
+        ]
+      },
+      "credentials": {
+        "activeCampaignApi": ""
+      },
+      "webhookId": "245a9464-663a-4588-828b-861e03088aed"
+    },
+    {
+      "id": "error-2d94cea0",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

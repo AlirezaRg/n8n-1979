@@ -1,0 +1,158 @@
+{
+  "active": false,
+  "name": "Weather via Slack",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "9aea370b-7eb9-4742-9663-6628513e4de3",
+      "name": "Webhook",
+      "webhookId": "41a60a4f-66d0-433b-aa43-b225dffa6761",
+      "notes": "This webhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -340,
+        -300
+      ],
+      "parameters": {
+        "path": "slack1",
+        "options": {},
+        "httpMethod": "POST"
+      }
+    },
+    {
+      "id": "c982487f-076a-48e8-9a35-78e8fbfb8936",
+      "name": "Slack",
+      "webhookId": "4840f197-e116-4ef5-9372-0abd063e4aad",
+      "notes": "This slack node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        560,
+        -300
+      ],
+      "parameters": {
+        "text": "={{\n  JSON.parse($node[\"NWS1\"].json.data).properties.periods\n  .map(period => \n    `*${period.name}*\\n` +\n    `Temp: ${period.temperature}�${period.temperatureUnit}\\n` +\n    `Wind: ${period.windSpeed} ${period.windDirection}\\n` +\n    `Forecast: ${period.shortForecast}`\n  )\n  .join(\"\\n\\n\")\n}}\n",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "C0889718P8S",
+          "cachedResultName": "n8n"
+        },
+        "otherOptions": {},
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "GSiEiuKBz8GR5qiD",
+          "name": "AlexK Slack account"
+        }
+      }
+    },
+    {
+      "id": "7d42112a-0590-4a09-ba0e-dbdf1eddccf2",
+      "name": "OpenStreetMap",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -100,
+        -300
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        },
+        "sendQuery": true,
+        "sendHeaders": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $('Webhook').item.json.body.text }}"
+            },
+            {
+              "name": "format",
+              "value": "json"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "alexk1919 (alex@alexk1919.com)"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "565a0123-9059-4e6e-be97-96e0875c1b84",
+      "name": "NWS",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        120,
+        -300
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "alexk1919 (alex@alexk1919.com)"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "3505e6c2-6e66-4abd-a1bb-75a1d8fc9a08",
+      "name": "NWS1",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        340,
+        -300
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "alexk1919 (alex@alexk1919.com)"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

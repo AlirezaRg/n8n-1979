@@ -1,0 +1,125 @@
+{
+  "active": false,
+  "name": "Create a new list, add a new contact to the list, update the contact, and get all contacts in the...",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "ea0b03e4-e930-4bb3-8fef-b3352a2cf1a4",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        290,
+        260
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "4461826b-00d1-4741-afd0-4a69bd823065",
+      "name": "Automizy",
+      "notes": "This automizy node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.automizy",
+      "typeVersion": 1,
+      "position": [
+        490,
+        260
+      ],
+      "parameters": {
+        "name": "n8n-docs",
+        "resource": "list"
+      },
+      "credentials": {
+        "automizyApi": "automizy"
+      }
+    },
+    {
+      "id": "7aa7a572-945a-4a2d-b89c-dd5b09a8e3a8",
+      "name": "Automizy1",
+      "notes": "This automizy node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.automizy",
+      "typeVersion": 1,
+      "position": [
+        690,
+        260
+      ],
+      "parameters": {
+        "email": "example@n8n.io",
+        "listId": "={{$node[\"Automizy\"].json[\"id\"]}}",
+        "additionalFields": {
+          "status": "ACTIVE"
+        }
+      },
+      "credentials": {
+        "automizyApi": {
+          "id": null,
+          "name": "automizy"
+        }
+      }
+    },
+    {
+      "id": "d8a19ed0-43ef-41da-8da0-292dcc1ee07a",
+      "name": "Automizy2",
+      "notes": "This automizy node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.automizy",
+      "typeVersion": 1,
+      "position": [
+        890,
+        260
+      ],
+      "parameters": {
+        "email": "={{$node[\"Automizy1\"].json[\"email\"]}}",
+        "operation": "update",
+        "updateFields": {
+          "tags": [
+            "reviewer"
+          ]
+        }
+      },
+      "credentials": {
+        "automizyApi": {
+          "id": null,
+          "name": "automizy"
+        }
+      }
+    },
+    {
+      "id": "0dfa19c4-18af-4d62-965f-992037d13d15",
+      "name": "Automizy3",
+      "notes": "This automizy node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.automizy",
+      "typeVersion": 1,
+      "position": [
+        1090,
+        260
+      ],
+      "parameters": {
+        "listId": "={{$node[\"Automizy\"].json[\"id\"]}}",
+        "operation": "getAll",
+        "returnAll": true,
+        "additionalFields": {}
+      },
+      "credentials": {
+        "automizyApi": {
+          "id": null,
+          "name": "automizy"
+        }
+      }
+    },
+    {
+      "id": "error-34bbd0b8",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

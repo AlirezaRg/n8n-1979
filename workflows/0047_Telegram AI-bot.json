@@ -1,0 +1,501 @@
+{
+  "active": false,
+  "name": "Telegram AI-bot",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "ea71a467-a646-4aca-b72e-cef1249c74e2",
+      "name": "Telegram Trigger",
+      "webhookId": "51942fbb-ca0e-4ec4-9423-5fcc7d3c4281",
+      "notes": "This telegramTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [
+        20,
+        340
+      ],
+      "parameters": {
+        "updates": [
+          "*"
+        ],
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "{{ $credentials.telegramApi.id }}",
+          "name": "Telegram bot"
+        }
+      }
+    },
+    {
+      "id": "1cbe43d4-ea8b-4178-bc10-4bfad7abe143",
+      "name": "CheckCommand",
+      "notes": "This switch node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        980,
+        360
+      ],
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "value2": "/",
+              "operation": "notStartsWith"
+            },
+            {
+              "output": 1,
+              "value2": "/start",
+              "operation": "startsWith"
+            },
+            {
+              "output": 2,
+              "value2": "=/image ",
+              "operation": "startsWith"
+            }
+          ]
+        },
+        "value1": "={{ $json.message?.text }}",
+        "dataType": "string",
+        "fallbackOutput": 3
+      }
+    },
+    {
+      "id": "074e907f-634b-4242-b669-33fa064f8472",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        581.661764705882
+      ],
+      "parameters": {
+        "width": 316.1071428571428,
+        "height": 231.22373949579838,
+        "content": "## Error fallback for unsupported commands"
+      }
+    },
+    {
+      "id": "2aa961b8-f0af-4d5c-a6af-1be56ea4b2e6",
+      "name": "Settings",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        380,
+        340
+      ],
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "model_temperature",
+              "value": 0.8
+            },
+            {
+              "name": "token_length",
+              "value": 500
+            }
+          ],
+          "string": [
+            {
+              "name": "system_command",
+              "value": "=You are a friendly chatbot. User name is {{ $json?.message?.from?.first_name }}. User system language is {{ $json?.message?.from?.language_code }}. First, detect user text language. Next, provide your reply in the same language. Include several suitable emojis in your answer."
+            },
+            {
+              "name": "bot_typing",
+              "value": "={{ $json?.message?.text.startsWith('/image') ? \"upload_photo\" : \"typing\" }}"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "2d2fe268-1e3e-483b-847c-4412e586c1ca",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1240,
+        -240
+      ],
+      "parameters": {
+        "width": 330.5019024637719,
+        "height": 233,
+        "content": "## Chatbot mode by default\n### (when no command is provided)"
+      }
+    },
+    {
+      "id": "09a9c0b4-ac6e-46eb-b2e0-ef2b55e94ada",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1240,
+        20
+      ],
+      "parameters": {
+        "width": 330.7863484403046,
+        "height": 219.892857142857,
+        "content": "## Welcome message\n### /start"
+      }
+    },
+    {
+      "id": "088cffee-5720-488b-a4ec-cfdccbf77e75",
+      "name": "Chat_mode",
+      "notes": "This openAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        -160
+      ],
+      "parameters": {
+        "model": "gpt-4",
+        "prompt": {
+          "messages": [
+            {
+              "role": "system",
+              "content": "={{ $json.system_command }}"
+            },
+            {
+              "content": "={{ $json.message.text }}"
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": "YOUR_TOKEN_HERE",
+          "temperature": "={{ $json.model_temperature }}"
+        },
+        "resource": "chat"
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "{{ $credentials.openAiApi.id }}",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "id": "41248697-6474-4a8f-a8b8-038c96465948",
+      "name": "Greeting",
+      "notes": "This openAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        80
+      ],
+      "parameters": {
+        "prompt": {
+          "messages": [
+            {
+              "role": "system",
+              "content": "={{ $json.system_command }}"
+            },
+            {
+              "content": "=This is the first message from a user. Please welcome a new user in `{{ $json.message.from.language_code }}` language"
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": "YOUR_TOKEN_HERE",
+          "temperature": "={{ $json.model_temperature }}"
+        },
+        "resource": "chat"
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "{{ $credentials.openAiApi.id }}",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "id": "20c2e7fa-5d65-441b-8d1d-a8d46c624964",
+      "name": "Text reply",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        -40
+      ],
+      "parameters": {
+        "text": "={{ $json.message.content }}",
+        "chatId": "={{ $('Settings').first().json.message.from.id }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "{{ $credentials.telegramApi.id }}",
+          "name": "Telegram bot"
+        }
+      },
+      "webhookId": "98e96646-d328-4c0b-bf11-2b8c56b6753c"
+    },
+    {
+      "id": "30321276-ebe1-41ac-b420-9dab8daa405b",
+      "name": "Send Typing action",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        580,
+        480
+      ],
+      "parameters": {
+        "action": "={{ $json.bot_typing }}",
+        "chatId": "={{ $json.message.from.id }}",
+        "operation": "sendChatAction"
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "{{ $credentials.telegramApi.id }}",
+          "name": "Telegram bot"
+        }
+      },
+      "webhookId": "41a4e8a3-f5cd-42db-a0d6-bd78a2663e83"
+    },
+    {
+      "id": "7d7ff2e8-b0ca-4638-a056-f7b4e2e6273d",
+      "name": "Merge",
+      "notes": "This merge node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        800,
+        360
+      ],
+      "parameters": {
+        "mode": "chooseBranch"
+      }
+    },
+    {
+      "id": "656bab5e-b7f7-47a1-8e75-4a17d2070290",
+      "name": "Sticky Note3",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1240,
+        280
+      ],
+      "parameters": {
+        "width": 329.7428571428562,
+        "height": 233.8785714285713,
+        "content": "## Create an image\n### /image + request"
+      }
+    },
+    {
+      "id": "ca2111d2-463a-4ef0-9436-ee09598dbf07",
+      "name": "Create an image",
+      "notes": "This openAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        360
+      ],
+      "parameters": {
+        "prompt": "={{ $json.message.text.split(' ').slice(1).join(' ') }}",
+        "options": {
+          "n": 1,
+          "size": "512x512"
+        },
+        "resource": "image",
+        "responseFormat": "imageUrl"
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "{{ $credentials.openAiApi.id }}",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "id": "e91d616b-1d5e-40e8-8468-2d0b2dda4cf7",
+      "name": "Send error message",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        660
+      ],
+      "parameters": {
+        "text": "=Sorry, {{ $json.message.from.first_name }}! This command is not supported yet. Please type some text to a chat bot or try this command:\n/image \\[your prompt]\n\nEnter the command, then space and provide your request. Example:\n\n`/image a picture or a cute little kitten with big eyes. Miyazaki studio ghibli style`",
+        "chatId": "={{ $json.message.from.id }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "{{ $credentials.telegramApi.id }}",
+          "name": "Telegram bot"
+        }
+      },
+      "webhookId": "51b2721b-5fe0-4e15-ac00-15d1de0004bc"
+    },
+    {
+      "id": "125e27d2-b03b-4f02-9dd1-8fc81ecf0b6b",
+      "name": "Send image",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        360
+      ],
+      "parameters": {
+        "file": "={{ $json.url }}",
+        "chatId": "={{ $('Settings').first().json.message.from.id }}",
+        "operation": "sendPhoto",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "{{ $credentials.telegramApi.id }}",
+          "name": "Telegram bot"
+        }
+      },
+      "webhookId": "f9799293-773a-4740-b759-6b669b407449"
+    },
+    {
+      "id": "730a51ac-223e-4956-be7f-166eadb6ed81",
+      "name": "PreProcessing",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        200,
+        340
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "message.text",
+              "value": "={{ $json?.message?.text || \"\" }}"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": true
+        }
+      }
+    },
+    {
+      "id": "error-88be9acd",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat_mode": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Greeting": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text reply": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Typing action": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an image": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send error message": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send image": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

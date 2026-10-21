@@ -1,0 +1,277 @@
+{
+  "active": false,
+  "name": "Motion-illustration Workflow Generated with Midjourney and Kling API",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "963603c8-dbe5-4d07-bd1e-74518ddd7a4c",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1780,
+        -80
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "76717322-4eee-483b-9ab9-dd4e9b0f510a",
+      "name": "Kling Video Generator",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -820,
+        -180
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n    \"model\": \"kling\",\n    \"task_type\": \"video_generation\",\n    \"input\": {\n        \"version\": \"1.6\",\n        \n        \"image_url\":\"{{ $json.random_temp_url }}\",\n\n        \"prompt\": \"A young girl sits on a sunlit grassy meadow, gently petting a fluffy white rabbit\"\n       \n    }\n} ",
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "842c1874-47ab-4efb-baad-155071fd29bb",
+      "name": "Get Video",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -620,
+        -60
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "9f36d2ba-ea56-48b8-9c83-60d741c394cb",
+      "name": "Get Image",
+      "notes": "This code node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1000,
+        -180
+      ],
+      "parameters": {
+        "jsCode": "// JavaScript Code for Function Node\nreturn {\n  random_temp_url: $input.all()[0].json.data.output.temporary_image_urls[\n    Math.floor(Math.random() * $input.all()[0].json.data.output.temporary_image_urls.length)\n  ]\n};"
+      }
+    },
+    {
+      "id": "14995fd1-937a-4e82-a2bb-19dbb65773c4",
+      "name": "Basic Prompt",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1560,
+        -80
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "{\n  \"model\": \"midjourney\",\n  \"task_type\": \"imagine\",\n  \"input\": {\n    \"prompt\": \"A gentle girl and a fluffy rabbit explore a sunlit forest together, playing by a sparkling stream. Butterflies flutter around them as golden sunlight filters through green leaves. Warm and peaceful atmosphere, 4K nature documentary style. --s 500 --sref 4028286908  --niji 6\",\n    \"aspect_ratio\": \"1:1\",\n    \"process_mode\": \"turbo\",\n    \"skip_prompt_check\": false\n  }\n}",
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "791dae4a-4d99-4bdf-a259-20d3df12b92c",
+      "name": "Get Data Status",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1180,
+        -80
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "a0f8758e-d6fd-44f8-bd79-bc3c4dceddcf",
+              "operator": {
+                "name": "filter.operator.equals",
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $json.data.status }}",
+              "rightValue": "completed"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "adb13639-1dd9-45af-be7e-c99b6b1219f3",
+      "name": "Wait for Image Generation",
+      "webhookId": "f3bcf634-8c4b-4bf9-a7f2-d4ee369f5349",
+      "notes": "This wait node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1220,
+        200
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "58ad9c2d-fad7-471b-ad5d-f248b3cfbe29",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1820,
+        -300
+      ],
+      "parameters": {
+        "width": 280,
+        "content": "## Motion-illustration\nThis workflow is primarily designed to generate dynamic illustrations for content creators and social media professionals with APIs provided by PiAPI."
+      }
+    },
+    {
+      "id": "2571d9ea-1f32-49b0-84da-ad12177714f3",
+      "name": "Midjourney Image Generator",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1360,
+        -80
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "159df2d3-6c5d-436d-b229-1b3d527daf48",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1820,
+        160
+      ],
+      "parameters": {
+        "width": 360,
+        "height": 200,
+        "content": "## Step-by-step Instruction\n1. Fill in your x-api-key of your PiAPI account in the Midjourney Image Generator and Kling Video Generator nodes.\n2. Enter your desired image prompt in **Basic Prompt** node.\n3. Click Test workflow."
+      }
+    },
+    {
+      "id": "00de8ec3-102b-41b4-9839-e8fc8cd48253",
+      "name": "Wait for Video Generation",
+      "webhookId": "c7b2590d-96a3-4c7c-8821-3023fead254b",
+      "notes": "This wait node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -440,
+        200
+      ],
+      "parameters": {
+        "amount": 20
+      }
+    },
+    {
+      "id": "75531dff-04d5-4439-ae04-3291ef9cfcde",
+      "name": "Get Final Video URL",
+      "notes": "This code node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -140,
+        80
+      ],
+      "parameters": {
+        "jsCode": "// Process the entire response\nreturn {\n  video_url: $input.all()[0].json.data.output.video_url,\n  watermark_free_url: $input.all()[0].json.data.output.works[0].video.resource_without_watermark\n};"
+      }
+    },
+    {
+      "id": "1fe883e9-64ee-4bec-8b12-238251089df3",
+      "name": "Verify Data Status",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -440,
+        -60
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "f36fa981-22e0-46db-af8c-c2ac55242c27",
+              "operator": {
+                "name": "filter.operator.equals",
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $json.data.status }}",
+              "rightValue": "completed"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,90 @@
+{
+  "active": false,
+  "name": "Googlesheets Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "e61b9382-acf0-4ccb-89cf-433d0730876b",
+      "name": "Read Sheet",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        700,
+        300
+      ],
+      "parameters": {
+        "range": "Data!A:G",
+        "rawData": true
+      }
+    },
+    {
+      "id": "80a8e21a-631a-4d63-a3f9-59d08db4a8e3",
+      "name": "Cron",
+      "notes": "This cron node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        500,
+        300
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "custom",
+              "cronExpression": "0 */2 * * * *"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "e06e043a-1862-4cb6-923b-e22e83c88a94",
+      "name": "Write Sheet 2",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        900,
+        400
+      ],
+      "parameters": {
+        "range": "={{$node[\"Read Sheet\"].parameter[\"range\"]}}",
+        "rawData": true,
+        "operation": "update"
+      }
+    },
+    {
+      "id": "6427c9b4-b15c-4144-a9b8-0d394d9c5439",
+      "name": "Write Sheet 1",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        900,
+        200
+      ],
+      "parameters": {
+        "range": "={{$node[\"Read Sheet\"].parameter[\"range\"]}}",
+        "rawData": true,
+        "operation": "update"
+      }
+    },
+    {
+      "id": "error-fb5a9330",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

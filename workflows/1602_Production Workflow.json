@@ -1,0 +1,114 @@
+{
+  "active": false,
+  "name": "Production Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-9f02c4e9",
+      "name": "On clicking 'execute'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-dad63eb8",
+      "name": "Customer Datastore",
+      "type": "n8n-nodes-base.n8nTrainingCustomerDatastore",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "operation": "getAllPeople",
+        "returnAll": true
+      }
+    },
+    {
+      "id": "node-072fd87d",
+      "name": "SplitInBatches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "options": {},
+        "batchSize": 1
+      }
+    },
+    {
+      "id": "node-72c0c332",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        850,
+        300
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "requestMethod": "POST",
+        "bodyParametersUi": {
+          "parameter": [
+            {
+              "name": "id",
+              "value": "={{$json[\"id\"]}}"
+            },
+            {
+              "name": "name",
+              "value": "={{$json[\"name\"]}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-228a9e32",
+      "name": "Wait",
+      "webhookId": "b809abfb-8e02-4b31-90b9-0005be656312",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        950,
+        100
+      ],
+      "parameters": {
+        "unit": "seconds",
+        "amount": 4
+      }
+    },
+    {
+      "id": "node-c32a4f69",
+      "name": "Replace Me",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "error-3a7a45de",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

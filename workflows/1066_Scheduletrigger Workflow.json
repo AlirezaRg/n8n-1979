@@ -1,0 +1,128 @@
+{
+  "active": false,
+  "name": "Scheduletrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "edf41c95-2421-4008-9097-73687fe4bbfc",
+      "name": "Schedule Trigger",
+      "notes": "This scheduleTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        380,
+        240
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      }
+    },
+    {
+      "id": "bde8d167-b7c4-4fc8-a256-b022bb33347d",
+      "name": "Test Data",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        800,
+        240
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e0e09aa8-2374-43f7-87bf-f2ffcac8e1d9",
+              "name": "name",
+              "type": "string",
+              "value": "n8n"
+            },
+            {
+              "id": "2086908e-c301-4392-9cf6-b6461e11dcd4",
+              "name": "url",
+              "type": "string",
+              "value": "{{ $env.WEBHOOK_URL }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "e53d7ec5-f98a-41fe-b082-00e2f680dcea",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        760,
+        40
+      ],
+      "parameters": {
+        "content": "## Test Data \n\nUsing n8n.io as test url.\n\nFor production use, you have to connect your data here."
+      }
+    },
+    {
+      "id": "835c2a8c-edd6-43dc-b898-e2c49dd65beb",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        -40
+      ],
+      "parameters": {
+        "width": 389,
+        "height": 255.7976193268613,
+        "content": "## Web Scraping \n\nUsing **Scrappey's** API to scrape every website.\n\nDon't get blocked again by anti-bot technologies while scraping the web.\n\n**Setup:**\nReplace YOUR_API_KEY with [your Scrappey API key.]({{ $env.WEBHOOK_URL }}\n"
+      }
+    },
+    {
+      "id": "7f8b3077-ec09-4fec-a4f0-f6b7f3f7ec0e",
+      "name": "Scrape website with Scrappey",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1280,
+        240
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        },
+        "sendBody": true,
+        "sendQuery": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "cmd",
+              "value": "request.get"
+            },
+            {
+              "name": "url",
+              "value": "={{ $json.url }}"
+            }
+          ]
+        },
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "YOUR_API_KEY"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

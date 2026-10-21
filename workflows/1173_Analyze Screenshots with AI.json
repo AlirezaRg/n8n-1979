@@ -1,0 +1,183 @@
+{
+  "active": false,
+  "name": "Analyze Screenshots with AI",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "6d7f34b8-6203-4512-a428-7b5a18c63db6",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        240,
+        1100
+      ],
+      "parameters": {
+        "width": 373.2796418305297,
+        "height": 381.1230421279239,
+        "content": "## Setup \n**For Testing use the Setup node to put in test name & url.**\n\nIf you want to use this workflow in production, you can expand it to load data from other sources like a DB or Google Sheet"
+      }
+    },
+    {
+      "id": "ae568c65-e8f6-45bb-9c96-a870da1fc7d6",
+      "name": "Setup",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        360,
+        1320
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "website_name",
+              "value": "=n8n"
+            },
+            {
+              "name": "url",
+              "value": "{{ $env.WEBHOOK_URL }}"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "ca9f0357-a596-4453-b351-fdd8d47c81ad",
+      "name": "URLbox API Request",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "retryOnFail": true,
+      "position": [
+        780,
+        1120
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "sendBody": true,
+        "sendHeaders": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ $json.url }}"
+            },
+            {
+              "name": "full_page",
+              "value": true
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "YOUR_API_KEY"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "3caffa3c-657a-4f74-a3cb-daf7beb67890",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        640,
+        920
+      ],
+      "parameters": {
+        "width": 373.2796418305297,
+        "height": 381.1230421279239,
+        "content": "## URLbox API call \n[URLbox]({{ $env.WEBHOOK_URL }} is a Screenshot API. With this API you can automate making screenshots based on website url's.\n\nYou have to replace the Placeholder with your API Key"
+      }
+    },
+    {
+      "id": "d2b81b41-1497-4733-8130-67f8de0acff4",
+      "name": "Analyze the Screenshot",
+      "notes": "This openAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.1,
+      "position": [
+        1220,
+        1120
+      ],
+      "parameters": {
+        "text": "=Your Input is a Screenshot of a Website.\nDescribe the content of the Website in one sentence.",
+        "options": {},
+        "resource": "image",
+        "imageUrls": "{{ $env.BASE_URL }}",
+        "operation": "analyze"
+      }
+    },
+    {
+      "id": "68d86931-69bb-4b78-a7fe-44969172672f",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        920
+      ],
+      "parameters": {
+        "width": 373.2796418305297,
+        "height": 381.1230421279239,
+        "content": "## Analyze the Screenshot \nAnalyze the screenshot using OpenAI.\n\nAdd your OpenAI Credentials on the top of the node.\n\nThe prompt is an example. Change it based on what you want to extract from the screenshot."
+      }
+    },
+    {
+      "id": "8a22fca5-7f06-45fb-a03f-585a7eb35b40",
+      "name": "Merge Name & Description",
+      "notes": "This merge node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        1620,
+        1300
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {},
+        "combinationMode": "mergeByPosition"
+      }
+    },
+    {
+      "id": "4f902a0a-ee93-4190-9b1e-ab3fa15eb4aa",
+      "name": "Sticky Note3",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1480,
+        1200
+      ],
+      "parameters": {
+        "width": 371.85912137154685,
+        "height": 300.15337596590155,
+        "content": "## Merge\nMerge the description with the name of the website & the url."
+      }
+    },
+    {
+      "id": "8b3eb3f4-b31a-48f0-94bb-35379d07a81f",
+      "name": "Manual Execution",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        20,
+        1320
+      ],
+      "parameters": {}
+    }
+  ],
+  "connections": {}
+}

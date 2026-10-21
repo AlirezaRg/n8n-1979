@@ -1,0 +1,101 @@
+{
+  "active": false,
+  "name": "Create a table and insert data into it",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "58853029-9bce-4429-90ad-662c2c862110",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        440,
+        460
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "cac7592e-b89b-4262-8181-62e18307bbfa",
+      "name": "Set",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        840,
+        460
+      ],
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "id"
+            }
+          ],
+          "string": [
+            {
+              "name": "name",
+              "value": "Tanay"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "dec3d257-12c7-45a7-9932-ee4a4a3c210d",
+      "name": "QuestDB",
+      "notes": "This questDb node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.questDb",
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "position": [
+        640,
+        460
+      ],
+      "parameters": {
+        "query": "CREATE TABLE test (id INT, name STRING);",
+        "operation": "executeQuery"
+      },
+      "credentials": {
+        "questDb": "QuestDB"
+      }
+    },
+    {
+      "id": "5a957acf-d4f6-403a-bab7-16278bae0823",
+      "name": "QuestDB1",
+      "notes": "This questDb node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.questDb",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        460
+      ],
+      "parameters": {
+        "table": "test",
+        "columns": "id, name"
+      },
+      "credentials": {
+        "questDb": {
+          "id": null,
+          "name": "QuestDB"
+        }
+      }
+    },
+    {
+      "id": "error-629511f8",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

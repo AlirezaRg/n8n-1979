@@ -1,0 +1,147 @@
+{
+  "active": false,
+  "name": "Create, update, and get an entry in Strapi",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-a9dca093",
+      "name": "On clicking 'execute'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-312078ab",
+      "name": "Strapi",
+      "type": "n8n-nodes-base.strapi",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "columns": "Title, Content, Description",
+        "operation": "create",
+        "contentType": "posts"
+      },
+      "credentials": {
+        "strapiApi": "strapi"
+      }
+    },
+    {
+      "id": "node-d231c235",
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "Title",
+              "value": "Automate Strapi with n8n"
+            },
+            {
+              "name": "Content",
+              "value": "Strapi is a headless CMS. We will use Strapi and n8n to automate our content creation workflows."
+            },
+            {
+              "name": "Description",
+              "value": "Learn how to automate Strapi with n8n."
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "node-1c0ff992",
+      "name": "Strapi1",
+      "type": "n8n-nodes-base.strapi",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        300
+      ],
+      "parameters": {
+        "columns": "slug",
+        "operation": "update",
+        "contentType": "={{$node[\"Strapi\"].parameter[\"contentType\"]}}"
+      },
+      "credentials": {
+        "strapiApi": {
+          "id": null,
+          "name": "strapi"
+        }
+      }
+    },
+    {
+      "id": "node-6bf0c481",
+      "name": "Set1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        850,
+        300
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "id",
+              "value": "={{$node[\"Strapi\"].json[\"id\"]}}"
+            },
+            {
+              "name": "slug",
+              "value": "automate-strapi-with-n8n"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "node-454af4a7",
+      "name": "Strapi2",
+      "type": "n8n-nodes-base.strapi",
+      "typeVersion": 1,
+      "position": [
+        1250,
+        300
+      ],
+      "parameters": {
+        "entryId": "={{$node[\"Strapi1\"].json[\"id\"]}}",
+        "contentType": "={{$node[\"Strapi\"].parameter[\"contentType\"]}}"
+      },
+      "credentials": {
+        "strapiApi": {
+          "id": null,
+          "name": "strapi"
+        }
+      }
+    },
+    {
+      "id": "error-e4ec8aa7",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,303 @@
+{
+  "active": false,
+  "name": "AI Voice Chat using Webhook, Memory Manager, OpenAI, Google Gemini & ElevenLabs",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "86cbf150-df4f-42f7-b7b3-e03c32e6f23c",
+      "name": "Get Chat",
+      "notes": "This memoryManager node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "position": [
+        1700,
+        -400
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "a9153a24-e902-4f29-9b83-447317ce3119",
+      "name": "Insert Chat",
+      "notes": "This memoryManager node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "position": [
+        2540,
+        -400
+      ],
+      "parameters": {
+        "mode": "insert",
+        "messages": {
+          "messageValues": [
+            {
+              "type": "user",
+              "message": "={{ $('OpenAI - Speech to Text').item.json[\"text\"] }}"
+            },
+            {
+              "type": "ai",
+              "message": "={{ $json.text }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "f5c272d4-248b-45a5-87b5-eb659a865d05",
+      "name": "Sticky Note5",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1664,
+        -491
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 486.4746124819703,
+        "height": 238.4911357933579,
+        "content": "## Get Context"
+      }
+    },
+    {
+      "id": "32ad17ca-0045-487d-9387-71c2e73629d4",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2510,
+        -489
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 321.2536584847704,
+        "height": 231.05945912581728,
+        "content": "## Save Context"
+      }
+    },
+    {
+      "id": "17ae4f1a-6192-4c52-8157-3cb47b37e0fb",
+      "name": "Aggregate",
+      "notes": "This aggregate node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "position": [
+        2020,
+        -400
+      ],
+      "parameters": {
+        "options": {},
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "context"
+      }
+    },
+    {
+      "id": "00b3081e-fbcd-489b-b45a-4e847c346594",
+      "name": "Window Buffer Memory",
+      "notes": "This memoryBufferWindow node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.2,
+      "position": [
+        2080,
+        -100
+      ],
+      "parameters": {
+        "sessionKey": "YOUR_CREDENTIAL_HERE",
+        "sessionIdType": "customKey"
+      }
+    },
+    {
+      "id": "55ca2790-e905-414a-a9f6-7d88a9e5807d",
+      "name": "Google Gemini Chat Model",
+      "notes": "This lmChatGoogleGemini node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2220,
+        -100
+      ],
+      "parameters": {
+        "options": {},
+        "modelName": "models/gemini-1.5-flash"
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "2bUF1ZI9hoMIM5XN",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "id": "e8b3433f-b205-404c-9f05-504556d6b6dd",
+      "name": "Respond to Webhook",
+      "notes": "This respondToWebhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        3560,
+        -400
+      ],
+      "parameters": {
+        "options": {},
+        "respondWith": "binary"
+      }
+    },
+    {
+      "id": "de296743-5ac7-454b-bf3a-d020cc024511",
+      "name": "ElevenLabs - Generate Audio",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3240,
+        -400
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "sendBody": true,
+        "sendHeaders": true,
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $('Basic LLM Chain').item.json.text }}"
+            }
+          ]
+        },
+        "genericAuthType": "httpCustomAuth",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "lnGfV4BlxSE6Xc4X",
+          "name": "Eleven Labs"
+        }
+      }
+    },
+    {
+      "id": "214e15f2-8a16-4598-b4ac-9fc2ec6545e6",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3040,
+        -560
+      ],
+      "parameters": {
+        "width": 468.73250812192407,
+        "height": 843.7602354099661,
+        "content": "* ### For the Text-to-Speech part, we'll use ElevenLabs.io, which is free and offers a variety of voices to choose from. However, you can also use the OpenAI `\"Generate audio\"` node instead.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n* ### Since there is no pre-built node for `\"ElevenLabs\"` in n8n, we'll connect to it through its API using the \"HTTP Request\" node.\n\n## Prerequisites:\n* ### `\"ElevenLabs API Key\"` (you can obtain it from their website).\n* ### `\"Voice ID\"` (you can also get it from ElevenLabs' \"Voice Library\").\n## Setup\n* ### In the URL parameter, replace \"{{voice id}}\" at the end of the URL with the Voice ID you obtained from ElevenLabs.io.\n* ### To set up your API Key, add custom authentication and include the following `JSON` with your acual ElevenLabs API Key:\n```json\n{\n  \"headers\": {\n    \"xi-api-key\": \"put-your-API-Key-here\"\n  }\n}\n```"
+      }
+    },
+    {
+      "id": "94ad934c-4a13-47b1-83a5-76fab43b3a47",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1663,
+        -598
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 487.4293487597613,
+        "height": 91.01435855269375,
+        "content": "### The \"Get Chat,\" \"Insert Chat,\" and \"Window Buffer Memory\" nodes will help the LLM model maintain context throughout the conversation."
+      }
+    },
+    {
+      "id": "0a96f48d-0d8b-4240-9eab-a681bfd4c8b5",
+      "name": "Limit",
+      "notes": "This limit node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        2900,
+        -400
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "9a5d4ddb-6403-4758-858e-9fbe10c421a9",
+      "name": "Basic LLM Chain",
+      "notes": "This chainLlm node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.4,
+      "position": [
+        2200,
+        -400
+      ],
+      "parameters": {
+        "text": "={{ $('OpenAI - Speech to Text').item.json[\"text\"] }}",
+        "messages": {
+          "messageValues": [
+            {
+              "type": "AIMessagePromptTemplate",
+              "message": "=To maintain context and fully understand the user's question, always review the previous conversation between you and him before providing an answer.\nThis is the previous conversation:\n{{ $('Aggregate').item.json[\"context\"].map(m => `\nHuman: ${m.human || 'undefined'}\nAI Assistant: ${m.ai || 'undefined'}\n`).join('') }}"
+            }
+          ]
+        },
+        "promptType": "define"
+      }
+    },
+    {
+      "id": "f2f99895-9678-41b8-ad28-db40e1e23dc0",
+      "name": "Webhook",
+      "webhookId": "e9f611eb-a8dd-4520-8d24-9f36deaca528",
+      "notes": "This webhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        1320,
+        -400
+      ],
+      "parameters": {
+        "path": "voice_message",
+        "options": {},
+        "httpMethod": "POST",
+        "responseMode": "responseNode"
+      }
+    },
+    {
+      "id": "d9a5fb04-4c02-4da4-b690-7b0ecd0ae052",
+      "name": "OpenAI - Speech to Text",
+      "notes": "This openAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.3,
+      "position": [
+        1500,
+        -400
+      ],
+      "parameters": {
+        "options": {},
+        "resource": "audio",
+        "operation": "transcribe",
+        "binaryPropertyName": "voice_message"
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "2Cije3KX7OIVwn9B",
+          "name": "n8n OpenAI"
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,96 @@
+{
+  "active": false,
+  "name": "Create entry in Mailchimp from Airtable",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "c61085a4-4a65-4d2d-8333-aa641656a759",
+      "name": "Cron",
+      "notes": "This cron node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        450,
+        450
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {}
+          ]
+        }
+      }
+    },
+    {
+      "id": "5884d116-03e8-4e38-b6ce-c94df07cb2cd",
+      "name": "Airtable",
+      "notes": "This airtable node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        650,
+        450
+      ],
+      "parameters": {
+        "table": "Users",
+        "operation": "list",
+        "application": "=apprZs8g4tIGDUtqQ",
+        "additionalOptions": {
+          "fields": [
+            "Name",
+            "Email",
+            "Interest"
+          ]
+        }
+      },
+      "credentials": {
+        "airtableApi": "claudiajanebates@gmail.com"
+      }
+    },
+    {
+      "id": "1f5fe389-606d-4841-a057-fb9671fa3feb",
+      "name": "Mailchimp",
+      "notes": "This mailchimp node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.mailchimp",
+      "typeVersion": 1,
+      "position": [
+        840,
+        450
+      ],
+      "parameters": {
+        "list": "777b2643d4",
+        "email": "={{$node[\"Airtable\"].json[\"fields\"][\"Email\"]}}",
+        "status": "subscribed",
+        "options": {
+          "tags": "Interest"
+        },
+        "mergeFieldsUi": {
+          "mergeFieldsValues": [
+            {
+              "name": "FNAME",
+              "value": "={{$node[\"Airtable\"].json[\"fields\"][\"Name\"]}}"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "mailchimpApi": "claudiajanebates@gmail.com"
+      }
+    },
+    {
+      "id": "error-6d040ae3",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

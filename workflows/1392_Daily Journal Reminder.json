@@ -1,0 +1,76 @@
+{
+  "active": false,
+  "name": "Daily Journal Reminder",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "e479f9aa-d31d-4f8a-b2be-72510fe8f8c5",
+      "name": "Morning reminder",
+      "notesInFlow": true,
+      "notes": "Trigger very morning",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "position": [
+        220,
+        60
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 6
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "f533aef5-8453-467d-b44d-302a6e9900c2",
+      "name": "format reminder",
+      "notes": "This functionItem node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.functionItem",
+      "typeVersion": 1,
+      "position": [
+        460,
+        60
+      ],
+      "parameters": {
+        "functionCode": "\n// Creates message with todays date\nconst today = new Date()\nconst yesterday = new Date(today)\n\nyesterday.setDate(yesterday.getDate() - 1)\nconst message = `What did you do: ${yesterday.toISOString().split('T')[0]}`\n\nreturn {message};"
+      }
+    },
+    {
+      "id": "0b25832b-6e76-41aa-bbb9-e1a3d2c8f034",
+      "name": "Send journal reminder",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        700,
+        60
+      ],
+      "parameters": {
+        "text": "={{$node[\"format reminder\"].json[\"message\"]}}",
+        "chatId": "666884239",
+        "additionalFields": {}
+      },
+      "credentials": {},
+      "webhookId": "75db52ed-131e-4a4c-a0dc-5082de55e204"
+    },
+    {
+      "id": "error-06652537",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

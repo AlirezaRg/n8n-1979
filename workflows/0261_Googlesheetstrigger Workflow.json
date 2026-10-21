@@ -1,0 +1,136 @@
+{
+  "active": false,
+  "name": "Googlesheetstrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "b3a0fa7c-eb47-4f51-98d7-ac1a8de7b05d",
+      "name": "On new or updated row",
+      "notes": "This googleSheetsTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        800,
+        380
+      ],
+      "parameters": {
+        "options": {
+          "columnsToWatch": [
+            "Security Code"
+          ]
+        },
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Investments"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1Np8TQv7kWwwrGiPkWWsmr4WYWAosv1BMBwwCd0f-dis",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Investments"
+        }
+      },
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "{{ $credentials.googleSheetsTriggerOAuth2Api.id }}",
+          "name": "TEST USER"
+        }
+      }
+    },
+    {
+      "id": "61b96d9b-801c-43e6-b89a-a55245386e4f",
+      "name": "Send message",
+      "notes": "This discord node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        380
+      ],
+      "parameters": {
+        "text": "=```\n{{ $json.ascii_table }}\n```",
+        "options": {},
+        "webhookUri": "{{ $env.API_BASE_URL }}"
+      }
+    },
+    {
+      "id": "2dc9ce88-2079-4419-9f48-2281ac25cb36",
+      "name": "Convert to ASCII table",
+      "notes": "This code node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        380
+      ],
+      "parameters": {
+        "jsCode": "/* configure columns to be displayed */\nconst columns_to_display = [\n  \"Security Code\",\n  \"Price\",\n  \"Quantity\",\n]\n\n/* End of configuration section (do not edit code below) */\nconst google_sheets_data = $('On new or updated row').all();\n\n/**\n * Takes a list of objects and returns an ascii table with\n * padding and headers.\n */\nfunction ascii_table(data, columns_to_display) {\n  let table = \"\"\n  \n  // Get the headers\n  let headers = []\n  for (let i = 0; i < columns_to_display.length; i++) {\n    headers.push(columns_to_display[i])\n  }\n\n  // Get the longest string in each column\n  let longest_strings = []\n  for (let i = 0; i < headers.length; i++) {\n    let longest_string = headers[i].length\n    for (let j = 0; j < data.length; j++) {\n      let string_length = data[j].json[headers[i]].length\n      if (string_length > longest_string) {\n        longest_string = string_length\n      }\n    }\n    longest_strings.push(longest_string)\n  }\n\n  // Add the headers to the table\n  for (let i = 0; i < headers.length; i++) {\n    table += headers[i].toString().padEnd(longest_strings[i] + 2, \" \")\n  }\n\n  // Add the data to the table\n  for (let i = 0; i < data.length; i++) {\n    table += \"\\n\"\n    for (let j = 0; j < headers.length; j++) {\n      table += data[i].json[headers[j]].toString().padEnd(longest_strings[j] + 2, \" \")\n    }\n  }\n\n  return table\n}\n\noutput = {\n  ascii_table: ascii_table(google_sheets_data, columns_to_display),\n}\n\nconsole.log(output.ascii_table)\n\nreturn output"
+      }
+    },
+    {
+      "id": "2db7b37b-22f9-424d-a889-33f8a0db2b01",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        340,
+        220
+      ],
+      "parameters": {
+        "width": 402,
+        "height": 433,
+        "content": "## Send Google Sheets data as a message to a Discord channel\nThis workflow sends a message to a Discord channel when a new row is added or a row is updated in a Google Sheet. The message will send all data rows in the Google Sheet.\n\n### How it works\nUsing a code node, we can use the obtained Google Sheet data to create a custom message that will be sent to Discord. The message will be sent to the Discord channel specified in the Discord node.\n\n### Setup\nThis workflow requires that you set up a Discord webhook and have an existing Google Sheet with data. See how to set up a Discord webhook [here]({{ $env.WEBHOOK_URL }}\n"
+      }
+    },
+    {
+      "id": "error-debcd628",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "On new or updated row": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

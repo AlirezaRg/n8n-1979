@@ -1,0 +1,123 @@
+{
+  "active": false,
+  "name": "My workflow 3",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "24be1991-3de5-49c2-91a1-c636fb721a87",
+      "name": "Weekly Trigger (Monday 7AM)",
+      "notes": "This cron node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        80,
+        180
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "43d7764d-fbd4-414b-be44-bcc80c068db2",
+      "name": "Get SEO Data from GSC",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        300,
+        180
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "genericAuthType": "httpBasicAuth"
+      }
+    },
+    {
+      "id": "92852fd3-7663-413e-b1a9-8c728dea9a23",
+      "name": "Generate SEO Report",
+      "notes": "This function node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        500,
+        180
+      ],
+      "parameters": {
+        "functionCode": "\n                const rows = items[0].json.rows || [];\n                const reportLines = rows.map((row, index) => {\n                    return `${index + 1}. ${row.keys[0]} - Clicks: ${row.clicks}, Impressions: ${row.impressions}, CTR: ${row.ctr.toFixed(2)}, Position: ${row.position.toFixed(2)}`;\n                });\n                return [{\n                    json: {\n                        report: `Top 10 Search Queries (Last 7 Days):\\n\\n${reportLines.join(\"\\n\")}`\n                    }\n                }];\n            "
+      }
+    },
+    {
+      "id": "28d9f152-15a0-4a66-aa5e-aa6b9b4c1fa3",
+      "name": "?? Setup Instructions",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        60
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 280,
+        "height": 320,
+        "content": "\n"
+      }
+    },
+    {
+      "id": "8e9551d4-27ab-4106-b0cd-b82d6a671ec7",
+      "name": "?? Google Search Console Config",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        240,
+        60
+      ],
+      "parameters": {
+        "color": 2,
+        "height": 320,
+        "content": ""
+      }
+    },
+    {
+      "id": "c2aabd2e-0a2b-4b4b-a239-bf0927ad1e4d",
+      "name": "?? Email Node Setup",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        640,
+        40
+      ],
+      "parameters": {
+        "color": 5,
+        "height": 360,
+        "content": ""
+      }
+    },
+    {
+      "id": "1b870a08-d53c-4a51-9a41-4d71a5c954f9",
+      "name": "Send Weekly Report by Email",
+      "webhookId": "c9455684-b943-41a5-b2d7-adeafb985083",
+      "notes": "This gmail node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        720,
+        180
+      ],
+      "parameters": {
+        "sendTo": "rodrigue.gbadou@gmail.com",
+        "options": {},
+        "subject": "Send Weekly Report by Email"
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y4RWMfx2YG0VDaFJ",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

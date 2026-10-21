@@ -1,0 +1,145 @@
+{
+  "active": false,
+  "name": "Manualtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "9b5b5af9-8a56-40a3-ad75-1e1186e96439",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        640,
+        360
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "7c99e8d9-ef79-4833-bb0c-5005d210418e",
+      "name": "n8n | Get all executions",
+      "notes": "This n8n node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        880,
+        360
+      ],
+      "parameters": {
+        "filters": {},
+        "options": {},
+        "resource": "execution",
+        "returnAll": true
+      },
+      "credentials": {
+        "n8nApi": {
+          "id": "3c3kWsiMeyTemNnV",
+          "name": "n8n account"
+        }
+      }
+    },
+    {
+      "id": "95ae4ed4-22d4-41dc-be75-ea1224985f80",
+      "name": "Convert to CSV",
+      "notes": "This convertToFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1140,
+        360
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "07665975-a07c-4c7c-b9ec-cad583b17c07",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        800,
+        220
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 254,
+        "height": 355,
+        "content": "## Get all executions\n**Workflow and Status Filters can be applied here**"
+      }
+    },
+    {
+      "id": "14e2f531-5902-4c58-946c-a8571266c5e4",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        220
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 214.03132502922975,
+        "height": 355,
+        "content": "## Convert to CSV\n**CSV for easy parsing**"
+      }
+    },
+    {
+      "id": "e1bc72a9-3378-4dd4-88b0-3fb4eee1fea8",
+      "name": "No Operation, do nothing",
+      "notes": "This noOp node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1380,
+        360
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "066fa340-98d6-4e18-87f0-f995083d041d",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        220
+      ],
+      "parameters": {
+        "width": 214.07781344172514,
+        "height": 356,
+        "content": "## Replace this node\n**Replace this node with any cloud storage destination**"
+      }
+    },
+    {
+      "id": "error-69f7036c",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Convert to CSV": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

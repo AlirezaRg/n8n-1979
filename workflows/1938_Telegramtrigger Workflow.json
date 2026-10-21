@@ -1,0 +1,106 @@
+{
+  "active": false,
+  "name": "Telegramtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "ccfab7dc-417e-4c94-8ee0-a4067f006aa9",
+      "name": "Telegram Trigger",
+      "notes": "This telegramTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "updates": [
+          "message"
+        ]
+      },
+      "credentials": {
+        "telegramApi": ""
+      },
+      "webhookId": "8bbd5bc3-cd05-4f45-b95c-35bf3a112b8c"
+    },
+    {
+      "id": "ae263e4b-b141-4e06-adce-3bbfcd4e1c51",
+      "name": "Return Sticker",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        850,
+        200
+      ],
+      "parameters": {
+        "text": "=Hi {{$node[\"Look for Sticker\"].data[\"message\"][\"from\"][\"first_name\"]}}!\nThe ID of the sticker is: {{$node[\"Look for Sticker\"].data[\"message\"][\"sticker\"][\"file_id\"]}}\nIt is part of the sticker-set: {{$node[\"Look for Sticker\"].data[\"message\"][\"sticker\"][\"set_name\"]}}",
+        "chatId": "={{$node[\"Look for Sticker\"].data[\"message\"][\"chat\"][\"id\"]}}",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": null,
+          "name": ""
+        }
+      },
+      "webhookId": "4b510b21-7bcf-4e80-ad95-396877c16568"
+    },
+    {
+      "id": "a1d94bb5-7250-4afd-b942-682b02f2ebb0",
+      "name": "Return no Sticker found",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        850,
+        400
+      ],
+      "parameters": {
+        "text": "=Hi {{$node[\"Look for Sticker\"].data[\"message\"][\"from\"][\"first_name\"]}}!\nYour message did not contain any sticker.",
+        "chatId": "={{$node[\"Look for Sticker\"].data[\"message\"][\"chat\"][\"id\"]}}",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": "n8nTestBot"
+      },
+      "webhookId": "524966b8-26a4-40ff-8611-81cfb1a8ce8b"
+    },
+    {
+      "id": "654243ee-2773-4d27-9343-72ad97ea671a",
+      "name": "Look for Sticker",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{!!$node[\"Telegram Trigger\"].data[\"message\"][\"sticker\"]}}",
+              "value2": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "error-e228150e",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,4 @@
+.imported
+node_modules/
+*.log
+.n8n/

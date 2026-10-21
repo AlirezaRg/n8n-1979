@@ -1,0 +1,375 @@
+{
+  "active": false,
+  "name": "Translate Telegram audio messages with AI (55 supported languages) v1",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "f91fa0cf-ea01-4fc0-9ef2-754da399b7fb",
+      "name": "Telegram Trigger",
+      "webhookId": "c537cfcc-6c4a-436a-8871-d32f8ce016cb",
+      "notes": "This telegramTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [
+        440,
+        220
+      ],
+      "parameters": {
+        "updates": [
+          "*"
+        ],
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "Ov00cT0t4h4AFtZ0",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "057ae05f-2c7d-48c5-a057-a6917a88971c",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1240,
+        0
+      ],
+      "parameters": {
+        "width": 556.5162909529794,
+        "height": 586.6978417266175,
+        "content": "## Translation\n\n- Converts from speech to text.\n\n- Translates the language from the native language to translated language (as specified in settings node)\n\n"
+      }
+    },
+    {
+      "id": "c6947668-118e-4e23-bc55-1cdbce554a20",
+      "name": "Text reply",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        2240,
+        220
+      ],
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "Ov00cT0t4h4AFtZ0",
+          "name": "Telegram account"
+        }
+      },
+      "webhookId": "4644d471-188c-45d6-98fb-24e87cd825e3"
+    },
+    {
+      "id": "93551aea-0213-420d-bf82-7669ab291dae",
+      "name": "Telegram1",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        1060,
+        220
+      ],
+      "parameters": {
+        "fileId": "={{ $('Telegram Trigger').item.json.message.voice.file_id }}",
+        "resource": "file"
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "Ov00cT0t4h4AFtZ0",
+          "name": "Telegram account"
+        }
+      },
+      "webhookId": "d5d1b107-7ad0-495e-a4d7-3725c6ba45f2"
+    },
+    {
+      "id": "972177e4-b0a4-424f-9ca6-6555ff3271d7",
+      "name": "OpenAI Chat Model",
+      "notes": "This lmChatOpenAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        400
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "fOF5kro9BJ6KMQ7n",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "id": "0e8f610f-03a7-4943-bd19-b3fb10c89519",
+      "name": "Input Error Handling",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [
+        860,
+        220
+      ],
+      "parameters": {
+        "fields": {
+          "values": [
+            {
+              "name": "message.text",
+              "stringValue": "={{ $json?.message?.text || \"\" }}"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "c8ab9e01-c9b5-4647-8008-9157ed97c4c3",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1920,
+        0
+      ],
+      "parameters": {
+        "width": 585.8688089385912,
+        "height": 583.7625899280566,
+        "content": "## Telegram output\n\n- Provide the output in both text as well as speech. \n\n- Many languages are supported including English,French, German, Spanish, Chinese, Japanese.\n\nFull list here:\n{{ $env.WEBHOOK_URL }}\n"
+      }
+    },
+    {
+      "id": "0898dc4d-c3ad-43df-871f-1896f673f631",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -140,
+        0
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 489.00549958607303,
+        "height": 573.4892086330929,
+        "content": "## Multi-lingual AI Powered Universal Translator with Speech ?\n\n### Key capabilities\nThis flow enables a Telegram bot that can \n- accept speech in one of 55 languages \n- translates to another language and returns result in speech\n\n### Use case:\n- Learning a new language\n- Communicate with others while traveling to another country\n\n### Setup\n- Open the Settings node and specify the languages you would like to work with"
+      }
+    },
+    {
+      "id": "ae0595d2-7e40-4c1e-a643-4b232220d19a",
+      "name": "Settings",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        660,
+        220
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "501ac5cc-73e8-4e9c-bf91-df312aa9ff88",
+              "name": "language_native",
+              "type": "string",
+              "value": "english"
+            },
+            {
+              "id": "efb9a7b2-5baa-44cc-b94d-c8030f17e890",
+              "name": "language_translate",
+              "type": "string",
+              "value": "french"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "2d3654cf-a182-4916-a50c-a501828c2f6e",
+      "name": "Auto-detect and translate",
+      "notes": "This chainLlm node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.4,
+      "position": [
+        1500,
+        220
+      ],
+      "parameters": {
+        "text": "=Detect the language of the text that follows. \n- If it is {{ $('Settings').item.json.language_native }} translate to {{ $('Settings').item.json.language_translate }}. \n- If it is in {{ $('Settings').item.json.language_translate }} translate to {{ $('Settings').item.json.language_native }} . \n- In the output just provide the translation and do not explain it. Just provide the translation without anything else.\n\nText:\n {{ $json.text }}\n",
+        "promptType": "define"
+      }
+    },
+    {
+      "id": "a6e63516-4967-4e81-ba5b-58ad0ab21ee3",
+      "name": "Audio reply",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        2240,
+        400
+      ],
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "operation": "sendAudio",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "Ov00cT0t4h4AFtZ0",
+          "name": "Telegram account"
+        }
+      },
+      "webhookId": "3cb6eb65-8ba8-4493-b122-76b6f48ac388"
+    },
+    {
+      "id": "e4782117-03de-41d2-9208-390edc87fc08",
+      "name": "OpenAI2",
+      "notes": "This openAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.3,
+      "position": [
+        1300,
+        220
+      ],
+      "parameters": {
+        "options": {},
+        "resource": "audio",
+        "operation": "transcribe"
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "fOF5kro9BJ6KMQ7n",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "id": "b29355f5-122c-4557-8215-28fdb523d221",
+      "name": "OpenAI",
+      "notes": "This openAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.3,
+      "position": [
+        2020,
+        400
+      ],
+      "parameters": {
+        "input": "={{ $json.text }}",
+        "options": {},
+        "resource": "audio"
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "fOF5kro9BJ6KMQ7n",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "id": "error-c1857c84",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text reply": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram1": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audio reply": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI2": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

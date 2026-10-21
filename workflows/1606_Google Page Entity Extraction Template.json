@@ -1,0 +1,123 @@
+{
+  "active": false,
+  "name": "Google Page Entity Extraction Template",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "8719f1de-2a3e-4c34-9edc-e4b8f993b525",
+      "name": "Respond to Webhook",
+      "notes": "This respondToWebhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1240,
+        -420
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "01420fd5-3483-4e74-b9fc-971199898449",
+      "name": "Google Entities",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1020,
+        -420
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={{ $json.apiRequest }}",
+        "sendBody": true,
+        "sendQuery": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "YOUR-GOOGLE-API-KEY"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "5c1c258a-44ed-4d5a-a22d-cddb4df09018",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -300,
+        -700
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 620,
+        "height": 880,
+        "content": "# Google Page Entity Extraction Template\n\n## What this workflow does\nThis workflow allows you to extract named entities (people, organizations, locations, etc.) from any web page using Google's Natural Language API. Simply send a URL to the webhook endpoint, and the workflow will fetch the page content, process it through Google's entity recognition service, and return the structured entity data.\n\n### How to use\n1. Replace \"YOUR-GOOGLE-API-KEY\" with your actual Google Cloud API key (Natural Language API must be enabled)\n2. Activate the workflow and use the webhook URL as your endpoint\n3. Send a POST request to the webhook with a JSON body containing the URL you want to analyze: {\"url\": \"{{ $env.WEBHOOK_URL }}\"}\n4. Review the returned entity analysis with categories, salience scores, and metadata\n\n## Webhook Input Format\nThe webhook expects a POST request with a JSON body in this format:\n```json\n{\n  \"url\": \"{{ $env.WEBHOOK_URL }}\"\n}\n```\n### Response Format\nThe webhook returns a JSON response containing the full entity analysis from Google's Natural Language API, including:\n\nEntity names and types (PERSON, LOCATION, ORGANIZATION, etc.)\nSalience scores indicating entity importance\nMetadata and mentions within the text\nEntity sentiment (if available)"
+      }
+    },
+    {
+      "id": "79add9a7-adca-4ce5-8a6a-5fcb75288846",
+      "name": "Get Url",
+      "webhookId": "2944c8f6-03cd-4ab8-8b8e-cb033edf877a",
+      "notes": "This webhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        360,
+        -420
+      ],
+      "parameters": {
+        "path": "2944c8f6-03cd-4ab8-8b8e-cb033edf877a",
+        "options": {},
+        "httpMethod": "POST",
+        "responseMode": "responseNode"
+      }
+    },
+    {
+      "id": "081a52bc-2da7-44fb-bdc3-4cb73cbf8dd3",
+      "name": "Get URL Page Contents",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        580,
+        -420
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "dda5ef3d-f031-4dd6-b117-c1f69aa66b63",
+      "name": "Respond with detected entities",
+      "notes": "This code node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        -420
+      ],
+      "parameters": {
+        "jsCode": "// Clean and prepare HTML for API request\nconst html = $input.item.json.data;\n// Trim if too large (optional)\nconst trimmedHtml = html.length > 100000 ? html.substring(0, 100000) : html;\n\nreturn {\n  json: {\n    apiRequest: {\n      document: {\n        type: \"HTML\",\n        content: trimmedHtml\n      },\n      encodingType: \"UTF8\"\n    }\n  }\n}"
+      }
+    }
+  ],
+  "connections": {}
+}

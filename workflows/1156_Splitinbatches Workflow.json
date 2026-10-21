@@ -1,0 +1,193 @@
+{
+  "active": false,
+  "name": "Splitinbatches Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "09c19ba1-45f2-43af-9985-3508d801c1b7",
+      "name": "Loop Over Items",
+      "notes": "This splitInBatches node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        440,
+        0
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "18625b1d-f8ff-4e48-8b64-a9d42d24eccc",
+      "name": "Click to Test Flow",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        40,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "649933c4-b16b-46de-9038-7d8c0b3d8e88",
+      "name": "Get emails from Gmail with certain subject",
+      "webhookId": "99c4deca-17c7-47ae-a38c-50344938e792",
+      "notes": "This gmail node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "simple": false,
+        "filters": {
+          "q": "subject:?? Uber Eats ???????"
+        },
+        "options": {},
+        "operation": "getAll",
+        "returnAll": true
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y4RWMfx2YG0VDaFJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "id": "b2118a34-52ad-4464-b7ea-7f3105536fad",
+      "name": "Receive certain keyword Gmail Trigger",
+      "notes": "This gmailTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        120,
+        -180
+      ],
+      "parameters": {
+        "simple": false,
+        "filters": {
+          "q": "subject:?? Uber Eats ???????"
+        },
+        "options": {},
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour",
+              "minute": 30
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y4RWMfx2YG0VDaFJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "id": "00986543-d01a-4b11-bbaa-60c73a1dae02",
+      "name": "Extract Price, Shop, Date, TIme",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        620,
+        60
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c24405f8-267f-4933-a178-1b51145d62bf",
+              "name": "price",
+              "type": "string",
+              "value": "={{ $json[\"text\"].match(/\\$(\\d+(\\.\\d{2})?)/)[1] }}"
+            },
+            {
+              "id": "968cf7cd-6e28-4328-a829-3fe2cb327643",
+              "name": "shop",
+              "type": "string",
+              "value": "={{ $json[\"text\"].match(/?????([\\u4e00-\\u9fa5a-zA-Z0-9\\s]+)??/)[1] }}"
+            },
+            {
+              "id": "53642bcb-f3a6-4086-bdc1-2f8d27927462",
+              "name": "date",
+              "type": "string",
+              "value": "={{ $json[\"text\"].match(/Date: (\\d{4}?\\d{1,2}?\\d{1,2}?)/)[1].replace(\"?\", \".\").replace(\"?\", \".\").replace(\"?\", \"\") }}"
+            },
+            {
+              "id": "cd227132-971b-4970-8b5d-724463efe036",
+              "name": "time",
+              "type": "string",
+              "value": "={{ \n  $json[\"text\"].match(/(??|??) (\\d{1,2}):(\\d{2})/) ? \n  ($json[\"text\"].match(/(??|??) (\\d{1,2}):(\\d{2})/)[1] === '??' && $json[\"text\"].match(/(??|??) (\\d{1,2}):(\\d{2})/)[2] !== '12' \n    ? (parseInt($json[\"text\"].match(/(??|??) (\\d{1,2}):(\\d{2})/)[2]) + 12) + ':' + $json[\"text\"].match(/(??|??) (\\d{1,2}):(\\d{2})/)[3] \n    : $json[\"text\"].match(/(??|??) (\\d{1,2}):(\\d{2})/)[2] + ':' + $json[\"text\"].match(/(??|??) (\\d{1,2}):(\\d{2})/)[3]\n  )\n  : null \n}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "3d8f97ea-4a0d-4939-898f-8a0ca9415e7d",
+      "name": "Send to Slack with Block",
+      "webhookId": "0e812732-74d2-4924-8db3-6b9234965937",
+      "notes": "This slack node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        800,
+        60
+      ],
+      "parameters": {
+        "text": "=Ubereat ????: \n??:  {{ $json.shop }}\n??: {{ $json.price }}\n??: {{ $json.date }}\n\n????:\nmoze3://expense?amount={{ $json.price }}&account=???&subcategory=??&store={{ $json.shop }}&date={{ $json.date }}",
+        "select": "channel",
+        "blocksUi": "={\n\t\"blocks\": [\n\t\t{\n\t\t\t\"type\": \"section\",\n\t\t\t\"text\": {\n\t\t\t\t\"type\": \"mrkdwn\",\n\t\t\t\t\"text\": \"Ubereat ????:\\n\\n*??:* {{ $json.shop }}\\n*??:* {{ $json.price }}\\n*??:* {{ $json.date }}\"\n\t\t\t}\n\t\t},\n\t\t{\n\t\t\t\"type\": \"divider\"\n\t\t},\n\t\t{\n\t\t\t\"type\": \"section\",\n\t\t\t\"text\": {\n\t\t\t\t\"type\": \"mrkdwn\",\n\t\t\t\t\"text\": \"Moze ?????\"\n\t\t\t},\n\t\t\t\"accessory\": {\n\t\t\t\t\"type\": \"button\",\n\t\t\t\t\"text\": {\n\t\t\t\t\t\"type\": \"plain_text\",\n\t\t\t\t\t\"text\": \"??\",\n\t\t\t\t\t\"emoji\": true\n\t\t\t\t},\n\t\t\t\t\"value\": \"click\",\n\t\t\t\t\"url\": \"moze3://expense?amount={{ $json.price }}&account=???&subcategory=??&store={{ $json.shop }}&date={{ $json.date }}&&project=????&&time={{ $json.time }}\",\n\t\t\t\t\"action_id\": \"button-action\"\n\t\t\t}\n\t\t}\n\t]\n}",
+        "channelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "C0883CJM1UH",
+          "cachedResultName": "???????"
+        },
+        "messageType": "block",
+        "otherOptions": {},
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "sD1J9ZLyEhcglrRa",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "id": "error-f597a38f",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Send to Slack with Block": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

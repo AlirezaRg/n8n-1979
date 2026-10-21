@@ -1,0 +1,142 @@
+{
+  "active": false,
+  "name": "MAIA - Health Check",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "10335465-853d-47ea-aad7-34460c741b74",
+      "name": "No Operation, do nothing",
+      "notes": "This noOp node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        860,
+        -20
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "ea7771ba-3d35-423a-9813-2a65448a15fc",
+      "name": "Telegram",
+      "webhookId": "6c02772a-8f40-4d9b-8fe5-220aac63c34e",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        860,
+        160
+      ],
+      "parameters": {
+        "text": "=Health Check :  {{ $json.URLS }}\n\n{{ $json.error.code }}",
+        "chatId": "1548053076",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "QYefc34gGshZQURo",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "bae03dc7-e35b-4760-8de8-151d2d97391b",
+      "name": "Schedule Trigger",
+      "notes": "This scheduleTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "a53fba9c-0f7e-4757-8bcd-e3622845e804",
+      "name": "Fetch Urls",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Sheet1"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "17-tY9_wn-D2FV627Sx3-Z3abqFYvz794edej7es5J6w"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "LXIVLIr0wD38Xaty",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "c96a2070-953b-4a03-a308-dae92d841851",
+      "name": "Check URL",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "alwaysOutputData": false,
+      "onError": "continueErrorOutput",
+      "position": [
+        520,
+        0
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "4fe54bbe-32ef-41d2-94f8-2a7d4ec175b6",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        160,
+        -220
+      ],
+      "parameters": {
+        "content": "## Step 1\nCreate a new google sheet where A1 is a title, and then list in column A all the urls you want to check."
+      }
+    },
+    {
+      "id": "96f8b3bb-d3e1-415a-a849-84b1d524acb5",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        800,
+        320
+      ],
+      "parameters": {
+        "content": "## Step 2\nTo use telegram, simply define chatid.\n\nYou can replace with any type of notification like slack, etc..."
+      }
+    }
+  ],
+  "connections": {}
+}

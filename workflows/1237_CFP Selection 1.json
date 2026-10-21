@@ -1,0 +1,59 @@
+{
+  "active": false,
+  "name": "CFP Selection 1",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "62351e1a-afc0-41c6-94a1-e1688d77e310",
+      "name": "Typeform Trigger",
+      "notes": "This typeformTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.typeformTrigger",
+      "typeVersion": 1,
+      "position": [
+        450,
+        250
+      ],
+      "parameters": {
+        "formId": ""
+      },
+      "credentials": {
+        "typeformApi": "Typeform"
+      },
+      "webhookId": "c82bbb47-91a6-4c94-b7f9-92e060a9bca9"
+    },
+    {
+      "id": "1a637f37-b513-4eb0-a389-8624f315fe3a",
+      "name": "Airtable",
+      "notes": "This airtable node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        660,
+        250
+      ],
+      "parameters": {
+        "table": "",
+        "operation": "append",
+        "application": ""
+      },
+      "credentials": {
+        "airtableApi": "Airtable"
+      }
+    },
+    {
+      "id": "error-1f83707b",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

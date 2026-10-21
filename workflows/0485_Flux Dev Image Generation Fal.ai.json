@@ -1,0 +1,287 @@
+{
+  "active": false,
+  "name": "Flux Dev Image Generation Fal.ai",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "00f3a7d9-9931-40a4-8eb5-5b9086d6995c",
+      "name": "Fal Flux",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        420,
+        0
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n \"prompt\": \"{{ $json.Prompt }}\",\n \"image_size\": {\n \"width\": {{ $json.Width }},\n \"height\": {{ $json.Height }}\n},\n \"num_inference_steps\": {{ $json.Steps }},\n \"guidance_scale\": {{ $json.Guidance }},\n \"num_images\": 1,\n \"enable_safety_checker\": true\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "lNxvZHlUafPAHBYN",
+          "name": "Fal Flux Header Auth account"
+        }
+      }
+    },
+    {
+      "id": "3032a543-2e21-415e-a5bd-d56ea33e4411",
+      "name": "Get Image Result URL",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1220,
+        -20
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "lNxvZHlUafPAHBYN",
+          "name": "Fal Flux Header Auth account"
+        }
+      }
+    },
+    {
+      "id": "56e13e53-1697-4970-9bea-b75e0e849425",
+      "name": "Download Image",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1400,
+        -20
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "dd2efd2c-8712-4a77-8786-cccebdec876b",
+      "name": "Google Drive",
+      "notes": "This googleDrive node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1580,
+        -20
+      ],
+      "parameters": {
+        "name": "={{ $binary.data.fileName }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "options": {},
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1R3PSyHXWHlY9DRFdOUEAPEop2fZy-_-K",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Flux Image"
+        }
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "CFiX9XTXGg4hGaGV",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "id": "a598d868-0461-41fc-b6aa-f9998e9d6146",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "a576d7b6-b2f3-4d53-8e7f-bb6449ff9c64",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        80,
+        -120
+      ],
+      "parameters": {
+        "width": 260,
+        "height": 120,
+        "content": "## Set Parameter Here \nset Image Prompt and related settings"
+      }
+    },
+    {
+      "id": "d39e85a8-3ddd-4f10-ba4c-beb86a850e10",
+      "name": "Wait 3 Sec",
+      "webhookId": "61a8626c-e281-4d4b-abb0-b9d87d1b4e7c",
+      "notes": "This wait node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        640,
+        0
+      ],
+      "parameters": {
+        "amount": 3
+      }
+    },
+    {
+      "id": "b27ac2f1-3f14-467e-81c4-af8b8fb37138",
+      "name": "Check Status",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        840,
+        0
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "lNxvZHlUafPAHBYN",
+          "name": "Fal Flux Header Auth account"
+        }
+      }
+    },
+    {
+      "id": "7ee45dab-8e31-44de-bbb1-e99a565ee19c",
+      "name": "Completed?",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1020,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "299a7c34-dcff-4991-a73f-5b1a84f188ea",
+              "operator": {
+                "name": "filter.operator.equals",
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "COMPLETED"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "c5036a7d-1879-449f-8ce9-9c1cf2c7426b",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        -100
+      ],
+      "parameters": {
+        "width": 220,
+        "height": 100,
+        "content": "## Set Drive Folder Here "
+      }
+    },
+    {
+      "id": "c8887168-6234-486c-b7cb-cc0752c6341c",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        360,
+        -180
+      ],
+      "parameters": {
+        "width": 260,
+        "height": 180,
+        "content": "### Generic Credential Type\n### Header : Authorization\nKey $FAL_KEY\"\n\nfor example:\nKey 6f2960baxxxxxxxxx"
+      }
+    },
+    {
+      "id": "587043c4-e808-4c3f-910f-60f5eb8aff15",
+      "name": "Edit Fields",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        180,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f0a033cf-fa2b-4930-93b9-ff9c45fa7c14",
+              "name": "Prompt",
+              "type": "string",
+              "value": "Thai young woman net idol 25 yrs old, walking on the street"
+            },
+            {
+              "id": "2b56185d-5c61-4c17-85f1-53ac4aab2b18",
+              "name": "Width",
+              "type": "number",
+              "value": 1024
+            },
+            {
+              "id": "51eb65c0-ae0a-4ce7-ab00-9d13f05ce1e6",
+              "name": "Height",
+              "type": "number",
+              "value": 768
+            },
+            {
+              "id": "8e89fca7-d380-4876-b973-69caa0394bc5",
+              "name": "Steps",
+              "type": "number",
+              "value": 30
+            },
+            {
+              "id": "875e06b7-352a-4dde-8595-3274e9969c9c",
+              "name": "Guidance",
+              "type": "number",
+              "value": 3.5
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

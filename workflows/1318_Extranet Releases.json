@@ -1,0 +1,65 @@
+{
+  "active": false,
+  "name": "Extranet Releases",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "db9e67d1-f53f-447e-846f-21c2804fc1c8",
+      "name": "Slack",
+      "notes": "This slack node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        560,
+        550
+      ],
+      "parameters": {
+        "text": "=New release is available in {{$node[\"Github Trigger\"].json[\"body\"][\"repository\"][\"full_name\"]}} !\n{{$node[\"Github Trigger\"].json[\"body\"][\"release\"][\"tag_name\"]}} Details:\n{{$node[\"Github Trigger\"].json[\"body\"][\"release\"][\"body\"]}}\n\nLink: {{$node[\"Github Trigger\"].json[\"body\"][\"release\"][\"html_url\"]}}",
+        "as_user": true,
+        "channel": "extranet-md",
+        "attachments": [],
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": "Extranet-md"
+      }
+    },
+    {
+      "id": "bf6b37dd-1ac4-4bb6-87a0-b8ba5a042067",
+      "name": "Github Trigger",
+      "notes": "This githubTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.githubTrigger",
+      "typeVersion": 1,
+      "position": [
+        350,
+        550
+      ],
+      "parameters": {
+        "owner": "Mesdocteurs",
+        "events": [
+          "release"
+        ],
+        "repository": "mda-admin-partner-api"
+      },
+      "credentials": {
+        "githubApi": "Github API"
+      },
+      "webhookId": "25cf9bb8-cd54-4607-ac46-4f180422e759"
+    },
+    {
+      "id": "error-46f13603",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,70 @@
+{
+  "active": false,
+  "name": "Webhook Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "0357b17f-9fcf-4725-8311-28bd9c76c37c",
+      "name": "On GET request",
+      "webhookId": "454eb4ea-e460-4196-b31c-284abf234fc3",
+      "notes": "This webhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        820,
+        400
+      ],
+      "parameters": {
+        "path": "download-pdf",
+        "options": {},
+        "responseMode": "responseNode"
+      }
+    },
+    {
+      "id": "21d8c543-33c2-45eb-b392-2cb7139344c6",
+      "name": "Fetch binary file",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1040,
+        400
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "3ced3067-d82c-4bb4-b5fe-53a8d79c2177",
+      "name": "Respond with attachment",
+      "notes": "This respondToWebhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        400
+      ],
+      "parameters": {
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "content-disposition",
+                "value": "=attachment; filename=\"my_document_{{ $now.toFormat('yyyy-MM-dd') }}.pdf\""
+              }
+            ]
+          }
+        },
+        "respondWith": "binary"
+      }
+    }
+  ],
+  "connections": {}
+}

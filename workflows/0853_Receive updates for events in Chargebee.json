@@ -1,0 +1,39 @@
+{
+  "active": false,
+  "name": "Receive updates for events in Chargebee",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "424adac1-3fd3-4961-809a-9c771eafed71",
+      "name": "Chargebee Trigger",
+      "notes": "This chargebeeTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.chargebeeTrigger",
+      "typeVersion": 1,
+      "position": [
+        700,
+        250
+      ],
+      "parameters": {
+        "events": [
+          "*"
+        ]
+      },
+      "webhookId": "a4121ff7-6f6b-4077-9c61-61bef1dfe6d0"
+    },
+    {
+      "id": "error-26157550",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,54 @@
+{
+  "active": false,
+  "name": "Create a client in Harvest",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "8324f296-e2f7-4c6b-a726-7bf6a3e780ab",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "66caba65-c894-44e2-82f5-23af62b927a6",
+      "name": "Harvest",
+      "notes": "This harvest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.harvest",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "name": "",
+        "resource": "client",
+        "operation": "create",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "harvestApi": ""
+      }
+    },
+    {
+      "id": "error-2acf14c1",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,53 @@
+{
+  "active": false,
+  "name": "Send a message on Twake",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "a343903b-8b1c-4aa5-8c8c-6644ec69ce3c",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        600,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "99537f3d-b2e1-4543-8d96-e529e36b5bc8",
+      "name": "Twake",
+      "notes": "This twake node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.twake",
+      "typeVersion": 1,
+      "position": [
+        800,
+        300
+      ],
+      "parameters": {
+        "content": "",
+        "channelId": "",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "twakeCloudApi": ""
+      }
+    },
+    {
+      "id": "error-83276ffb",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,78 @@
+{
+  "active": false,
+  "name": "Production Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-5820e616",
+      "name": "Gitlab Trigger",
+      "type": "n8n-nodes-base.gitlabTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        140
+      ],
+      "parameters": {
+        "owner": "tennox",
+        "events": [
+          "tag_push"
+        ],
+        "repository": "ci-test"
+      },
+      "webhookId": "20f5881d-e1c2-4e04-a28f-e90dba133bda"
+    },
+    {
+      "id": "node-ec1325b8",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        820,
+        40
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "requestMethod": "POST",
+        "authentication": "{{ $credentials.headerAuth }}",
+        "jsonParameters": true,
+        "bodyParametersJson": "={ \n\"collectionId\": \"PLACEHOLDER\",\n\"parentDocumentId\": \"PLACEHOLDER\",\n\"publish\": true, \n\"title\": {{JSON.stringify(\"Release \" + $json.body.name)}},\n\"text\": {{JSON.stringify($json.body.description + '\\n\\n\\\\\\n[More info](' + $json.body.url + ')')}}\n}"
+      }
+    },
+    {
+      "id": "node-453bd98b",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        540,
+        140
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.body.object_kind}}",
+              "value2": "release"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "error-1d3e1df6",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

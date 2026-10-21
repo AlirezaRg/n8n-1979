@@ -1,0 +1,104 @@
+{
+  "active": false,
+  "name": "Manualtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "bd7fd0e7-b63d-4847-913d-743d6c2d503f",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "ababf91c-3381-4570-a9e5-4af4b93bd971",
+      "name": "Set",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "ID",
+              "value": 1
+            }
+          ],
+          "string": [
+            {
+              "name": "Name",
+              "value": "n8n"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "90eff573-2bfa-493d-abdd-2e513f2a070c",
+      "name": "Stackby",
+      "notes": "This stackby node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stackby",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "table": "Table 1",
+        "columns": "ID, Name",
+        "stackId": "stbgReRhlmmAgT2suT"
+      },
+      "credentials": {
+        "stackbyApi": "Stackby API credentials"
+      }
+    },
+    {
+      "id": "03fbe2b6-e77b-43b5-8e95-3243669bc224",
+      "name": "Stackby1",
+      "notes": "This stackby node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stackby",
+      "typeVersion": 1,
+      "position": [
+        850,
+        300
+      ],
+      "parameters": {
+        "table": "={{$node[\"Stackby\"].parameter[\"table\"]}}",
+        "stackId": "={{$node[\"Stackby\"].parameter[\"stackId\"]}}",
+        "operation": "list",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "stackbyApi": {
+          "id": null,
+          "name": "Stackby API credentials"
+        }
+      }
+    },
+    {
+      "id": "error-f08cef76",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

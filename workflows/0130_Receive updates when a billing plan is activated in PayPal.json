@@ -1,0 +1,42 @@
+{
+  "active": false,
+  "name": "Receive updates when a billing plan is activated in PayPal",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "2fad9cd4-fc44-4bac-9ebb-9b66540e3605",
+      "name": "PayPal Trigger",
+      "webhookId": "242a300e-b5a0-45a2-87bc-40def6fe56ef",
+      "notes": "This payPalTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.payPalTrigger",
+      "typeVersion": 1,
+      "position": [
+        1130,
+        620
+      ],
+      "parameters": {
+        "events": [
+          "BILLING.PLAN.ACTIVATED"
+        ]
+      },
+      "credentials": {
+        "payPalApi": "paypal"
+      }
+    },
+    {
+      "id": "error-14b453ae",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

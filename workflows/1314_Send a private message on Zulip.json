@@ -1,0 +1,51 @@
+{
+  "active": false,
+  "name": "Send a private message on Zulip",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "3c36e35d-9146-47ec-9039-6ac5dece3180",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "0851fb3a-3105-4cda-886d-38ea068d1546",
+      "name": "Zulip",
+      "notes": "This zulip node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.zulip",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "to": []
+      },
+      "credentials": {
+        "zulipApi": ""
+      }
+    },
+    {
+      "id": "error-5e1ef000",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

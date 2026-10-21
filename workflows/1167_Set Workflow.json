@@ -1,0 +1,94 @@
+{
+  "active": false,
+  "name": "Set Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "83c6d7e3-ae2e-4576-8bc6-1e1a7b553fca",
+      "name": "Settings",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        260,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "080b234c-a753-409d-9d2d-3322678a01f2",
+              "name": "woocommerce url",
+              "type": "string",
+              "value": "{{ $env.WEBHOOK_URL }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "7018ae65-bb9d-4bac-8746-01193cb0e523",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "223ed34b-3e26-406c-a5a5-34f8408e3fe6",
+      "name": "HTTP Request - Update Rank Math Meta",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "retryOnFail": true,
+      "position": [
+        500,
+        0
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "sendBody": true,
+        "authentication": "{{ $credentials.predefinedCredentialType }}",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "post_id",
+              "value": "246"
+            },
+            {
+              "name": "rank_math_title",
+              "value": "Demo SEO Title"
+            },
+            {
+              "name": "rank_math_description",
+              "value": "Demo SEO Description"
+            },
+            {
+              "name": "rank_math_canonical_url",
+              "value": "{{ $env.WEBHOOK_URL }}"
+            }
+          ]
+        },
+        "nodeCredentialType": "YOUR_CREDENTIAL_HERE"
+      },
+      "credentials": {
+        "wordpressApi": {
+          "id": "6rPlJdCaIXaVciGM",
+          "name": "Wordpress account"
+        },
+        "wooCommerceApi": {
+          "id": "klGFZkgHrRfC8BVg",
+          "name": "WooCommerce account"
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

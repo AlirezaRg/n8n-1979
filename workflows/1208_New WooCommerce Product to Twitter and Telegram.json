@@ -1,0 +1,87 @@
+{
+  "active": false,
+  "name": "New WooCommerce Product to Twitter and Telegram",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "1e3d79e1-b86a-46db-9b9f-ffcd06ac0f3d",
+      "name": "Twitter",
+      "notes": "This twitter node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 1,
+      "position": [
+        720,
+        300
+      ],
+      "parameters": {
+        "text": "=? New Product Announcement ?\nWe have just added {{$json[\"name\"]}}, Head to {{$json[\"permalink\"]}} to find out more.",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "twitterOAuth1Api": {
+          "id": "{{ $credentials.twitterOAuth1Api.id }}",
+          "name": "joffcom"
+        }
+      }
+    },
+    {
+      "id": "c9ee73e1-c267-4f3c-a590-385d4db26341",
+      "name": "Telegram",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        720,
+        500
+      ],
+      "parameters": {
+        "text": "=? New Product Announcement ?\nWe have just added {{$json[\"name\"]}}, Head to {{$json[\"permalink\"]}} to find out more.",
+        "chatId": "123456",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "{{ $credentials.telegramApi.id }}",
+          "name": "Telegram account"
+        }
+      },
+      "webhookId": "ed61db3f-a002-4bb6-a08d-b3fde69045dd"
+    },
+    {
+      "id": "49cb5781-ba4c-455c-99d5-26aeac54480c",
+      "name": "WooCommerce Trigger",
+      "webhookId": "ab7b134b-9b2d-4e0d-b496-1aee30db0808",
+      "notes": "This wooCommerceTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.wooCommerceTrigger",
+      "typeVersion": 1,
+      "position": [
+        540,
+        400
+      ],
+      "parameters": {
+        "event": "product.created"
+      },
+      "credentials": {
+        "wooCommerceApi": {
+          "id": "{{ $credentials.wooCommerceApi.id }}",
+          "name": "WooCommerce account"
+        }
+      }
+    },
+    {
+      "id": "error-64dc9762",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

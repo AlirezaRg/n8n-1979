@@ -1,0 +1,101 @@
+{
+  "active": false,
+  "name": "Manualtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "9d09405e-64a3-47ef-9d46-4942de51444b",
+      "name": "When clicking \"Execute Workflow\"",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        400,
+        460
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "4fdc396b-07bd-471e-9e62-136300804809",
+      "name": "Set URLs",
+      "notes": "This code node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        620,
+        460
+      ],
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    url: \"{{ $env.WEBHOOK_URL }}\"\n  }\n}, {\n  json: {\n    url: \"{{ $env.WEBHOOK_URL }}\"\n  }\n}, {\n  json: {\n    url: \"{{ $env.WEBHOOK_URL }}\"\n  }\n}]"
+      }
+    },
+    {
+      "id": "17482568-2117-4a8c-a307-ebf30dc9c560",
+      "name": "HTTP Request",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        840,
+        460
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "de27f52b-8f7e-4b9c-a097-987db4cef5aa",
+      "name": "Merge items",
+      "notes": "This code node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        460
+      ],
+      "parameters": {
+        "jsCode": "let binaries = {}, binary_keys = [];\n\nfor (const [index, inputItem] of Object.entries($input.all())) {\n  binaries[`data_${index}`] = inputItem.binary.data;\n  binary_keys.push(`data_${index}`);\n}\n\nreturn [{\n    json: {\n        binary_keys: binary_keys.join(',')\n    },\n    binary: binaries\n}];\n"
+      }
+    },
+    {
+      "id": "539fe99d-c557-4e51-bc88-011fb604e1f3",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        580,
+        320
+      ],
+      "parameters": {
+        "width": 394,
+        "height": 304,
+        "content": "## Example data\nThese nodes simply download some example files to work with."
+      }
+    },
+    {
+      "id": "710fd054-2360-447a-b503-049507c0a3b2",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        320
+      ],
+      "parameters": {
+        "width": 304,
+        "height": 307,
+        "content": "## Transformation\nThis is where the magic happens. Multiple items with one binary object each are being transformed into one item with multiple binary objects."
+      }
+    }
+  ],
+  "connections": {}
+}

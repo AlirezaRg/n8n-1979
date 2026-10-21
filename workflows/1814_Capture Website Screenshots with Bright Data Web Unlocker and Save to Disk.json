@@ -1,0 +1,165 @@
+{
+  "active": false,
+  "name": "Capture Website Screenshots with Bright Data Web Unlocker and Save to Disk",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "d61cb066-1d5f-47d5-a4dd-4534f3d3c6d8",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        -160
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "eb99305b-0375-4cdd-8682-637d281598a0",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -540,
+        -500
+      ],
+      "parameters": {
+        "width": 360,
+        "height": 260,
+        "content": "## Note\n\nThe \"**Set URL, Filename and Bright Data Zone**\" node must be updated with the appropriate url, file name and **Bright Data Proxies & Infrastructure** zone.\n\nThe \"**Write a file to disk**\" node has the location to download the website screenshot. Please make sure to set the path"
+      }
+    },
+    {
+      "id": "205f64e9-5b31-4c76-912a-307eccde159e",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        -240
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 260,
+        "height": 280,
+        "content": "## Website Screenshot"
+      }
+    },
+    {
+      "id": "e7705941-2ae8-4c38-93cb-2cb865314872",
+      "name": "Write a file to disk",
+      "notes": "This readWriteFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        140,
+        -160
+      ],
+      "parameters": {
+        "options": {},
+        "fileName": "={{ \"c:\\\\\"+ $json.filename }}",
+        "operation": "write",
+        "dataPropertyName": "={{ $json.filename }}"
+      }
+    },
+    {
+      "id": "167ff255-da5b-43c1-a22f-e00c4cc166d8",
+      "name": "Capture a screenshot",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -80,
+        -160
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "={{ $json.filename }}"
+            }
+          },
+          "allowUnauthorizedCerts": true
+        },
+        "sendBody": true,
+        "sendHeaders": true,
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "zone",
+              "value": "={{ $json.zone }}"
+            },
+            {
+              "name": "url",
+              "value": "={{ $json.url }}"
+            },
+            {
+              "name": "format",
+              "value": "raw"
+            },
+            {
+              "name": "data_format",
+              "value": "screenshot"
+            }
+          ]
+        },
+        "genericAuthType": "httpHeaderAuth",
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "kdbqXuxIR8qIxF7y",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "id": "1c5c3d72-f20d-4d06-a6f2-461d043c4a01",
+      "name": "Set URL, Filename and Bright Data Zone",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -300,
+        -160
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9de0c3e-609a-4e87-b6ab-b4312be026a9",
+              "name": "url",
+              "type": "string",
+              "value": "{{ $env.WEBHOOK_URL }}"
+            },
+            {
+              "id": "408ed65a-0d66-4f98-b2eb-0d5e066e3250",
+              "name": "filename",
+              "type": "string",
+              "value": "devto.png"
+            },
+            {
+              "id": "ee10fcb0-a610-4987-8a4e-dfab077aee0e",
+              "name": "zone",
+              "type": "string",
+              "value": "web_unlocker1"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

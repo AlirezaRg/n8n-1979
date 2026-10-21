@@ -1,0 +1,40 @@
+{
+  "active": false,
+  "name": "Receive updates when an event occurs in Taiga",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "f11f785d-45ec-4eab-bb4c-2b441fb0b23c",
+      "name": "Taiga Trigger",
+      "webhookId": "53939c3e-7dc6-4fdf-94d8-d29f92f8fa12",
+      "notes": "This taigaTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.taigaTrigger",
+      "typeVersion": 1,
+      "position": [
+        690,
+        260
+      ],
+      "parameters": {
+        "projectId": 385605
+      },
+      "credentials": {
+        "taigaCloudApi": "taiga"
+      }
+    },
+    {
+      "id": "error-e09cc439",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

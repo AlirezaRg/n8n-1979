@@ -1,0 +1,43 @@
+{
+  "active": false,
+  "name": "Jiratrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "e2f82076-1d3e-4ed9-8718-3f772d52d6d8",
+      "name": "Jira Trigger",
+      "webhookId": "a3ddaf66-7f75-4494-b435-ef88ef1f1917",
+      "notes": "This jiraTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.jiraTrigger",
+      "typeVersion": 1,
+      "position": [
+        880,
+        400
+      ],
+      "parameters": {
+        "events": [
+          "*"
+        ],
+        "additionalFields": {}
+      },
+      "credentials": {
+        "jiraSoftwareCloudApi": "n8n"
+      }
+    },
+    {
+      "id": "error-2c1c04cd",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,188 @@
+{
+  "active": false,
+  "name": "Manualtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "d0c92688-14fc-4393-a1d6-926eb867b81e",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        180,
+        240
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "0edbad78-249b-441c-877d-bac57fb44a91",
+      "name": "Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        180,
+        31
+      ],
+      "parameters": {
+        "width": 436,
+        "height": 169,
+        "content": "## n8n version\n\nThis workflow was created using n8n version 0.197.1 and uses a new [expression syntax]({{ $env.WEBHOOK_URL }} as well as a new version of the Merge node. Make sure you're also using n8n version 0.197.1 or newer when running this workflow."
+      }
+    },
+    {
+      "id": "251d893c-11cb-4702-a289-44f198581722",
+      "name": "Download XML File",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        400,
+        240
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "0973b302-1ba9-4faf-9d6c-2caca1b301f5",
+      "name": "Parse XML content",
+      "notes": "This xml node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        620,
+        240
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "01854111-27cb-40c1-b95e-14f91f89e9f1",
+      "name": "Create new spreadsheet file",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 2,
+      "executeOnce": true,
+      "position": [
+        1060,
+        140
+      ],
+      "parameters": {
+        "title": "My XML Data",
+        "options": {},
+        "resource": "spreadsheet"
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "{{ $credentials.googleSheetsOAuth2Api.id }}",
+          "name": "Tom's Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "affbcb81-5873-406e-a51d-cd6fee682992",
+      "name": "Define header row",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "executeOnce": true,
+      "position": [
+        1280,
+        140
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "columns",
+              "value": "={{ [ Object.keys($(\"Split out food items\").first().json) ] }}"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "537aff03-ae08-4712-bfae-15f0e3a5e69a",
+      "name": "Split out food items",
+      "notes": "This itemLists node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        840,
+        240
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "breakfast_menu.food"
+      }
+    },
+    {
+      "id": "b247f984-6ed2-4de0-8877-a61571863ff8",
+      "name": "Write header row",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        140
+      ],
+      "parameters": {
+        "options": {},
+        "rawData": true,
+        "sheetId": "={{ $(\"Create new spreadsheet file\").first().json[\"spreadsheetId\"] }}",
+        "operation": "update",
+        "dataProperty": "columns"
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "{{ $credentials.googleSheetsOAuth2Api.id }}",
+          "name": "Tom's Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "fc9e2c32-30b1-4162-a686-2d049e52e111",
+      "name": "Wait for spreadsheet creation",
+      "notes": "This merge node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        1720,
+        240
+      ],
+      "parameters": {
+        "mode": "chooseBranch",
+        "output": "input2"
+      }
+    },
+    {
+      "id": "fdc6d5d9-e08d-4086-a233-0edb3c11bc86",
+      "name": "Write data to sheet",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 2,
+      "position": [
+        1940,
+        240
+      ],
+      "parameters": {
+        "options": {},
+        "sheetId": "={{ $(\"Create new spreadsheet file\").first().json[\"spreadsheetId\"] }}",
+        "operation": "append"
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "{{ $credentials.googleSheetsOAuth2Api.id }}",
+          "name": "Tom's Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

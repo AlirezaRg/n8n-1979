@@ -1,0 +1,462 @@
+{
+  "active": false,
+  "name": "Image-to-3D",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "8cc77575-854f-4359-8faa-fc78b8c23b65",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -220,
+        400
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "0dc7e6b8-43b8-4b9a-aa7a-4a100598162f",
+      "name": "Get status",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        840,
+        400
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "daOZafXpRXLtoLUV",
+          "name": "Fal.run API"
+        }
+      }
+    },
+    {
+      "id": "7540df1c-35e2-4ac5-871d-4d8410217979",
+      "name": "Wait 60 sec.",
+      "webhookId": "e10e9912-38e7-4e1f-ad7e-52b1e6a65d79",
+      "notes": "This wait node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        660,
+        400
+      ],
+      "parameters": {
+        "amount": 60
+      }
+    },
+    {
+      "id": "44c4b506-2a14-40ca-a75f-7af86ef5a9af",
+      "name": "Schedule Trigger",
+      "notes": "This scheduleTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -220,
+        260
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ca8b3bcd-3eb6-4723-b2ea-a973582d46af",
+      "name": "Sticky Note3",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -220,
+        -860
+      ],
+      "parameters": {
+        "color": 3,
+        "width": 740,
+        "height": 520,
+        "content": "# Image-to-3D\n\n\nThis workflow allows users to convert a 2D image into a 3D model by integrating multiple AI and web services. The process begins with a user uploading or providing an image URL, which is then sent to a generative AI model capable of interpreting the content and generating a 3D representation in .glb format. The model is then stored and a download link is returned to the user.\n\n![image]({{ $env.WEBHOOK_URL }}"
+      }
+    },
+    {
+      "id": "2230e7a5-225d-4538-b091-a9fbeedb1323",
+      "name": "Sticky Note4",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -220,
+        -300
+      ],
+      "parameters": {
+        "width": 740,
+        "height": 200,
+        "content": "## STEP 1 - GOOGLE SHEET\nCreate a [Google Sheet like this]({{ $env.WEBHOOK_URL }}\n\nPlease insert:\n- in the \"IMAGE MODEL\" column the basic image of the model to dress\n\nLeave the \"3D RESULT\" column unfilled. It will be inserted by the system once the image has been created"
+      }
+    },
+    {
+      "id": "3aad3211-e6fc-4e4b-9c59-7dd82827a43b",
+      "name": "Completed?",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1020,
+        400
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "383d112e-2cc6-4dd4-8985-f09ce0bd1781",
+              "operator": {
+                "name": "filter.operator.equals",
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "COMPLETED"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "6ad70838-dbf4-4cb1-9b61-4cf6e1fcdf6a",
+      "name": "Update result",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        440,
+        780
+      ],
+      "parameters": {
+        "columns": {
+          "value": {
+            "row_number": "={{ $('Get new image').item.json.row_number }}",
+            "IMAGE RESULT": "={{ $('Get Url 3D image').item.json.model_mesh.url }}"
+          },
+          "schema": [
+            {
+              "id": "IMAGE MODEL",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "IMAGE MODEL",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "IMAGE PRODUCT",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "IMAGE PRODUCT",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PRODUCT ID",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "PRODUCT ID",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "IMAGE RESULT",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "IMAGE RESULT",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": true,
+              "required": false,
+              "displayName": "row_number",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "row_number"
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {},
+        "operation": "update",
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Foglio1"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1C0Et6X3Zwr_6CxeNjhLpDwjAfIGeUvLGFawckKb0utY",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Image to 3D"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "LXIVLIr0wD38Xaty",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "239b45b3-94cc-43a9-aa2e-2c85725f4cc0",
+      "name": "Set data",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        400
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c713d31f-9abd-496a-ac79-e8e2efe60aa0",
+              "name": "image",
+              "type": "string",
+              "value": "={{ $json['IMAGE'] }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "70908a7d-72a5-4131-a82b-ed455a453fd5",
+      "name": "Sticky Note5",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -220,
+        120
+      ],
+      "parameters": {
+        "width": 740,
+        "height": 100,
+        "content": "## STEP 3 - MAIN FLOW\nStart the workflow manually or periodically by hooking the \"Schedule Trigger\" node. It is recommended to set it at 5 minute intervals."
+      }
+    },
+    {
+      "id": "d81f8aa0-3302-4a26-9425-aeb2a87674e7",
+      "name": "Sticky Note6",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -220,
+        -60
+      ],
+      "parameters": {
+        "width": 740,
+        "height": 140,
+        "content": "## STEP 2 - GET API KEY (YOURAPIKEY)\nCreate an account [here]({{ $env.WEBHOOK_URL }} and obtain API KEY.\nIn the node \"Create Image\" set \"Header Auth\" and set:\n- Name: \"Authorization\"\n- Value: \"Key YOURAPIKEY\""
+      }
+    },
+    {
+      "id": "484d029d-b88f-48bb-b487-e7a50b47eb7d",
+      "name": "Sticky Note7",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        400,
+        340
+      ],
+      "parameters": {
+        "width": 180,
+        "height": 200,
+        "content": "Set API Key created in Step 2"
+      }
+    },
+    {
+      "id": "7061d7c1-7da8-473c-98a3-57dc15def557",
+      "name": "Get new image",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        0,
+        400
+      ],
+      "parameters": {
+        "options": {},
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "3D RESULT"
+            }
+          ]
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Foglio1"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1C0Et6X3Zwr_6CxeNjhLpDwjAfIGeUvLGFawckKb0utY",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Image to 3D"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "LXIVLIr0wD38Xaty",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "edcdc4f0-4e7f-4fec-af9c-bbe8bf6bd8e6",
+      "name": "Create 3D Image",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        400
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n  \"image_url\": \"{{ $json.image }}\",\n  \"ss_guidance_strength\": 7.5,\n  \"ss_sampling_steps\": 12,\n  \"slat_guidance_strength\": 3,\n  \"slat_sampling_steps\": 12,\n  \"mesh_simplify\": 0.95,\n  \"texture_size\": 1024\n}",
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "genericAuthType": "httpHeaderAuth",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "daOZafXpRXLtoLUV",
+          "name": "Fal.run API"
+        }
+      }
+    },
+    {
+      "id": "9ac6f843-090f-4c15-88e7-46ee494ed1b9",
+      "name": "Get Url 3D image",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -220,
+        780
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "daOZafXpRXLtoLUV",
+          "name": "Fal.run API"
+        }
+      }
+    },
+    {
+      "id": "a02ac260-c88a-4c5a-9fc6-7230b95c462b",
+      "name": "Get File 3D image",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        780
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "311be624-4707-4361-a58a-ee90ff42490c",
+      "name": "Upload 3D Image",
+      "notes": "This googleDrive node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        220,
+        780
+      ],
+      "parameters": {
+        "name": "={{ $now.format('yyyyLLddHHmmss') }}-{{ $('Get Url 3D image').item.json.model_mesh.file_name }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "options": {},
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1aHRwLWyrqfzoVC8HoB-YMrBvQ4tLC-NZ",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Fal.run"
+        }
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "HEy5EuZkgPZVEa9w",
+          "name": "Google Drive account (n3w.it)"
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,116 @@
+{
+  "active": false,
+  "name": "Get the price of BTC in EUR and send an SMS when the price is larger than EUR 9000",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "a3e061de-1e9d-4745-9ba2-a07cc8389f75",
+      "name": "Cron",
+      "notes": "This cron node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        590,
+        500
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "8bf83109-15c5-427c-ae88-8513acb2769e",
+      "name": "CoinGecko",
+      "notes": "This coinGecko node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.coinGecko",
+      "typeVersion": 1,
+      "position": [
+        790,
+        500
+      ],
+      "parameters": {
+        "coinIds": [
+          "bitcoin"
+        ],
+        "options": {},
+        "operation": "price",
+        "currencies": [
+          "eur"
+        ]
+      }
+    },
+    {
+      "id": "9fd68e83-05e1-4278-98f6-f8be2a207860",
+      "name": "If Node",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        990,
+        500
+      ],
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$node[\"CoinGecko\"].json[\"bitcoin\"][\"eur\"]}}",
+              "value2": 9000,
+              "operation": "largerEqual"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "22443633-7f09-472d-9b0b-edcc3a731359",
+      "name": "Twilio",
+      "notes": "This twilio node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1190,
+        400
+      ],
+      "parameters": {
+        "to": "1234",
+        "from": "1234",
+        "message": "=The price went up! The new price is {{$node[\"CoinGecko\"].json[\"bitcoin\"][\"eur\"]}}"
+      },
+      "credentials": {
+        "twilioApi": "twilio-credentials"
+      }
+    },
+    {
+      "id": "2b720e7c-3b00-4fc0-a177-d3924776e836",
+      "name": "NoOp",
+      "notes": "This noOp node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1190,
+        600
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "error-ba2156aa",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

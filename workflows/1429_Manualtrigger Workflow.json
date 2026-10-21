@@ -1,0 +1,94 @@
+{
+  "active": false,
+  "name": "Manualtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "8e17720a-122f-4c48-a960-4f1fa4f44208",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        240
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "b7a89331-ceeb-43fb-9a50-b627546995de",
+      "name": "Gmail",
+      "notes": "This gmail node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 1,
+      "position": [
+        150,
+        240
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "getAll",
+        "returnAll": true,
+        "additionalFields": {
+          "q": "-in:chats unsubscribe -license -key -password",
+          "format": "ids"
+        }
+      },
+      "credentials": {
+        "gmailOAuth2": "Gmail"
+      }
+    },
+    {
+      "id": "04396a7c-d6dd-4c2b-befe-7497d62db5fe",
+      "name": "Delete Old Gmail",
+      "notes": "This gmail node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 1,
+      "position": [
+        500,
+        410
+      ],
+      "parameters": {
+        "resource": "message",
+        "messageId": "={{$json[\"id\"]}}",
+        "operation": "delete"
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": null,
+          "name": "Gmail"
+        }
+      }
+    },
+    {
+      "id": "cc0c1d98-b7ce-4603-a22d-075cb861c77a",
+      "name": "SplitInBatches",
+      "notes": "This splitInBatches node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        310,
+        240
+      ],
+      "parameters": {
+        "options": {},
+        "batchSize": 100
+      }
+    },
+    {
+      "id": "error-7f401c6f",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

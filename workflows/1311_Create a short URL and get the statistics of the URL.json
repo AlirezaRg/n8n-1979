@@ -1,0 +1,75 @@
+{
+  "active": false,
+  "name": "Create a short URL and get the statistics of the URL",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "72611b23-5b85-46bd-821b-3000f08c7d19",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        370,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "4a287c84-792c-4cdd-a1b4-bfd56752585b",
+      "name": "Yourls",
+      "notes": "This yourls node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.yourls",
+      "typeVersion": 1,
+      "position": [
+        570,
+        300
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}",
+        "additionalFields": {
+          "title": "Sending SMS the Low-Code Way with Airtable, Twilio Programmable SMS, and n8n"
+        }
+      },
+      "credentials": {
+        "yourlsApi": "{{ $env.BASE_URL }}"
+      }
+    },
+    {
+      "id": "40ee6fc8-8ad3-4fac-aa0f-9b7e1f34548d",
+      "name": "Yourls1",
+      "notes": "This yourls node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.yourls",
+      "typeVersion": 1,
+      "position": [
+        770,
+        300
+      ],
+      "parameters": {
+        "shortUrl": "{{ $env.BASE_URL }}",
+        "operation": "stats"
+      },
+      "credentials": {
+        "yourlsApi": {
+          "id": null,
+          "name": "{{ $env.BASE_URL }}"
+        }
+      }
+    },
+    {
+      "id": "error-11c50701",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

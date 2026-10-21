@@ -1,0 +1,74 @@
+{
+  "active": false,
+  "name": "Production Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-dd21e8d5",
+      "name": "Read from Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 2,
+      "position": [
+        460,
+        300
+      ],
+      "parameters": {
+        "options": {},
+        "sheetId": "1uFISwZJ1rzkOnOSNocX-_n-ASSAznWGdpcPK3_KCvVo"
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "{{ $credentials.googleSheetsOAuth2Api.id }}",
+          "name": "Tom's Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "node-fdbdb843",
+      "name": "Create HTML file",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 1,
+      "position": [
+        680,
+        300
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "toFile",
+        "fileFormat": "html"
+      }
+    },
+    {
+      "id": "node-7b1a86e3",
+      "name": "Webhook",
+      "webhookId": "08569699-fea2-4856-80aa-fe878ab9dd4f",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {
+        "path": "08569699-fea2-4856-80aa-fe878ab9dd4f",
+        "options": {},
+        "responseData": "firstEntryBinary",
+        "responseMode": "lastNode"
+      }
+    },
+    {
+      "id": "error-f1080724",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

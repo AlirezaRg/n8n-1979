@@ -1,0 +1,229 @@
+{
+  "active": false,
+  "name": "Rssfeedread Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "4a6d3143-34b5-4110-8a94-32c435f57c34",
+      "name": "RSS Feed Read",
+      "notes": "This rssFeedRead node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        420,
+        -20
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}"
+      }
+    },
+    {
+      "id": "338f9b13-4261-49aa-90df-c4043e0c53fc",
+      "name": "SplitInBatches",
+      "notes": "This splitInBatches node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -20
+      ],
+      "parameters": {
+        "options": {},
+        "batchSize": 1
+      }
+    },
+    {
+      "id": "0b1e3879-2dbc-468b-991b-e12b734cde2b",
+      "name": "Cron",
+      "notes": "This cron node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        -20
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "unit": "minutes",
+              "value": 10
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "47c3a14d-86e0-4659-b486-884d916af352",
+      "name": "only get new RSS",
+      "notes": "This function node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        640,
+        -20
+      ],
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newRSSIds = items.map(item => item.json[\"isoDate\"]);\nconst oldRSSIds = staticData.oldRSSIds; \n\nif (!oldRSSIds) {\n  staticData.oldRSSIds = newRSSIds;\n  return items;\n}\n\n\nconst actualNewRSSIds = newRSSIds.filter((id) => !oldRSSIds.includes(id));\nconst actualNewRSS = items.filter((data) => actualNewRSSIds.includes(data.json['isoDate']));\nstaticData.oldRSSIds = [...actualNewRSSIds, ...oldRSSIds];\n\nreturn actualNewRSS;\n"
+      }
+    },
+    {
+      "id": "4412b413-986c-448c-9ecf-8e7f7c6535d5",
+      "name": "Telegram_IT",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1220,
+        460
+      ],
+      "parameters": {
+        "text": "={{$json[\"title\"]}}\n{{$json[\"link\"]}}",
+        "chatId": "TelegramID",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "{{ $credentials.telegramApi.id }}",
+          "name": "IT_RSS"
+        }
+      },
+      "webhookId": "f18d8c0f-a977-4520-89ac-ba3004233a11"
+    },
+    {
+      "id": "07cec636-2dfc-4cca-9ab0-e48c42500ac1",
+      "name": "Telegram_Security",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1220,
+        220
+      ],
+      "parameters": {
+        "text": "={{$json[\"title\"]}}\n{{$json[\"link\"]}}",
+        "chatId": "TelegramID",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "{{ $credentials.telegramApi.id }}",
+          "name": "Security_RSS"
+        }
+      },
+      "webhookId": "e9516c0b-9b1f-4950-8d95-1de517b03249"
+    },
+    {
+      "id": "c5f00868-71d6-44e2-b132-4d601c15d49b",
+      "name": "RSS Source",
+      "notes": "This function node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        -20
+      ],
+      "parameters": {
+        "functionCode": "return [\n  {\n    json: {\n      url: '{{ $env.WEBHOOK_URL }}',\n    }\n  },\n  {\n    json: {\n      url: '{{ $env.WEBHOOK_URL }}',\n    }\n  },\n  {\n    json: {\n      url: '{{ $env.WEBHOOK_URL }}',\n    }\n  },\n  {\n    json: {\n      url: '{{ $env.WEBHOOK_URL }}',\n    }\n  },\n  {\n    json: {\n      url: '{{ $env.WEBHOOK_URL }}',\n    }\n  }\n];"
+      }
+    },
+    {
+      "id": "2091845d-edbf-4720-8ab1-02a99db4ff55",
+      "name": "Telegram_M365",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1220,
+        -40
+      ],
+      "parameters": {
+        "text": "={{$json[\"title\"]}}\n{{$json[\"link\"]}}",
+        "chatId": "TelegramID",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "{{ $credentials.telegramApi.id }}",
+          "name": "M365_RSS"
+        }
+      },
+      "webhookId": "f14ee018-1858-416b-ad84-282f3693424f"
+    },
+    {
+      "id": "4585ac13-b2bd-4617-8507-e08c79ad54fb",
+      "name": "IF-2",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        880,
+        240
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"title\"]}}",
+              "value2": "??|????|??|??|??|??|??|??|??|??|??|??|??|??|?|????|??|?|Security|security|Secure|secure",
+              "operation": "regex"
+            }
+          ]
+        },
+        "combineOperation": "any"
+      }
+    },
+    {
+      "id": "f32f7ee3-10bd-4022-bc08-608a169a3adb",
+      "name": "IF-1",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        880,
+        -20
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"link\"]}}",
+              "value2": "techcommunity.microsoft.com",
+              "operation": "contains"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "0f7d21e4-1fca-4e15-9e2f-59da6020af47",
+      "name": "Clear Function",
+      "notes": "This function node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        -180
+      ],
+      "parameters": {
+        "functionCode": "// Get the global workflow static data\nconst staticData = getWorkflowStaticData('global');\n// Update its data\nstaticData.oldRSSIds = new Date().getTime();\n// Delete data\ndelete staticData.oldRSSIds;\n\nreturn [\n  {\n    json: {}\n  }\n]"
+      }
+    },
+    {
+      "id": "error-747f6257",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

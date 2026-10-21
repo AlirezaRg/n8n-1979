@@ -1,0 +1,78 @@
+{
+  "active": false,
+  "name": "Manualtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "f7f8068b-52c9-4038-bd67-9ee50136e4fd",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        380,
+        240
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "860e5e46-a04d-41cb-b91a-c9f02603bcdf",
+      "name": "Sample data (name + language)",
+      "notes": "This code node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        160
+      ],
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      name: 'Stefan',\n      language: 'de',\n    }\n  },\n  {\n    json: {\n      name: 'Jim',\n      language: 'en',\n    }\n  },\n  {\n    json: {\n      name: 'Hans',\n      language: 'de',\n    }\n  }\n];"
+      }
+    },
+    {
+      "id": "5c6a867b-fd8a-49b7-ac35-ff84ed6d89f7",
+      "name": "Sample data (greeting + language)",
+      "notes": "This code node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        320
+      ],
+      "parameters": {
+        "jsCode": "return [\n\t  {\n    json: {\n      greeting: 'Hello',\n      language: 'en',\n    }\n  },\n  {\n    json: {\n      greeting: 'Hallo',\n      language: 'de',\n    }\n  }\n];"
+      }
+    },
+    {
+      "id": "08fca489-8f4c-4327-9919-922bd1be1cd5",
+      "name": "Merge (name + language + greeting)",
+      "notes": "This merge node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        820,
+        240
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {},
+        "fieldsToMatchString": "language"
+      }
+    },
+    {
+      "id": "error-77120327",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,49 @@
+{
+  "active": false,
+  "name": "Get synonyms of a German word",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "93488e07-9b2f-4012-86e8-579c39cec6b1",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        550,
+        260
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "bf991dff-b6b2-4e03-8130-4ef326d63b81",
+      "name": "OpenThesaurus",
+      "notes": "This openThesaurus node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.openThesaurus",
+      "typeVersion": 1,
+      "position": [
+        750,
+        260
+      ],
+      "parameters": {
+        "text": "Hallo",
+        "options": {}
+      }
+    },
+    {
+      "id": "error-93572f50",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

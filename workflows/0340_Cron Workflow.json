@@ -1,0 +1,87 @@
+{
+  "active": false,
+  "name": "Cron Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "22263ea2-4c8d-44eb-8207-88951c2994ea",
+      "name": "Cron",
+      "notes": "This cron node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        100,
+        420
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 5,
+              "mode": "everyWeek"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "2e4a2b52-6ac7-4531-9d10-76835edbe4bd",
+      "name": "MySQL - select",
+      "notes": "This mySql node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 1,
+      "position": [
+        300,
+        420
+      ],
+      "parameters": {
+        "query": "SELECT * FROM books;",
+        "operation": "executeQuery"
+      },
+      "credentials": {
+        "mySql": {
+          "id": "{{ $credentials.mySql.id }}",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "id": "60cdd661-0749-46a4-86a2-47a1253babda",
+      "name": "Google Sheets - write",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "options": {},
+        "sheetId": "qwertz",
+        "operation": "append",
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "{{ $credentials.googleSheetsOAuth2Api.id }}",
+          "name": "google_sheets_oauth"
+        }
+      }
+    },
+    {
+      "id": "error-42679379",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

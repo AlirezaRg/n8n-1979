@@ -1,0 +1,298 @@
+{
+  "active": false,
+  "name": "Production Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-ce5259b0",
+      "name": "On clicking 'execute'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        150
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-46b5b34c",
+      "name": "dataArray",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "functionCode": "const newItems = [];\nfor (item of items[0].json.data) {\n  newItems.push({json: item});\n}\nreturn newItems;"
+      }
+    },
+    {
+      "id": "node-99635667",
+      "name": "N8N Workflows",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        300,
+        300
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "node-6fced56a",
+      "name": "GitHub",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "continueOnFail": true,
+      "position": [
+        800,
+        130
+      ],
+      "parameters": {
+        "owner": "={{$node[\"Globals\"].json[\"repo\"][\"owner\"]}}",
+        "filePath": "={{$node[\"Globals\"].json[\"repo\"][\"path\"]}}{{$json[\"name\"]}}.json",
+        "resource": "file",
+        "operation": "get",
+        "repository": "={{$node[\"Globals\"].json[\"repo\"][\"name\"]}}",
+        "asBinaryProperty": false
+      },
+      "credentials": {
+        "githubApi": "GitHub"
+      },
+      "webhookId": "6ddad20b-a9da-41e6-8f2f-6ccc43b50643"
+    },
+    {
+      "id": "node-38585662",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-8118aabb",
+      "name": "N8N Workflow Detail",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        800,
+        460
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "node-56117a85",
+      "name": "github_status",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        300
+      ],
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "value2": "same"
+            },
+            {
+              "output": 1,
+              "value2": "different"
+            },
+            {
+              "output": 2,
+              "value2": "new"
+            }
+          ]
+        },
+        "value1": "={{$json[\"github_status\"]}}",
+        "dataType": "string"
+      }
+    },
+    {
+      "id": "node-edcc469d",
+      "name": "same",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        130
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-898e2367",
+      "name": "different",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-fa58330e",
+      "name": "new",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        460
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-71c19859",
+      "name": "GitHub Edit",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        180
+      ],
+      "parameters": {
+        "owner": "={{$node[\"Globals\"].json[\"repo\"][\"owner\"]}}",
+        "filePath": "={{$node[\"Globals\"].json[\"repo\"][\"path\"]}}{{$node[\"N8N Workflow Detail\"].json[\"data\"][\"name\"]}}.json",
+        "resource": "file",
+        "operation": "edit",
+        "repository": "={{$node[\"Globals\"].json[\"repo\"][\"name\"]}}",
+        "fileContent": "={{$node[\"isDiffOrNew\"].json[\"n8n_data_stringy\"]}}",
+        "commitMessage": "=[N8N Backup] {{$node[\"N8N Workflow Detail\"].json[\"data\"][\"name\"]}}.json ({{$json[\"github_status\"]}})"
+      },
+      "credentials": {
+        "githubApi": {
+          "id": null,
+          "name": "GitHub"
+        }
+      },
+      "webhookId": "a40edb1a-d1df-430f-a9a9-b1c76f4c9fd8"
+    },
+    {
+      "id": "node-b0b7edf0",
+      "name": "GitHub Create",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        460
+      ],
+      "parameters": {
+        "owner": "={{$node[\"Globals\"].json[\"repo\"][\"owner\"]}}",
+        "filePath": "={{$node[\"Globals\"].json[\"repo\"][\"path\"]}}{{$node[\"N8N Workflow Detail\"].json[\"data\"][\"name\"]}}.json",
+        "resource": "file",
+        "repository": "={{$node[\"Globals\"].json[\"repo\"][\"name\"]}}",
+        "fileContent": "={{$node[\"isDiffOrNew\"].json[\"n8n_data_stringy\"]}}",
+        "commitMessage": "=[N8N Backup] {{$node[\"N8N Workflow Detail\"].json[\"data\"][\"name\"]}}.json ({{$json[\"github_status\"]}})"
+      },
+      "credentials": {
+        "githubApi": {
+          "id": null,
+          "name": "GitHub"
+        }
+      },
+      "webhookId": "38b7f522-85ef-46e4-b3e5-928d8d86729f"
+    },
+    {
+      "id": "node-5f1fb908",
+      "name": "isDiffOrNew",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1150,
+        300
+      ],
+      "parameters": {
+        "functionCode": "// File Returned with Content\nif (Object.keys(items[0].json).includes(\"content\")) {\n  // Get JSON Objects\n  var origWorkflow = eval(\"(\"+Buffer.from(items[0].json.content, 'base64').toString()+\")\");\n  var n8nWorkflow = (items[1].json.data);\n  \n  // Order JSON Objects\n  var orderedOriginal = {}\n  var orderedActual = {}\n  \n  Object.keys(origWorkflow).sort().forEach(function(key) {\n    orderedOriginal[key] = origWorkflow[key];\n  });\n  \n  Object.keys(n8nWorkflow).sort().forEach(function(key) {\n    orderedActual[key] = n8nWorkflow[key];\n  });\n  \n  // Determine Difference\n  if ( JSON.stringify(orderedOriginal) === JSON.stringify(orderedActual) ) {\n    items[0].json.github_status = \"same\";\n    items[0].json.content_decoded = orderedOriginal;\n  } else {\n    items[0].json.github_status = \"different\";\n    items[0].json.content_decoded = orderedOriginal;\n    items[0].json.n8n_data_stringy = JSON.stringify(orderedActual, null, 2);\n  }\n// No File Returned / New Workflow\n} else {\n  // Order JSON Object\n  var n8nWorkflow = (items[1].json.data);\n  var orderedActual = {}\n  Object.keys(n8nWorkflow).sort().forEach(function(key) {\n    orderedActual[key] = n8nWorkflow[key];\n  });\n  \n  // Proper Formatting\n  items[0].json.github_status = \"new\";\n  items[0].json.n8n_data_stringy = JSON.stringify(orderedActual, null, 2);\n}\n\n// Return Items\nreturn items;"
+      }
+    },
+    {
+      "id": "node-669a0838",
+      "name": "Daily @ 20:00",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        0,
+        450
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 20,
+              "minute": 11
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-5ed197ef",
+      "name": "OneAtATime",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        600,
+        300
+      ],
+      "parameters": {
+        "options": {},
+        "batchSize": 1
+      }
+    },
+    {
+      "id": "node-7262d1fb",
+      "name": "Globals",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        150,
+        300
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "repo.owner",
+              "value": "octocat"
+            },
+            {
+              "name": "repo.name",
+              "value": "Hello-World"
+            },
+            {
+              "name": "repo.path",
+              "value": "my-team/n8n/workflows/"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "error-d5398d42",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

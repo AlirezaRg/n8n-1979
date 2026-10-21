@@ -1,0 +1,123 @@
+{
+  "active": false,
+  "name": "Get the logo, icon, and information of a company and store it in Airtable",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "e17e32c8-3ceb-409b-93da-dd27715236d5",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "dd22c8cd-5af8-4981-83d8-cca348331fe7",
+      "name": "Brandfetch",
+      "notes": "This Brandfetch node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.Brandfetch",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "domain": "n8n.io"
+      },
+      "credentials": {
+        "brandfetchApi": "Brandfetch n8n credentials"
+      }
+    },
+    {
+      "id": "f09c1b9b-2bd1-4bb1-a143-42c1037b34c3",
+      "name": "Brandfetch1",
+      "notes": "This Brandfetch node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.Brandfetch",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "domain": "={{$node[\"Brandfetch\"].parameter[\"domain\"]}}",
+        "operation": "company"
+      },
+      "credentials": {
+        "brandfetchApi": {
+          "id": null,
+          "name": "Brandfetch n8n credentials"
+        }
+      }
+    },
+    {
+      "id": "9b02ea67-904c-49c9-8374-f27090fad291",
+      "name": "Set",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        850,
+        300
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "Name",
+              "value": "={{$node[\"Brandfetch1\"].json[\"name\"]}}"
+            },
+            {
+              "name": "Icon URL",
+              "value": "={{$node[\"Brandfetch\"].json[\"icon\"][\"image\"]}}"
+            },
+            {
+              "name": "Logo URL",
+              "value": "={{$node[\"Brandfetch\"].json[\"logo\"][\"image\"]}}"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "0921b47f-8ed5-4e01-a64c-ce63e4a0dc92",
+      "name": "Airtable",
+      "notes": "This airtable node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        300
+      ],
+      "parameters": {
+        "table": "Table 1",
+        "options": {},
+        "operation": "append",
+        "application": "app5cseR9ZKgtU3dc"
+      },
+      "credentials": {
+        "airtableApi": "Airtable Credentials n8n"
+      }
+    },
+    {
+      "id": "error-ace36844",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,112 @@
+{
+  "active": false,
+  "name": "Manualtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "4069e053-2ee7-4b73-9029-37d133bc4746",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        270,
+        330
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "ba8b18fe-8e39-47bb-8145-a6c9ad5e1373",
+      "name": "Merge Data",
+      "notes": "This function node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1230,
+        430
+      ],
+      "parameters": {
+        "functionCode": "const allData = []\n\nlet counter = 0;\ndo {\n  try {\n    const items = $items(\"RSS Feed Read\", 0, counter).map(item => item.json);\n    allData.push.apply(allData, items);\n  } catch (error) {\n    return [{json: {allData}}];  \n  }\n\n  counter++;\n} while(true);\n\n\n"
+      }
+    },
+    {
+      "id": "3308c187-3180-44bc-b46f-2a13df89dd2e",
+      "name": "Function",
+      "notes": "This function node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        470,
+        330
+      ],
+      "parameters": {
+        "functionCode": "return [\n  {\n    json: {\n      url: '{{ $env.WEBHOOK_URL }}',\n    }\n  },\n  {\n    json: {\n      url: '{{ $env.WEBHOOK_URL }}',\n    }\n  }\n];"
+      }
+    },
+    {
+      "id": "ca86bb93-a739-407c-999c-5d1e15d32133",
+      "name": "RSS Feed Read",
+      "notes": "This rssFeedRead node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        870,
+        330
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}"
+      }
+    },
+    {
+      "id": "124293fd-75c0-4b08-8194-27aa18bb9dd9",
+      "name": "SplitInBatches",
+      "notes": "This splitInBatches node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        670,
+        330
+      ],
+      "parameters": {
+        "options": {},
+        "batchSize": 1
+      }
+    },
+    {
+      "id": "5f8fc724-93c9-47d2-9eb6-5034397c3fb0",
+      "name": "If Node",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1070,
+        520
+      ],
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": true,
+              "value2": "={{$node[\"SplitInBatches\"].context[\"noItemsLeft\"]}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "error-31158770",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,113 @@
+{
+  "active": false,
+  "name": "Scans von PDF zu Nextcloud",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "574d02f2-54c9-4f24-9c8b-4618ccdf2c7c",
+      "name": "HTTP Request",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -80,
+        -80
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "options": {},
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "7a1b5ef3-750f-45c5-b60e-34d463978abf",
+      "name": "Nextcloud",
+      "notes": "This nextCloud node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.nextCloud",
+      "typeVersion": 1,
+      "position": [
+        340,
+        -80
+      ],
+      "parameters": {
+        "path": "=/Scans/{{ $json.name }}",
+        "binaryDataUpload": true
+      },
+      "credentials": {
+        "nextCloudApi": {
+          "id": "P2d7981fwo6hiE8n",
+          "name": "NextCloud account"
+        }
+      }
+    },
+    {
+      "id": "93a27a7e-d709-4ceb-b062-4136fcaa7c0a",
+      "name": "HTTP Request1",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        140,
+        -80
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "*/*"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "77388051-b1b3-4a75-8190-628cb10c6734",
+      "name": "Schedule Trigger",
+      "notes": "This scheduleTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -280,
+        -80
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "c49a991e-0faf-4326-9238-d3cf4a661ea5",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -340,
+        -220
+      ],
+      "parameters": {
+        "width": 900,
+        "height": 380,
+        "content": "## Copy Scanner Documents to Nextcloud\n** Needed USB-Scanner and Program ScanServJS with an API"
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,288 @@
+{
+  "active": false,
+  "name": "Set Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "8b9016ec-9ec8-4163-97df-762adee6ea54",
+      "name": "Set",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        630,
+        990
+      ],
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "deal_value",
+              "value": "={{$json[\"properties\"][\"amount\"][\"value\"]}}"
+            },
+            {
+              "name": "deal_id",
+              "value": "={{$json[\"dealId\"]}}"
+            }
+          ],
+          "string": [
+            {
+              "name": "deal_name",
+              "value": "={{$json[\"properties\"][\"dealname\"][\"value\"]}}"
+            },
+            {
+              "name": "deal_date",
+              "value": "={{$json[\"properties\"][\"closedate\"][\"timestamp\"]}}"
+            },
+            {
+              "name": "deal_description",
+              "value": "={{$json[\"properties\"][\"description\"][\"value\"]}}"
+            },
+            {
+              "name": "deal_type",
+              "value": "={{$json[\"properties\"][\"dealtype\"][\"value\"]}}"
+            },
+            {
+              "name": "deal_stage",
+              "value": "={{$json[\"properties\"][\"dealstage\"][\"value\"]}}"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "d7fb8f03-e590-4c93-ac52-ec97adde12f1",
+      "name": "Switch",
+      "notes": "This switch node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        830,
+        740
+      ],
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "value2": "closedwon"
+            },
+            {
+              "output": 1,
+              "value2": "presentationscheduled"
+            },
+            {
+              "output": 2,
+              "value2": "closedlost"
+            }
+          ]
+        },
+        "value1": "={{$node[\"Hubspot\"].json[\"properties\"][\"dealstage\"][\"value\"]}}",
+        "dataType": "string"
+      }
+    },
+    {
+      "id": "db6928a5-97a9-450a-bdd0-fb952f9447af",
+      "name": "If Node",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        830,
+        1140
+      ],
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json[\"deal_value\"]}}",
+              "value2": 500,
+              "operation": "larger"
+            }
+          ],
+          "string": [
+            {
+              "value1": "={{$json[\"deal_type\"]}}",
+              "value2": "newbusiness"
+            },
+            {
+              "value1": "={{$json[\"deal_stage\"]}}",
+              "value2": "closedlost|closedwon",
+              "operation": "notEqual"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "7d56d0a4-d40e-4f21-a871-ddee401a1315",
+      "name": "high-priority",
+      "notes": "This hubspot node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 1,
+      "position": [
+        1030,
+        1040
+      ],
+      "parameters": {
+        "stageId": "1",
+        "resource": "ticket",
+        "pipelineId": "0",
+        "ticketName": "=Deal: {{$json[\"deal_name\"]}}",
+        "additionalFields": {
+          "priority": "HIGH",
+          "description": "={{$json[\"deal_description\"]}}",
+          "ticketOwnerId": 12345
+        }
+      },
+      "credentials": {
+        "hubspotApi": "hubspot_nodeqa"
+      }
+    },
+    {
+      "id": "7782edd6-7ee2-43bc-81a1-777687401f44",
+      "name": "low-priority",
+      "notes": "This hubspot node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 1,
+      "position": [
+        1030,
+        1240
+      ],
+      "parameters": {
+        "stageId": "1",
+        "resource": "ticket",
+        "pipelineId": "0",
+        "ticketName": "=Deal: {{$json[\"deal_name\"]}}",
+        "additionalFields": {
+          "priority": "MEDIUM",
+          "description": "={{$json[\"deal_description\"]}}"
+        }
+      },
+      "credentials": {
+        "hubspotApi": {
+          "id": null,
+          "name": "hubspot_nodeqa"
+        }
+      }
+    },
+    {
+      "id": "f37fb545-1245-4ff5-a26f-95304f173a46",
+      "name": "#closedwon",
+      "notes": "This slack node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        1030,
+        590
+      ],
+      "parameters": {
+        "text": "=We successfully closed the deal {{$node[\"Set\"].json[\"deal_name\"]}}!",
+        "channel": "deals",
+        "attachments": [],
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": "slack_nodeqa"
+      }
+    },
+    {
+      "id": "304c299e-5514-4dd0-9e0f-202223c43d22",
+      "name": "Airtable",
+      "notes": "This airtable node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        1030,
+        890
+      ],
+      "parameters": {
+        "table": "lost_deals",
+        "fields": [
+          "deal_name",
+          "deal_id",
+          "deal_type"
+        ],
+        "options": {},
+        "operation": "append",
+        "application": "appqwertz",
+        "addAllFields": false
+      },
+      "credentials": {
+        "airtableApi": "airtable_nodeqa"
+      }
+    },
+    {
+      "id": "b1109f6d-673a-4bc0-b67a-d19a91a41118",
+      "name": "Google Slides",
+      "notes": "This googleSlides node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSlides",
+      "typeVersion": 1,
+      "position": [
+        1030,
+        740
+      ],
+      "parameters": {
+        "title": "=Presentation for deal {{$node[\"Set\"].json[\"deal_name\"]}}",
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "googleSlidesOAuth2Api": "slides"
+      }
+    },
+    {
+      "id": "16ea1eea-b67c-4f34-97ed-78316f07f2d4",
+      "name": "Hubspot Trigger",
+      "webhookId": "12345",
+      "notes": "This hubspotTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.hubspotTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        990
+      ],
+      "parameters": {
+        "eventsUi": {
+          "eventValues": [
+            {
+              "name": "deal.creation"
+            }
+          ]
+        },
+        "additionalFields": {}
+      }
+    },
+    {
+      "id": "e777373c-7f2b-4228-9de8-06af80c6107a",
+      "name": "Hubspot",
+      "notes": "This hubspot node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 1,
+      "position": [
+        440,
+        990
+      ],
+      "parameters": {
+        "dealId": "={{$json[\"dealId\"]}}",
+        "operation": "get",
+        "additionalFields": {}
+      }
+    },
+    {
+      "id": "error-fc0c498d",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

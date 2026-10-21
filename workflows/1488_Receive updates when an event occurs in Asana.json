@@ -1,0 +1,41 @@
+{
+  "active": false,
+  "name": "Receive updates when an event occurs in Asana",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "8a2b6c73-f99d-455b-93ce-5a5988e40207",
+      "name": "Asana-Trigger",
+      "webhookId": "0de3b493-efb6-472c-9deb-80d28c89d28d",
+      "notes": "This asanaTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.asanaTrigger",
+      "typeVersion": 1,
+      "position": [
+        1490,
+        860
+      ],
+      "parameters": {
+        "resource": "Tweets",
+        "workspace": "Engineering"
+      },
+      "credentials": {
+        "asanaApi": "asana"
+      }
+    },
+    {
+      "id": "error-a347ce82",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

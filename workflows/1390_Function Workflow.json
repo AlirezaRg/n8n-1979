@@ -1,0 +1,61 @@
+{
+  "active": false,
+  "name": "Function Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "trigger-ae8b249e",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        100
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "bd24b966-3ccc-40a2-8610-27200b5ce169",
+      "name": "Mock Data",
+      "notes": "This function node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        670,
+        371
+      ],
+      "parameters": {
+        "functionCode": "return [\n  {\n    json:[\n      {\n        id: 1,\n        name: \"Jim\"\n      }, \n      {\n        id: 2,\n        name: \"Stefan\"\n      },\n      {\n        id: 3,\n        name: \"Hans\"\n      }\n    ]\n  }\n];"
+      }
+    },
+    {
+      "id": "8030781e-2e57-40f8-acfe-4c1ac4608504",
+      "name": "Create JSON-items",
+      "notes": "This function node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        910,
+        371
+      ],
+      "parameters": {
+        "functionCode": "return items[0].json.map(item => { \n  return {\n    json: item,\n  }\n})\n"
+      }
+    },
+    {
+      "id": "error-e8eed1aa",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

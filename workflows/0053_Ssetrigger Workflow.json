@@ -1,0 +1,36 @@
+{
+  "active": false,
+  "name": "Ssetrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "ff31ca8a-9343-4296-8733-f2ffef1d5440",
+      "name": "SSE Trigger",
+      "notes": "This sseTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.sseTrigger",
+      "typeVersion": 1,
+      "position": [
+        850,
+        420
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}"
+      }
+    },
+    {
+      "id": "error-440a1e39",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,39 @@
+{
+  "active": false,
+  "name": "Receive messages for an ActiveMQ queue via AMQP Trigger",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "d654e5ee-35e0-4b1c-8799-48ffe7725b1b",
+      "name": "AMQP Trigger",
+      "notes": "This amqpTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.amqpTrigger",
+      "typeVersion": 1,
+      "position": [
+        650,
+        200
+      ],
+      "parameters": {
+        "sink": ""
+      },
+      "credentials": {
+        "amqp": ""
+      }
+    },
+    {
+      "id": "error-208eff13",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

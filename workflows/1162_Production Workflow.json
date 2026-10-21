@@ -1,0 +1,83 @@
+{
+  "active": false,
+  "name": "Production Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-bb478913",
+      "name": "Medium",
+      "type": "n8n-nodes-base.medium",
+      "typeVersion": 1,
+      "position": [
+        650,
+        450
+      ],
+      "parameters": {
+        "title": "={{$json[\"body\"][\"entry\"][\"Title\"]}}",
+        "content": "={{$json[\"body\"][\"entry\"][\"PostContent\"]}}",
+        "contentFormat": "markdown",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "mediumApi": "Medium Credentials"
+      }
+    },
+    {
+      "id": "node-0fae84be",
+      "name": "Webhook",
+      "webhookId": "5339f1ad-981f-43d5-94d5-87540e632a1c",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "path": "",
+        "options": {},
+        "httpMethod": "POST",
+        "authentication": "{{ $credentials.headerAuth }}"
+      },
+      "credentials": {
+        "httpHeaderAuth": "Strapi Webhook Credentials"
+      }
+    },
+    {
+      "id": "node-b6595a2d",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        650,
+        200
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "requestMethod": "POST",
+        "authentication": "{{ $credentials.headerAuth }}",
+        "jsonParameters": true,
+        "bodyParametersJson": "={\n\t\"article\": {\n\t\t\"title\": \"{{$json[\"body\"][\"entry\"][\"Title\"]}}\",\n\t\t\"published\": true,\n\t\t\"body_markdown\": \"{{$json[\"body\"][\"entry\"][\"PostContent\"]}}\",\n\t\t\"tags\":[\"{{$json[\"body\"][\"entry\"][\"Tag\"]}}\"]\n\t}\n}",
+        "headerParametersJson": "{\"Content-Type\": \"application/json\"}"
+      },
+      "credentials": {
+        "httpHeaderAuth": "Dev.to Credentials"
+      }
+    },
+    {
+      "id": "error-c816a5ed",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

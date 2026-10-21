@@ -1,0 +1,123 @@
+{
+  "active": false,
+  "name": "Airtable Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "trigger-5800ea01",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        100
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "8d835b69-b8e2-4998-9002-6bd794592b46",
+      "name": "Airtable",
+      "notes": "This airtable node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        470,
+        200
+      ],
+      "parameters": {
+        "table": "Table 1",
+        "operation": "list",
+        "additionalOptions": {}
+      },
+      "credentials": {
+        "airtableApi": ""
+      }
+    },
+    {
+      "id": "b5a4b510-6adf-4776-a6bc-e525ed90873b",
+      "name": "Mailcheck",
+      "notes": "This mailcheck node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.mailcheck",
+      "typeVersion": 1,
+      "position": [
+        670,
+        200
+      ],
+      "parameters": {
+        "email": "={{$json[\"fields\"][\"Email\"]}}"
+      },
+      "credentials": {
+        "mailcheckApi": "Mailcheck API Credentials"
+      }
+    },
+    {
+      "id": "3e051a21-24d9-4252-8ea9-4694e4d7d6af",
+      "name": "Set",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        870,
+        200
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "ID",
+              "value": "={{$node[\"Airtable\"].json[\"id\"]}}"
+            }
+          ],
+          "boolean": [
+            {
+              "name": "Valid",
+              "value": "={{$json[\"mxExists\"]}}"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "a8ffedc6-a723-466a-bae2-c1420077026c",
+      "name": "Airtable1",
+      "notes": "This airtable node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        1070,
+        200
+      ],
+      "parameters": {
+        "id": "={{$json[\"ID\"]}}",
+        "table": "=Table 1",
+        "fields": [
+          "Valid"
+        ],
+        "options": {},
+        "operation": "update",
+        "application": "={{$node[\"Airtable\"].parameter[\"application\"]}}",
+        "updateAllFields": false
+      },
+      "credentials": {
+        "airtableApi": "Airtable Credentials n8n"
+      }
+    },
+    {
+      "id": "error-319512e1",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

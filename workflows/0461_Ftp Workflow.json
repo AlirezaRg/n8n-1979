@@ -1,0 +1,137 @@
+{
+  "active": false,
+  "name": "Ftp Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "baa114b6-43be-461e-9c00-eca4bf11f82a",
+      "name": "SFTP zip file content",
+      "notes": "This ftp node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.ftp",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        680
+      ],
+      "parameters": {
+        "path": "=zigbee_backups/zigbee_backup_{{ new Date().toISOString().replaceAll(':','_') }}.zip",
+        "protocol": "sftp",
+        "operation": "upload"
+      },
+      "credentials": {
+        "sftp": {
+          "name": "SFTP Zigbee Backups"
+        }
+      }
+    },
+    {
+      "id": "d8749285-9436-4381-b9d0-fdce91f059bc",
+      "name": "CRON Monday 2:45 am",
+      "notes": "This scheduleTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        860,
+        440
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "45 2 * * 1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "c0e4d72b-0cb2-4699-b2b4-936135b2fde2",
+      "name": "Send Zigbee2MQTT backup request",
+      "notes": "This mqtt node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.mqtt",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        440
+      ],
+      "parameters": {
+        "topic": "zigbee2mqtt/bridge/request/backup",
+        "message": "getbackup",
+        "options": {},
+        "sendInputData": false
+      },
+      "credentials": {
+        "mqtt": {
+          "name": "MQTT account"
+        }
+      }
+    },
+    {
+      "id": "6cc320b1-ad2f-467f-a2f1-bb4d46662d07",
+      "name": "MQTT Trigger - Backup Response",
+      "notes": "This mqttTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.mqttTrigger",
+      "typeVersion": 1,
+      "position": [
+        860,
+        680
+      ],
+      "parameters": {
+        "topics": "zigbee2mqtt/bridge/response/backup",
+        "options": {}
+      },
+      "credentials": {
+        "mqtt": {
+          "name": "MQTT account"
+        }
+      }
+    },
+    {
+      "id": "71389cf8-278c-4104-8fe3-2933fcd0736d",
+      "name": "Parse JSON Object from Message Text",
+      "notes": "This code node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1080,
+        680
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "\nlet containerObject = JSON.parse($json.message);\nlet messageObject = containerObject.data;\nreturn messageObject;"
+      }
+    },
+    {
+      "id": "61ae5760-60ae-4d23-8004-eab93624088f",
+      "name": "Convert to File - base64 to binary",
+      "notes": "This convertToFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        680
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "toBinary",
+        "sourceProperty": "zip"
+      }
+    },
+    {
+      "id": "error-569c784c",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

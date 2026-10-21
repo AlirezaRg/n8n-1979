@@ -1,0 +1,147 @@
+{
+  "active": false,
+  "name": "Get Airtable data in Obsidian Notes",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "584cfe61-7f1b-4deb-ab4b-45a5ffd20daf",
+      "name": "Airtable",
+      "notes": "This airtableTool node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        540,
+        340
+      ],
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "mode": "list",
+          "value": "appP3ocJy1rXIo6ko",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "table"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "tblywtlpPtGQMTJRm",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Dummy"
+        },
+        "options": {},
+        "operation": "search"
+      },
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "yiZ7ZC1md4geZovu",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "id": "8a100c92-7971-464b-b3c0-18272f0a0bef",
+      "name": "OpenAI Chat Model",
+      "notes": "This lmChatOpenAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        220,
+        340
+      ],
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "q8L9oWVM7QyzYEE5",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "id": "98887b9b-2eae-4a2e-af2b-d40c1786c5a2",
+      "name": "AI Agent",
+      "notes": "This agent node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.6,
+      "position": [
+        280,
+        200
+      ],
+      "parameters": {
+        "text": "={{ $json.body.content }}",
+        "options": {},
+        "promptType": "define"
+      }
+    },
+    {
+      "id": "91296976-3d78-4a9e-9f4c-a4136abcca4e",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        -260
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 497.9113826976365,
+        "height": 389.9939760040372,
+        "content": "[![YouTube Video]({{ $env.WEBHOOK_URL }}]({{ $env.WEBHOOK_URL }}"
+      }
+    },
+    {
+      "id": "7adae874-d388-4265-aff8-28a1970bd0fb",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        360,
+        -240
+      ],
+      "parameters": {
+        "width": 563.3824678865192,
+        "height": 368.0048034646952,
+        "content": "## Get Airtable Data in Obsidian with AI Agent\n<-- Watch the video to see it in action!\n\n**How to Set Up:**\n- Install the [Post Webhook Plugin]({{ $env.WEBHOOK_URL }} in Obsidian.\n- Insert the n8n Webhook URL into the Post Webhook plugin settings.\n- Configure Your Airtable Node to match your workflow needs.\n\n\n**How to Use:**\n- Highlight text containing a question about your Airtable data.\n- Open the Obsidian Command Palette (Ctrl+P) and choose 'Send Selection to [Your Webhook]'.\n- Click, wait for the AI Agent to process your request, and see the result appear below your selected text."
+      }
+    },
+    {
+      "id": "52c40581-656d-45b5-b366-d67cf2474312",
+      "name": "Respond to Obsidian",
+      "notes": "This respondToWebhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        700,
+        200
+      ],
+      "parameters": {
+        "options": {},
+        "respondWith": "text",
+        "responseBody": "={{ $json.output }}"
+      }
+    },
+    {
+      "id": "f2bf502e-5e6f-4e71-8c4f-27ec2dc5ab67",
+      "name": "Webhook Set Up in Obsidian",
+      "webhookId": "59fc8248-d3f7-4dbc-bdf3-39d59e427160",
+      "notes": "This webhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -40,
+        200
+      ],
+      "parameters": {
+        "path": "59fc8248-d3f7-4dbc-bdf3-39d59e427160",
+        "options": {},
+        "httpMethod": "POST",
+        "responseMode": "responseNode"
+      }
+    }
+  ],
+  "connections": {}
+}

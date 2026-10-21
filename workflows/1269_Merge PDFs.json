@@ -1,0 +1,111 @@
+{
+  "active": false,
+  "name": "Merge PDFs",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "282b146b-ee58-4089-9ee6-94b153024bfa",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        740,
+        -40
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "39a37abd-924f-474c-8dde-7536170797f2",
+      "name": "HTTP Request",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        -140
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "b2359766-896f-4966-873e-b2dc0ee4f684",
+      "name": "HTTP Request2",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        60
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "7f70b25c-a171-4a7c-8067-141ce3275226",
+      "name": "Merge",
+      "notes": "This merge node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1180,
+        -40
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "183b90b4-5f22-4ff8-b47f-96b7c4d522d7",
+      "name": "Merge PDF1",
+      "notes": "This mergePdfs node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1400,
+        -40
+      ],
+      "parameters": {},
+      "credentials": {
+        "customJsApi": {
+          "id": "h29wo2anYKdANAzm",
+          "name": "CustomJS account"
+        }
+      }
+    },
+    {
+      "id": "131474f2-c6ca-4d1f-ba49-1f2f6d91394a",
+      "name": "Read/Write Files from Disk",
+      "notes": "This readWriteFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1620,
+        -40
+      ],
+      "parameters": {
+        "options": {},
+        "fileName": "test.pdf",
+        "operation": "write"
+      }
+    },
+    {
+      "id": "a86ddc41-60aa-482c-90f2-8eacc6bb0a9b",
+      "name": "Read/Write Files from Disk4",
+      "notes": "This readWriteFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1840,
+        -40
+      ],
+      "parameters": {
+        "options": {},
+        "fileSelector": "test.pdf"
+      }
+    }
+  ],
+  "connections": {}
+}

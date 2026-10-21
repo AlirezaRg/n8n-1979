@@ -1,0 +1,513 @@
+{
+  "active": false,
+  "name": "Gmail Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "49ab7596-665e-4a0f-bb8b-9dc04525ce88",
+      "name": "Gmail",
+      "notes": "This gmail node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2340,
+        1440
+      ],
+      "parameters": {
+        "message": "={{ $json.html }}",
+        "options": {},
+        "subject": "Podcast Review"
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y4RWMfx2YG0VDaFJ",
+          "name": "Gmail account"
+        }
+      },
+      "webhookId": "f1f70230-ac42-4959-ba58-665fde7064a5"
+    },
+    {
+      "id": "40aa23f4-69d6-46e5-84a2-b46a64a3f0af",
+      "name": "TaddyTopDaily",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1620,
+        820
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "sendBody": true,
+        "sendHeaders": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "=query { getTopChartsByGenres( limitPerPage:10, filterByCountry:UNITED_STATES_OF_AMERICA, taddyType:PODCASTEPISODE, genres:PODCASTSERIES_{{ $json.genre }}){ topChartsId podcastEpisodes{ uuid name audioUrl podcastSeries{ uuid name } } } }"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-USER-ID"
+            },
+            {
+              "name": "X-API-KEY"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "42eea23b-b09c-49ee-af5b-12abb3960390",
+      "name": "Genre",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1420,
+        820
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e995cd5b-b91c-4a9d-8215-44d7dfe3f52f",
+              "name": "genre",
+              "type": "string",
+              "value": "TECHNOLOGY"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "da256fbf-ed7b-4a26-9fa8-33d1c2b717a5",
+      "name": "Split Out",
+      "notes": "This splitOut node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1840,
+        820
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "data.getTopChartsByGenres.podcastEpisodes"
+      }
+    },
+    {
+      "id": "069ab68c-dcd6-406f-8e7f-2597f62a04f5",
+      "name": "Whisper Transcribe Audio",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1880,
+        1120
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "authentication": "{{ $credentials.predefinedCredentialType }}",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "whisper-1"
+            },
+            {
+              "name": "file",
+              "parameterType": "formBinaryData",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "nodeCredentialType": "YOUR_CREDENTIAL_HERE"
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "tTOOlpAaNT3QoKbQ",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "id": "ffa67b8d-8601-4e1d-8f72-b6266e6b3327",
+      "name": "Final Data",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2320,
+        1120
+      ],
+      "parameters": {
+        "mode": "raw",
+        "options": {},
+        "jsonOutput": "={\n\"podcast\": \"{{ $('TaddyTopDaily').item.json.data.getTopChartsByGenres.podcastEpisodes[$itemIndex].podcastSeries.name }}\",\n\"name\": \"{{ $('TaddyTopDaily').item.json.data.getTopChartsByGenres.podcastEpisodes[$itemIndex].name.replace(/\\\"/g,'\\\"') }}\",\n \"url\":\"{{ $('TaddyTopDaily').item.json.data.getTopChartsByGenres.podcastEpisodes[$itemIndex].audioUrl.replace(/\"/g,'') }}\",\n\"summary\":\"{{ $json.message.content.replace(/\\\\/g, '\\\\\\\\').replace(/\"/g, '\\\\\"').replace(/\\n/g, '<br/>').replace(/\\r/g, '\\\\r').replace(/\\t/g, '\\\\t') }}\"\n \n}\n"
+      }
+    },
+    {
+      "id": "88cd1fa5-07ae-4dcd-b4f8-85cbf7c98d73",
+      "name": "Merge Results",
+      "notes": "This code node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1900,
+        1440
+      ],
+      "parameters": {
+        "jsCode": "return [{fields:$input.all().map(x=>x.json)}]"
+      }
+    },
+    {
+      "id": "4c2c80d1-750f-42f1-a0f1-343dec325b0f",
+      "name": "HTML",
+      "notes": "This html node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "executeOnce": true,
+      "position": [
+        2120,
+        1440
+      ],
+      "parameters": {
+        "html": "<!DOCTYPE html>\n<html>\n<head>\n <meta charset=\"UTF-8\" />\n</head>\n<body>\n <table>\n <tr> \n {{ ['Podcast', 'Episode', 'Summary'].map(propname=>'<td><h4>'+propname+'</h4></td>').join('') }}\n </tr>\n {{ $json.fields.map(ep=>{ return `<tr><td>${ep.podcast}</td><td><a href=\"${ep.url}\">${ep.name}</a></td><td>${ep.summary}</td><td></td></tr>`} ) }}\n </table>\n</body>\n</html>\n\n<style>\ntr { \n border: 1px solid #000; \n padding: 8px; \n }\n.container {\n background-color: #ffffff;\n text-align: center;\n padding: 16px;\n border-radius: 8px;\n}\n\nh1 {\n color: #ff6d5a;\n font-size: 24px;\n font-weight: bold;\n padding: 8px;\n}\n\nh2 {\n color: #909399;\n font-size: 18px;\n font-weight: bold;\n padding: 8px;\n}\n</style>\n"
+      }
+    },
+    {
+      "id": "f1d13556-2c3a-48e5-84a1-5b82f338c6ba",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        340,
+        760
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 547.952991050529,
+        "height": 683.5200847858991,
+        "content": "## Daily Podcast Summary\n### This workflow will summarize the content in the day's top podcasts for a certain genre, then send you the podcasts with summaries by email\n\n## Setup:\n 1. Create a free API key on Taddy here: {{ $env.WEBHOOK_URL }}\n 2. Input your user number and API key into the `TaddyTopDaily` node in the header parameters X-USER-ID and X-API-KEY respectively.\n 3. Create access credentials for your Gmail as described here: {{ $env.WEBHOOK_URL }} Use the credentials from your *client_secret.json* in the `Gmail` node.\n 4. In the `Genre` node, set the genre of podcasts you want a summary for. Valid values are: TECHNOLOGY, NEWS, ARTS, COMEDY, SPORTS, FICTION, etc. Look at api.taddy.org for the full list (they will be displayed in the help docs as PODCASTSERIES_TECHNOLOGY, PODCASTSERIES_NEWS, etc.)\n 5. Enter your email address in the `Gmail` node.\n 6. Change the schedule time for sending email from `Schedule` to whichever time you want to receive the email.\n \n\n## Test:\n- Link a `Test Workflow` node in place of the `Schedule` node.\n- Hit Test Workflow.\n- Check your email for the results."
+      }
+    },
+    {
+      "id": "5aee7279-349e-47cd-99dc-7a32677b5a20",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1820,
+        1060
+      ],
+      "parameters": {
+        "width": 651.4454343326669,
+        "height": 252.64899257060446,
+        "content": "### Whisper transcribes and Open AI summarizes the podcast"
+      }
+    },
+    {
+      "id": "f8b4a203-b27f-4a11-90ef-a7e1561219f5",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        760
+      ],
+      "parameters": {
+        "width": 1189.7320416038633,
+        "height": 249.2202456997519,
+        "content": "### Get daily list of top podcasts (according to Apple charts) and download audio, then crop for OpenAI"
+      }
+    },
+    {
+      "id": "7045c9c8-5509-4dc0-b167-ddd4d6c90c22",
+      "name": "Sticky Note3",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1825,
+        1384
+      ],
+      "parameters": {
+        "width": 645.0210885124873,
+        "height": 227.94126205257731,
+        "content": "### Finally, send the email!"
+      }
+    },
+    {
+      "id": "8dc9583b-cec3-4ac0-a74a-329f6c3b4801",
+      "name": "Summarize Podcast",
+      "notes": "This openAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        2140,
+        1120
+      ],
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "prompt": {
+          "messages": [
+            {
+              "content": "=Summarize the major points of the following podcast: {{ $json.text }}. Start your answer by saying 'This episode focuses on', 'This episode is about', etc. Contain your answer to 3-4 paragraphs max, and focus on only key information. "
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": "YOUR_TOKEN_HERE"
+        },
+        "resource": "chat",
+        "requestOptions": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "tTOOlpAaNT3QoKbQ",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "id": "e8d122f1-29f9-41ca-9c6b-b72269686fd6",
+      "name": "Schedule",
+      "notes": "This scheduleTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        1220,
+        820
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "67bc7a5b-8d0a-4de4-918d-410551dad4d7",
+      "name": "Request Audio Crop",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1000,
+        1220
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "sendHeaders": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "1",
+              "parameterType": "formBinaryData",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "convertOption",
+              "value": "{\"startTime\":\"00:08:00\",\"endTime\":\"00:24:00\",\"audioFormat\":\"mp3\"}"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "*/*("
+            },
+            {
+              "name": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "name": "Origin",
+              "value": "{{ $env.WEBHOOK_URL }}"
+            },
+            {
+              "name": "Referer",
+              "value": "{{ $env.WEBHOOK_URL }}"
+            },
+            {
+              "name": "Sec-Fetch-Dest",
+              "value": "empty"
+            },
+            {
+              "name": "Sec-Fetch-Mode",
+              "value": "cors"
+            },
+            {
+              "name": "Sec-Fetch-Site",
+              "value": "same-site"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "0dc62507-3fea-45d7-a0dc-e92fb8e2600f",
+      "name": "Get Download Link",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1200,
+        1220
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json, text/javascript, */*; q=0.01"
+            },
+            {
+              "name": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "name": "Origin",
+              "value": "{{ $env.WEBHOOK_URL }}"
+            },
+            {
+              "name": "Referer",
+              "value": "{{ $env.WEBHOOK_URL }}"
+            },
+            {
+              "name": "Sec-Fetch-Dest",
+              "value": "empty"
+            },
+            {
+              "name": "Sec-Fetch-Dest",
+              "value": "cors"
+            },
+            {
+              "name": "Sec-Fetch-Dest",
+              "value": "same-site"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "8aa65189-2a4b-4ac4-9915-45ccd679a5da",
+      "name": "Download Cut MP3",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1660,
+        1140
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "4e7318df-dbaa-4d9f-858d-4455ead763c1",
+      "name": "Download Podcast",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2060,
+        820
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "ab4601c6-7387-4f2f-a2f3-4256f88c0b3e",
+      "name": "Wait",
+      "webhookId": "bc28bc57-d9ea-430e-88db-78d088a058cb",
+      "notes": "This wait node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1600,
+        1360
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "a0b300b9-aaad-48f1-8319-a03700e0d298",
+      "name": "Sticky Note4",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        920,
+        1100
+      ],
+      "parameters": {
+        "width": 898.7483569555845,
+        "height": 387.3779915472271,
+        "content": "### Crop the podcast down before analysis"
+      }
+    },
+    {
+      "id": "34ca89fe-4ed1-491f-b3b9-32e97040959b",
+      "name": "If Downloads Ready",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.1,
+      "position": [
+        1380,
+        1180
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "49440938-0cb3-41c8-bcab-b7ad96973f77",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "leftValue": "={{ $input.all().map(x=>x.json.Data.DownloadLink).reduce((accumulator, currentValue) => accumulator && currentValue, true)\n}}",
+              "rightValue": ""
+            }
+          ]
+        },
+        "looseTypeValidation": true
+      }
+    }
+  ],
+  "connections": {}
+}

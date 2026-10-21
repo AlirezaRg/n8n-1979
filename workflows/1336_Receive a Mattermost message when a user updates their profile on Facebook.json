@@ -1,0 +1,63 @@
+{
+  "active": false,
+  "name": "Receive a Mattermost message when a user updates their profile on Facebook",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "f44a76c3-119c-43f6-9bc8-7e16fb8d1ce1",
+      "name": "Facebook Trigger",
+      "webhookId": "14ba2eea-04a1-4659-b83e-0090ba480452",
+      "notes": "This facebookTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.facebookTrigger",
+      "typeVersion": 1,
+      "position": [
+        590,
+        260
+      ],
+      "parameters": {
+        "appId": "",
+        "options": {
+          "includeValues": true
+        }
+      },
+      "credentials": {
+        "facebookGraphAppApi": "facebook"
+      }
+    },
+    {
+      "id": "5cb1abfd-1060-40c4-8239-c9339e16dad1",
+      "name": "Mattermost",
+      "notes": "This mattermost node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.mattermost",
+      "typeVersion": 1,
+      "position": [
+        790,
+        260
+      ],
+      "parameters": {
+        "message": "=The user with uid {{$node[\"Facebook Trigger\"].json[\"uid\"]}} changed their {{$node[\"Facebook Trigger\"].json[\"changes\"][0][\"field\"]}} to {{$node[\"Facebook Trigger\"].json[\"changes\"][0][\"value\"][\"page\"]}}.",
+        "channelId": "13fx8838gtbj3d41a6a7c1w7fe",
+        "attachments": [],
+        "otherOptions": {}
+      },
+      "credentials": {
+        "mattermostApi": "mattermost"
+      }
+    },
+    {
+      "id": "error-675ca28a",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

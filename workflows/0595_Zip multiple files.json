@@ -1,0 +1,104 @@
+{
+  "active": false,
+  "name": "Zip multiple files",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "8de50ed2-b298-4701-8747-f6c7158fa15f",
+      "name": "Execute Workflow Trigger",
+      "notes": "This executeWorkflowTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "5e03dfdd-696e-4a04-99e9-4094ae4371ac",
+      "name": "Compression",
+      "notes": "This compression node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.compression",
+      "typeVersion": 1.1,
+      "position": [
+        460,
+        0
+      ],
+      "parameters": {
+        "fileName": "=data{{$now.format('yyyy-MM-dd-tt')}}.zip",
+        "operation": "compress",
+        "binaryPropertyName": "={{ $json.binary_keys }}"
+      }
+    },
+    {
+      "id": "e25abf55-fb05-47d0-ba65-9b4e2f08d856",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -340,
+        -100
+      ],
+      "parameters": {
+        "height": 360,
+        "content": "## About\nUse me as modular workflow. Instead of building me fixed in your workflow. Just call me when you need me.\n\n\n## Input\nInput can be multiple files \n-imgaes\n-pdfs\n-xlsx,csv....\n\n## Output\nSingle zip file"
+      }
+    },
+    {
+      "id": "db7b6475-25b5-44de-b37e-70b75c91455e",
+      "name": "Prepare Output",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        680,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b0c3c3db-584a-48c9-b0ca-7f527d35f5a4",
+              "name": "fileName",
+              "type": "string",
+              "value": "={{ $binary.data.fileName.replaceAll(\" \",\"\") }}"
+            }
+          ]
+        },
+        "includeOtherFields": true
+      }
+    },
+    {
+      "id": "6cf6b9ba-e5a3-4d5f-a539-e84d839f7e99",
+      "name": "Code Magic",
+      "notes": "This code node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ],
+      "parameters": {
+        "jsCode": "let binaries = {}, binary_keys = [];\n\nfor (const [index, inputItem] of Object.entries($input.all())) {\n  binaries[`data_${index}`] = inputItem.binary.data;\n  binary_keys.push(`data_${index}`);\n}\n\nreturn [{\n    json: {\n        binary_keys: binary_keys.join(',')\n    },\n    binary: binaries\n}];\n"
+      }
+    },
+    {
+      "id": "error-e1e6306a",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

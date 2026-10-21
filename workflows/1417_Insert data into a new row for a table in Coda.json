@@ -1,0 +1,83 @@
+{
+  "active": false,
+  "name": "Insert data into a new row for a table in Coda",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "b3373027-ffb8-4ad9-8a37-54d3495b8975",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "645a8abf-98dd-467c-9063-bfa730bc8deb",
+      "name": "Coda",
+      "notes": "This coda node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.coda",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "docId": "",
+        "options": {},
+        "tableId": ""
+      },
+      "credentials": {
+        "codaApi": ""
+      }
+    },
+    {
+      "id": "1501bec4-7b74-4056-815c-3a7132248b24",
+      "name": "Set",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "Column 1",
+              "value": "This is column 1 data"
+            },
+            {
+              "name": "Column 2",
+              "value": "This is column 2 data"
+            },
+            {
+              "name": "Column 3",
+              "value": "This is column 3 data"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "error-09f78734",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

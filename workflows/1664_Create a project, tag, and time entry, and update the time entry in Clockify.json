@@ -1,0 +1,134 @@
+{
+  "active": false,
+  "name": "Create a project, tag, and time entry, and update the time entry in Clockify",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "f9bfe11c-b110-4937-b48a-cce408c64fe6",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "c2caa017-f2ff-40f8-8e9d-a7a60b38f6f5",
+      "name": "Clockify",
+      "notes": "This clockify node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.clockify",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "name": "n8n-docs",
+        "workspaceId": "5f7af249d33ce12a712306dd",
+        "additionalFields": {
+          "note": "For n8n-docs",
+          "color": "#0000FF",
+          "isPublic": false
+        }
+      },
+      "credentials": {
+        "clockifyApi": "clockify-burner"
+      }
+    },
+    {
+      "id": "91500f35-0690-4ef3-8fc8-669009671a96",
+      "name": "Clockify1",
+      "notes": "This clockify node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.clockify",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "name": "docs",
+        "resource": "tag",
+        "workspaceId": "5f7af249d33ce12a712306dd"
+      },
+      "credentials": {
+        "clockifyApi": {
+          "id": null,
+          "name": "clockify-burner"
+        }
+      }
+    },
+    {
+      "id": "7358bcab-d4ba-485b-b48d-caf7a50d910f",
+      "name": "Clockify2",
+      "notes": "This clockify node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.clockify",
+      "typeVersion": 1,
+      "position": [
+        850,
+        300
+      ],
+      "parameters": {
+        "start": "2020-10-05T08:30:00Z",
+        "resource": "timeEntry",
+        "workspaceId": "5f7af249d33ce12a712306dd",
+        "additionalFields": {
+          "end": "2020-10-05T09:30:00Z",
+          "tagIds": [
+            "5f7afbfc73610f56b88ee9ef"
+          ],
+          "description": "Added Clockify Docs"
+        }
+      },
+      "credentials": {
+        "clockifyApi": {
+          "id": null,
+          "name": "clockify-burner"
+        }
+      }
+    },
+    {
+      "id": "5ca287cc-c327-418b-97bc-164c97af48a9",
+      "name": "Clockify3",
+      "notes": "This clockify node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.clockify",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        300
+      ],
+      "parameters": {
+        "resource": "timeEntry",
+        "operation": "update",
+        "timeEntryId": "={{$node[\"Clockify2\"].json[\"id\"]}}",
+        "workspaceId": "5f7af249d33ce12a712306dd",
+        "updateFields": {
+          "projectId": "={{$node[\"Clockify\"].json[\"id\"]}}"
+        }
+      },
+      "credentials": {
+        "clockifyApi": {
+          "id": null,
+          "name": "clockify-burner"
+        }
+      }
+    },
+    {
+      "id": "error-891268c0",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,293 @@
+{
+  "active": false,
+  "name": "Githubtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "e0591328-a2e4-49ca-a69c-738ca5d8a51e",
+      "name": "Github Trigger",
+      "webhookId": "52c5fe44-23ef-4903-b6ae-731edd36127e",
+      "notes": "This githubTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.githubTrigger",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "owner": "harshil1712",
+        "events": [
+          "issue_comment",
+          "issues"
+        ],
+        "repository": "build-discord-bot",
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "githubOAuth2Api": "GitHub Personal Credentials"
+      }
+    },
+    {
+      "id": "4060f8cf-f449-4cce-898c-fc54512c7a85",
+      "name": "Githubtrigger 1",
+      "webhookId": "52c5fe44-23ef-4903-b6ae-731edd36127e",
+      "notes": "This githubTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.githubTrigger",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "owner": "harshil1712",
+        "events": [
+          "issue_comment",
+          "issues"
+        ],
+        "repository": "build-discord-bot",
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "githubOAuth2Api": {
+          "id": null,
+          "name": "GitHub Personal Credentials"
+        }
+      }
+    },
+    {
+      "id": "fbec4657-40c1-4813-8df4-e16b3338d624",
+      "name": "Switch",
+      "notes": "This switch node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "value2": "opened"
+            },
+            {
+              "output": 1,
+              "value2": "created"
+            }
+          ]
+        },
+        "value1": "={{$json[\"body\"][\"action\"]}}",
+        "dataType": "string"
+      }
+    },
+    {
+      "id": "b7e52471-6a1e-4baf-998d-bb4cc515788c",
+      "name": "IF no assignee?",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        150
+      ],
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json[\"body\"][\"issue\"][\"assignees\"].length}}",
+              "operation": "equal"
+            }
+          ],
+          "string": [
+            {
+              "value1": "={{$json[\"body\"][\"issue\"][\"body\"]}}",
+              "value2": "/[a,A]ssign[\\w*\\s*]*me/gm",
+              "operation": "regex"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "36fa6d1b-9054-42ff-b670-3e94cc999958",
+      "name": "NoOp",
+      "notes": "This noOp node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1250,
+        250
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "00d20428-4962-4309-bfd5-f051d358e90b",
+      "name": "IF wants to work?",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        850,
+        500
+      ],
+      "parameters": {
+        "conditions": {
+          "number": [],
+          "string": [
+            {
+              "value1": "={{$json[\"body\"][\"comment\"][\"body\"]}}",
+              "value2": "/[a,A]ssign[\\w*\\s*]*me/gm",
+              "operation": "regex"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "8046707d-3ef0-42cf-8905-71f35ed32e22",
+      "name": "IF not assigned?",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        450
+      ],
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json[\"body\"][\"issue\"][\"assignees\"].length}}",
+              "operation": "equal"
+            }
+          ],
+          "string": []
+        }
+      }
+    },
+    {
+      "id": "d9dfee90-f772-4de8-adff-dca85b78f0f8",
+      "name": "Assign Issue Creator",
+      "notes": "This github node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        1250,
+        50
+      ],
+      "parameters": {
+        "owner": "={{$node[\"Switch\"].json[\"body\"][\"repository\"][\"owner\"][\"login\"]}}",
+        "operation": "edit",
+        "editFields": {
+          "labels": [
+            {
+              "label": "assigned"
+            }
+          ],
+          "assignees": [
+            {
+              "assignee": "={{$json.body.issue[\"user\"][\"login\"]}}"
+            }
+          ]
+        },
+        "repository": "={{$node[\"Switch\"].json[\"body\"][\"repository\"][\"name\"]}}",
+        "issueNumber": "={{ $json[\"body\"][\"issue\"][\"number\"] }}",
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "githubOAuth2Api": "GitHub@Harshil"
+      },
+      "webhookId": "e800cf8e-343c-4e51-b2d7-c93bb881609d"
+    },
+    {
+      "id": "ac216e02-aef6-4ccb-a5b1-22aed871e9d9",
+      "name": "Add Comment",
+      "notes": "This github node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        1350,
+        600
+      ],
+      "parameters": {
+        "body": "=Hey @{{$json[\"body\"][\"comment\"][\"user\"][\"login\"]}},\n\nThis issue is already assigned to {{$json[\"body\"][\"issue\"][\"assignee\"][\"login\"]}} ??",
+        "owner": "={{$json[\"body\"][\"repository\"][\"owner\"][\"login\"]}}",
+        "operation": "createComment",
+        "repository": "={{$json[\"body\"][\"repository\"][\"name\"]}}",
+        "issueNumber": "={{$json[\"body\"][\"issue\"][\"number\"]}}",
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "githubOAuth2Api": {
+          "id": null,
+          "name": "GitHub@Harshil"
+        }
+      },
+      "webhookId": "936f7a91-82d3-4f94-8186-a30498caeaf6"
+    },
+    {
+      "id": "c48e79d9-300e-42e5-85cb-e27e696516e4",
+      "name": "NoOp1",
+      "notes": "This noOp node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        650
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "8acc4285-c67f-4c1a-b276-30967b221c66",
+      "name": "Assign Commenter",
+      "notes": "This github node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        1350,
+        400
+      ],
+      "parameters": {
+        "owner": "={{$json[\"body\"][\"repository\"][\"owner\"][\"login\"]}}",
+        "operation": "edit",
+        "editFields": {
+          "labels": [
+            {
+              "label": "assigned"
+            }
+          ],
+          "assignees": [
+            {
+              "assignee": "={{$json[\"body\"][\"comment\"][\"user\"][\"login\"]}}"
+            }
+          ]
+        },
+        "repository": "={{$json[\"body\"][\"repository\"][\"name\"]}}",
+        "issueNumber": "={{$json[\"body\"][\"issue\"][\"number\"]}}",
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "githubOAuth2Api": {
+          "id": null,
+          "name": "GitHub@Harshil"
+        }
+      },
+      "webhookId": "437c8847-7710-4fda-9743-f08134eb2e30"
+    },
+    {
+      "id": "error-fef31ef8",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

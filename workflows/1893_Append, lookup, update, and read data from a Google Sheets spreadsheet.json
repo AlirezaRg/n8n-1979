@@ -1,0 +1,213 @@
+{
+  "active": false,
+  "name": "Append, lookup, update, and read data from a Google Sheets spreadsheet",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "dd536ac6-fa16-4bf8-b07c-06fd82aa94c4",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        450,
+        450
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "003db6d4-b010-4ee6-9ba2-f146cd61472e",
+      "name": "Google Sheets2",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        1450,
+        450
+      ],
+      "parameters": {
+        "key": "YOUR_CREDENTIAL_HERE",
+        "range": "A:D",
+        "options": {
+          "valueInputMode": "USER_ENTERED",
+          "valueRenderMode": "UNFORMATTED_VALUE"
+        },
+        "sheetId": "1remFwo--5ehUgIU7UUndKldPI0Xm93e1T3DldD9GOg0",
+        "operation": "update",
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": "google-sheet"
+      }
+    },
+    {
+      "id": "49308656-f6ef-401e-82fa-db4282a14ee0",
+      "name": "Set1",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1250,
+        450
+      ],
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "Rent",
+              "value": "={{$node[\"Google Sheets1\"].json[\"Rent\"]+100}}"
+            },
+            {
+              "name": "ID",
+              "value": "={{$node[\"Google Sheets1\"].json[\"ID\"]}}"
+            }
+          ],
+          "string": [
+            {
+              "name": "Name",
+              "value": "={{$node[\"Google Sheets1\"].json[\"Name\"]}}"
+            },
+            {
+              "name": "City",
+              "value": "={{$node[\"Google Sheets1\"].json[\"City\"]}}"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "93828e2d-7bc6-48aa-a35f-6546d39297fe",
+      "name": "Google Sheets1",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        450
+      ],
+      "parameters": {
+        "range": "A:D",
+        "options": {
+          "valueRenderMode": "UNFORMATTED_VALUE",
+          "returnAllMatches": true
+        },
+        "sheetId": "1remFwo--5ehUgIU7UUndKldPI0Xm93e1T3DldD9GOg0",
+        "operation": "lookup",
+        "lookupValue": "Berlin",
+        "lookupColumn": "City",
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": null,
+          "name": "google-sheet"
+        }
+      }
+    },
+    {
+      "id": "12204ded-3322-47cc-a833-d64ca9295700",
+      "name": "Google Sheets",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        850,
+        450
+      ],
+      "parameters": {
+        "range": "A:D",
+        "options": {
+          "valueInputMode": "USER_ENTERED"
+        },
+        "sheetId": "1remFwo--5ehUgIU7UUndKldPI0Xm93e1T3DldD9GOg0",
+        "operation": "append",
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": null,
+          "name": "google-sheet"
+        }
+      }
+    },
+    {
+      "id": "de55186a-26b1-4643-8033-59be8eda3d0d",
+      "name": "Google Sheets3",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        1650,
+        450
+      ],
+      "parameters": {
+        "range": "A:D",
+        "options": {
+          "valueRenderMode": "FORMATTED_VALUE"
+        },
+        "sheetId": "1remFwo--5ehUgIU7UUndKldPI0Xm93e1T3DldD9GOg0",
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": null,
+          "name": "google-sheet"
+        }
+      }
+    },
+    {
+      "id": "96fccd39-f431-44b7-88e6-41a583b93b52",
+      "name": "Set",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        650,
+        450
+      ],
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "ID",
+              "value": "={{Math.floor(Math.random()*1000)}}"
+            }
+          ],
+          "string": [
+            {
+              "name": "Name",
+              "value": "John's Place"
+            },
+            {
+              "name": "Rent",
+              "value": "$1,000"
+            },
+            {
+              "name": "City",
+              "value": "Berlin"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "error-873da12a",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

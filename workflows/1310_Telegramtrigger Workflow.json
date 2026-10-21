@@ -1,0 +1,202 @@
+{
+  "active": false,
+  "name": "Telegramtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "0ad7e93e-c15a-4dd6-a58c-a3be4a0321a6",
+      "name": "Telegram Trigger",
+      "notes": "This telegramTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        250
+      ],
+      "parameters": {
+        "updates": [
+          "message"
+        ]
+      },
+      "credentials": {
+        "telegramApi": "Telegram"
+      },
+      "webhookId": "a907edd3-1258-47a8-8b1c-cb8475e45883"
+    },
+    {
+      "id": "6f0251c0-a4fb-4747-b9e3-499c4d862e07",
+      "name": "Monday.com",
+      "notes": "This mondayCom node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.mondayCom",
+      "typeVersion": 1,
+      "position": [
+        650,
+        150
+      ],
+      "parameters": {
+        "name": "={{$node[\"Freshdesk\"].json[\"subject\"]}}",
+        "boardId": "565971708",
+        "groupId": "new_group",
+        "resource": "boardItem",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "mondayComApi": "Monday"
+      }
+    },
+    {
+      "id": "f8c3501e-f222-4c88-b020-3b3ca08b3ef2",
+      "name": "Monday.com1",
+      "notes": "This mondayCom node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.mondayCom",
+      "typeVersion": 1,
+      "position": [
+        650,
+        350
+      ],
+      "parameters": {
+        "name": "={{$node[\"Telegram Trigger\"].json[\"message\"][\"text\"]}}",
+        "boardId": "565971708",
+        "groupId": "topics",
+        "resource": "boardItem",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "mondayComApi": {
+          "id": null,
+          "name": "Monday"
+        }
+      }
+    },
+    {
+      "id": "f6c3d174-050a-4160-b1f7-8f2c550a7821",
+      "name": "Telegram",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        500,
+        150
+      ],
+      "parameters": {
+        "text": "Hi, thanks for sending this. We will review your request for refund as soon as possible ?? ?? ??",
+        "chatId": "={{$node[\"Telegram Trigger\"].json[\"message\"][\"chat\"][\"id\"]}}",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": null,
+          "name": "Telegram"
+        }
+      },
+      "webhookId": "c64142d8-844b-4408-bae8-4361c8df6e2a"
+    },
+    {
+      "id": "6335ebb3-3803-4703-9346-187def2d7aeb",
+      "name": "IF1",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        180,
+        250
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$node[\"Telegram Trigger\"].json[\"message\"][\"text\"]}}",
+              "value2": "refund",
+              "operation": "contains"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "9f942eed-9adc-4071-ac93-b6d3162be1b3",
+      "name": "Freshdesk",
+      "notes": "This freshdesk node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.freshdesk",
+      "typeVersion": 1,
+      "position": [
+        350,
+        150
+      ],
+      "parameters": {
+        "options": {
+          "tags": "refund",
+          "subject": "={{$node[\"IF1\"].json[\"message\"][\"text\"]}}"
+        },
+        "requester": "email",
+        "requesterIdentificationValue": ""
+      },
+      "credentials": {
+        "freshdeskApi": "Freshdesk"
+      }
+    },
+    {
+      "id": "fe3a9a46-9072-4fab-8aa8-aeb2f0284793",
+      "name": "Freshdesk1",
+      "notes": "This freshdesk node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.freshdesk",
+      "typeVersion": 1,
+      "position": [
+        350,
+        350
+      ],
+      "parameters": {
+        "options": {
+          "tags": "complaint",
+          "subject": "={{$node[\"IF1\"].json[\"message\"][\"text\"]}}"
+        },
+        "requester": "email",
+        "requesterIdentificationValue": ""
+      },
+      "credentials": {
+        "freshdeskApi": {
+          "id": null,
+          "name": "Freshdesk"
+        }
+      }
+    },
+    {
+      "id": "5c3b001a-b9a9-4e21-a1f3-4df80a86c2be",
+      "name": "Telegram1",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        500,
+        350
+      ],
+      "parameters": {
+        "text": "Hi, thanks for sending this. We will review your complaint as soon as possible ?? ?? ?",
+        "chatId": "={{$node[\"Telegram Trigger\"].json[\"message\"][\"chat\"][\"id\"]}}",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": null,
+          "name": "Telegram"
+        }
+      },
+      "webhookId": "8dd59cfe-d13d-4782-b5c0-873277e7611b"
+    },
+    {
+      "id": "error-3625fe81",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

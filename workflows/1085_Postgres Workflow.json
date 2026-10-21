@@ -1,0 +1,79 @@
+{
+  "active": false,
+  "name": "Postgres Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "trigger-94453e98",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        100
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "91247a9d-0af3-4185-a6af-e04c7a357480",
+      "name": "Run Query",
+      "notes": "This postgres node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        450,
+        450
+      ],
+      "parameters": {
+        "query": "SELECT name, ean FROM product",
+        "operation": "executeQuery"
+      },
+      "credentials": {
+        "postgres": "postgres"
+      }
+    },
+    {
+      "id": "5d5628be-71bf-4256-8575-601e7cde3a4b",
+      "name": "Spreadsheet File",
+      "notes": "This spreadsheetFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 1,
+      "position": [
+        600,
+        450
+      ],
+      "parameters": {
+        "operation": "toFile"
+      }
+    },
+    {
+      "id": "30aecc10-471f-450a-b97b-f619301031ac",
+      "name": "Write Binary File",
+      "notes": "This writeBinaryFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        750,
+        450
+      ],
+      "parameters": {
+        "fileName": "spreadsheet.xls"
+      }
+    },
+    {
+      "id": "error-fcb71123",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

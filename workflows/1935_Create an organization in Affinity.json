@@ -1,0 +1,53 @@
+{
+  "active": false,
+  "name": "Create an organization in Affinity",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "db96779d-9d0d-4f8c-8038-ab49858c5020",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        400,
+        250
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "4434a13e-9015-4307-b286-9959e1cdfbbb",
+      "name": "Affinity",
+      "notes": "This affinity node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.affinity",
+      "typeVersion": 1,
+      "position": [
+        600,
+        250
+      ],
+      "parameters": {
+        "name": "",
+        "domain": "",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "affinityApi": ""
+      }
+    },
+    {
+      "id": "error-0581ddfa",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

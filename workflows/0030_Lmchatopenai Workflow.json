@@ -1,0 +1,101 @@
+{
+  "active": false,
+  "name": "Lmchatopenai Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "trigger-9ee3ef68",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        100
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "939bb301-5e12-4d5b-9a56-61a61cca5f0d",
+      "name": "OpenAI Chat Model",
+      "notes": "This lmChatOpenAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        640,
+        460
+      ],
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "8gccIjcuf3gvaoEr",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "id": "372777e8-ce90-4dea-befc-ac1b2eb4729f",
+      "name": "Window Buffer Memory",
+      "notes": "This memoryBufferWindow node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.2,
+      "position": [
+        780,
+        460
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "7a8f0ad1-1c00-4043-b3e5-c88521140a1a",
+      "name": "SerpAPI",
+      "notes": "This toolSerpApi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        920,
+        460
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "serpApi": {
+          "id": "aJCKjxx6U3K7ydDe",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "id": "a7624108-e3da-4193-a625-887314216b8b",
+      "name": "When chat message received",
+      "webhookId": "53c136fe-3e77-4709-a143-fe82746dd8b6",
+      "notes": "This chatTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.1,
+      "position": [
+        360,
+        240
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "6b8b7de8-fe3f-43b5-97ce-a52a9e44eb5e",
+      "name": "AI Agent",
+      "notes": "This agent node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.6,
+      "position": [
+        680,
+        240
+      ],
+      "parameters": {
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

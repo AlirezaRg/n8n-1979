@@ -1,0 +1,77 @@
+{
+  "active": false,
+  "name": "Read RSS feed from two different sources",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "fa8717e5-092a-4359-89cc-57cc8fa2bf25",
+      "name": "RSS Feed Read",
+      "notes": "This rssFeedRead node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        180
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "62ce6cf3-fb83-4013-b288-40d179f35f99",
+      "name": "When clicking \"Execute Workflow\"",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        520,
+        100
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "81496a04-b986-4e13-b884-23562f953a37",
+      "name": "Code",
+      "notes": "This code node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        700,
+        100
+      ],
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      url: '{{ $env.WEBHOOK_URL }}',\n    }\n  },\n  {\n    json: {\n      url: '{{ $env.WEBHOOK_URL }}',\n    }\n  }\n];"
+      }
+    },
+    {
+      "id": "6e3a444f-fec3-4a7f-a063-d5b152c5f43a",
+      "name": "Loop Over Items",
+      "notes": "This splitInBatches node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        880,
+        100
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "error-978c5419",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

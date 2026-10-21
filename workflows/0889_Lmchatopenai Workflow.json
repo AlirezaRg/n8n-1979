@@ -1,0 +1,296 @@
+{
+  "active": false,
+  "name": "Lmchatopenai Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "aa0c62d1-2a5e-4336-8783-a8a21cb23374",
+      "name": "OpenAI Chat Model",
+      "notes": "This lmChatOpenAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1180,
+        760
+      ],
+      "parameters": {
+        "options": {
+          "temperature": 0
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "VQtv7frm7eLiEDnd",
+          "name": "OpenAi account 7"
+        }
+      }
+    },
+    {
+      "id": "0c7d21e6-5bf6-4927-ad23-008b22e2ffde",
+      "name": "When clicking \"Execute Workflow\"",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        280,
+        560
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "352de912-3a36-4bf2-b013-b46e0ace38e9",
+      "name": "Generate French Audio",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        720,
+        560
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\"text\":\"{{ $json.text }}\",\"model_id\":\"eleven_multilingual_v2\",\"voice_settings\":{\"stability\":0.5,\"similarity_boost\":0.5}}",
+        "sendBody": true,
+        "sendQuery": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "genericAuthType": "httpHeaderAuth",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "optimize_streaming_latency",
+              "value": "1"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "audio/mpeg"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "OMni1VQQclVYOmeZ",
+          "name": "ElevenLabs David"
+        }
+      }
+    },
+    {
+      "id": "0cde2e89-0669-41b4-8fe1-1a6aff14792f",
+      "name": "Set ElevenLabs voice ID and text",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [
+        500,
+        560
+      ],
+      "parameters": {
+        "fields": {
+          "values": [
+            {
+              "name": "voice_id",
+              "stringValue": "wl7sZxfTOitHVachQiUm"
+            },
+            {
+              "name": "text",
+              "stringValue": "=Apr�s, on a fait la sieste, Camille a travaill� pour French Today et j'ai �tudi� un peu, et puis Camille a propos� de suivre une visite guid�e de l'Abbaye de Beauport qui commen�ait � 17 heures. On a march� environ vingt minutes, et je m'arr�tais souvent pour prendre des photos : la baie de Paimpol est si jolie ! Mais Camille m'a dit : � D�p�che-toi Sunny?! La visite guid�e commence dans cinq minutes. � Donc, j'ai boug� mes fesses et on est arriv�es � l'abbaye"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "38aa323e-a899-4018-afb9-4d4682ac8ff1",
+      "name": "Translate Text to English",
+      "notes": "This chainLlm node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.2,
+      "position": [
+        1180,
+        560
+      ],
+      "parameters": {
+        "prompt": "=Translate to English:\n{{ $json.text }}"
+      }
+    },
+    {
+      "id": "f0b7adad-fa0b-4764-96e0-0883bbcc02d6",
+      "name": "Translate English text to speech",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1540,
+        560
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\"text\":\"{{ $json[\"text\"].replaceAll('\"', '\\\\\"').trim() }}\",\"model_id\":\"eleven_multilingual_v2\",\"voice_settings\":{\"stability\":0.5,\"similarity_boost\":0.5}}",
+        "sendBody": true,
+        "sendQuery": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "genericAuthType": "httpHeaderAuth",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "optimize_streaming_latency",
+              "value": "1"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "audio/mpeg"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "OMni1VQQclVYOmeZ",
+          "name": "ElevenLabs David"
+        }
+      }
+    },
+    {
+      "id": "f8700266-5491-4ca7-b29a-3f5ec1e9b66f",
+      "name": "Transcribe Audio",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        960,
+        560
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "authentication": "{{ $credentials.predefinedCredentialType }}",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "file",
+              "parameterType": "formBinaryData",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "model",
+              "value": "whisper-1"
+            }
+          ]
+        },
+        "nodeCredentialType": "YOUR_CREDENTIAL_HERE"
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "VQtv7frm7eLiEDnd",
+          "name": "OpenAi account 7"
+        }
+      }
+    },
+    {
+      "id": "25630b45-3827-4ee0-a77e-c30cadefe999",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        449.2637232176971,
+        319.7947500318393
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 199.37543798209555,
+        "height": 420.623805972039,
+        "content": "1] In ElevenLabs, add a voice to your [voice lab]({{ $env.WEBHOOK_URL }} and copy its ID. Open this node and add the ID there"
+      }
+    },
+    {
+      "id": "a41d2622-4476-44c2-bac6-212be237aa4b",
+      "name": "Sticky Note3",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        680,
+        320
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 192.21792012722693,
+        "height": 418.3754668433847,
+        "content": "2] Get your ElevenLabs API key (click your name in the bottom-left of [ElevenLabs]({{ $env.WEBHOOK_URL }} and choose 'profile')\n\nIn this node, create a new header auth cred. Set the name to `xi-api-key` and the value to your API key"
+      }
+    },
+    {
+      "id": "58143bb1-816f-4ff6-9cac-9ce7765e02be",
+      "name": "Sticky Note4",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        920,
+        320
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 192.21792012722693,
+        "height": 414.59045768149747,
+        "content": "3] In the 'credential' field of this node, create a new OpenAI cred with your [OpenAI API key]({{ $env.API_BASE_URL }}"
+      }
+    },
+    {
+      "id": "bd2ef5d2-c27d-45e4-a66e-a73168f94087",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        160,
+        273.1221160672591
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 230.39134868652621,
+        "height": 233.3354221029769,
+        "content": "### About\nThis workflow takes some French text, and translates it into spoken audio.\n\nIt then transcribes that audio back into text, translates it into English and generates an audio file of the English text"
+      }
+    },
+    {
+      "id": "a1f207d4-dbed-4dfa-aad5-2b2f6e4e6271",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        440,
+        272.42998167622557
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 685.8541178336201,
+        "height": 478.0993479050163,
+        "content": "### Setup steps"
+      }
+    }
+  ],
+  "connections": {}
+}

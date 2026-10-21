@@ -1,0 +1,171 @@
+{
+  "active": false,
+  "name": "Production Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-e5da57f3",
+      "name": "On clicking 'execute'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        320,
+        170
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-8abb1749",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 1,
+      "position": [
+        960,
+        320
+      ],
+      "parameters": {
+        "mode": "mergeByIndex"
+      }
+    },
+    {
+      "id": "node-9f8567e1",
+      "name": "Move Binary Data",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        320
+      ],
+      "parameters": {
+        "mode": "jsonToBinary",
+        "options": {
+          "useRawData": false
+        }
+      }
+    },
+    {
+      "id": "node-0b17bc48",
+      "name": "Map",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        710,
+        320
+      ],
+      "parameters": {
+        "functionCode": "return items[0].json.data.map(item => {\n  return {json: item}\n});"
+      }
+    },
+    {
+      "id": "node-e2385e9d",
+      "name": "Get Workflow",
+      "notesInFlow": false,
+      "notes": "Don't forget to add your credentials for your n8n instance in this Node. Use Basic Auth for this. ",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        830,
+        460
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "authentication": "{{ $credentials.basicAuth }}"
+      },
+      "credentials": {
+        "httpBasicAuth": "n8n Creds"
+      }
+    },
+    {
+      "id": "node-7a9ce6f3",
+      "name": "Get Workflow List",
+      "notes": "Don't forget to add your credentials for your n8n instance in this Node. Use Basic Auth for this. ",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        520,
+        320
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "authentication": "{{ $credentials.basicAuth }}"
+      },
+      "credentials": {
+        "httpBasicAuth": {
+          "id": null,
+          "name": "n8n Creds"
+        }
+      }
+    },
+    {
+      "id": "node-fd3a326c",
+      "name": "FunctionItem",
+      "type": "n8n-nodes-base.functionItem",
+      "typeVersion": 1,
+      "position": [
+        1110,
+        320
+      ],
+      "parameters": {
+        "functionCode": "item = item.data;\nreturn item;"
+      }
+    },
+    {
+      "id": "node-24e2c225",
+      "name": "Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 1,
+      "position": [
+        1450,
+        320
+      ],
+      "parameters": {
+        "name": "={{$node[\"Merge\"].data[\"name\"]}}.json",
+        "parents": [
+          "Delete this text and put id for folder you want to upload into in this field. The folder ID can be found by opening the folder in your browser and copying the portion after https://drive.google.com/drive/u/0/folders/"
+        ],
+        "binaryData": true,
+        "resolveData": true
+      },
+      "credentials": {
+        "googleApi": "test"
+      }
+    },
+    {
+      "id": "node-9137d52e",
+      "name": "Run Daily at 2:30am",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        330,
+        320
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 2,
+              "minute": 30
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "error-49facdfe",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

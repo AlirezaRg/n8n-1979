@@ -1,0 +1,125 @@
+{
+  "active": false,
+  "name": "Manualtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "463ebdc7-9c6f-4464-9a0e-4078be11a787",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        280,
+        240
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "531d78cd-9f44-468a-9f88-30816922eb1b",
+      "name": "Write Result File to Disk",
+      "notes": "This readWriteFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        240
+      ],
+      "parameters": {
+        "options": {},
+        "fileName": "document.pdf",
+        "operation": "write",
+        "dataPropertyName": "=data"
+      }
+    },
+    {
+      "id": "7702ad91-05fd-4bfc-816a-3e863c1ca148",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        640,
+        60
+      ],
+      "parameters": {
+        "width": 420,
+        "height": 361,
+        "content": "## Authentication\nConversion requests must be authenticated. Please create \n[ConvertAPI account to get authentication secret]({{ $env.API_BASE_URL }}\n\nCreate a query auth credential with __secret__ as name and your secret from the convertAPI dashboard as value"
+      }
+    },
+    {
+      "id": "09d95adb-3c05-4727-8d0b-498870d08cca",
+      "name": "Download File",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        240
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "c5e25b57-ff04-4b4c-aab4-d92f8e18409e",
+      "name": "File conversion",
+      "notesInFlow": true,
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        800,
+        240
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "sendHeaders": true,
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "file",
+              "parameterType": "formBinaryData",
+              "inputDataFieldName": "=data"
+            }
+          ]
+        },
+        "genericAuthType": "httpQueryAuth",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/octet-stream"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "oHfHaXdP6a8AieHO",
+          "name": "Convertapi token"
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

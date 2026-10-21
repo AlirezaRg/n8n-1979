@@ -1,0 +1,112 @@
+{
+  "active": false,
+  "name": "Mattermost Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "94e8ec7d-fc35-4ac3-a29c-3eea8cfac968",
+      "name": "Mattermost",
+      "notes": "This mattermost node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.mattermost",
+      "typeVersion": 1,
+      "position": [
+        810,
+        300
+      ],
+      "parameters": {
+        "message": "=You got new feedback with a score of {{$json[\"SentimentScore\"][\"Negative\"]}}. Here is what it says:{{$node[\"Typeform Trigger\"].json[\"What did you think about the event?\"]}}",
+        "channelId": "h7cxrd1cefr13x689enzyw7xhc",
+        "attachments": [],
+        "otherOptions": {}
+      },
+      "credentials": {
+        "mattermostApi": "Mattermost Credentials"
+      }
+    },
+    {
+      "id": "90452677-03ac-41f8-90b6-99110ba4505e",
+      "name": "NoOp",
+      "notes": "This noOp node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        800,
+        500
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "4b2e025e-e03a-4505-a368-3591ada4d0fb",
+      "name": "If Node",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        600,
+        400
+      ],
+      "parameters": {
+        "conditions": {
+          "number": [],
+          "string": [
+            {
+              "value1": "={{$json[\"Sentiment\"]}}",
+              "value2": "NEGATIVE"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "c53aae5d-d666-44da-b5dd-d1f5a4ee4db7",
+      "name": "AWS Comprehend",
+      "notes": "This awsComprehend node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.awsComprehend",
+      "typeVersion": 1,
+      "position": [
+        400,
+        400
+      ],
+      "parameters": {
+        "text": "={{$json[\"What did you think about the event?\"]}}",
+        "operation": "detectSentiment"
+      },
+      "credentials": {
+        "aws": "AWS Comprehend Credentials"
+      }
+    },
+    {
+      "id": "5feb8d0f-48df-497f-ae6d-e00f740fb1c3",
+      "name": "Typeform Trigger",
+      "webhookId": "ad8a87ef-d293-4e48-8d36-838d69ebce0f",
+      "notes": "This typeformTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.typeformTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        400
+      ],
+      "parameters": {
+        "formId": "DuJHEGW5"
+      },
+      "credentials": {
+        "typeformApi": "typeform"
+      }
+    },
+    {
+      "id": "error-8b85f6dc",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

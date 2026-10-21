@@ -1,0 +1,75 @@
+{
+  "active": false,
+  "name": "Errortrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "d9c81685-d16e-45c0-a1ab-3927ef619568",
+      "name": "Error Trigger",
+      "notes": "This errorTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        380,
+        240
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "22089e9b-73ae-4d03-a11b-5f67f9b47fb4",
+      "name": "Extract webhook data",
+      "notes": "This code node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        820,
+        240
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const webhook_node_names = $json.workflowData.nodes.filter(x => x.type == 'n8n-nodes-base.webhook').map(x => x.name)\n\nconst webhook_data_array = webhook_node_names.map(n => $json.data.resultData.runData[n] ? $json.data.resultData.runData[n][0].data.main[0][0].json : null).filter(x => x != null)\n\nlet webhook_data = null;\nif (webhook_data_array.length > 0) {\n  webhook_data = webhook_data_array[0]\n}\n\nreturn {\n  'webhook_node_names': webhook_node_names,\n  'webook_node_payload': webhook_data\n}"
+      }
+    },
+    {
+      "id": "b7fb5443-3faf-4e59-b464-4d3ca131a84f",
+      "name": "Get execution data",
+      "notes": "This n8n node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        600,
+        240
+      ],
+      "parameters": {
+        "options": {
+          "activeWorkflows": true
+        },
+        "resource": "execution",
+        "operation": "get",
+        "executionId": "={{ $json.execution.id }}",
+        "requestOptions": {}
+      },
+      "credentials": {
+        "n8nApi": {
+          "id": "eGEre3g3El08ZItb",
+          "name": "n8n account"
+        }
+      }
+    },
+    {
+      "id": "error-e8fb9956",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,174 @@
+{
+  "active": false,
+  "name": "Create a room, invite members from a different room, and send a message in the room we created",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "ffc8126c-a1ce-4206-9dee-59d65f759390",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "15e8718e-f0d7-4450-bc78-f52d68844ba3",
+      "name": "Matrix",
+      "notes": "This matrix node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.matrix",
+      "typeVersion": 1,
+      "position": [
+        400,
+        300
+      ],
+      "parameters": {
+        "resource": "room",
+        "roomName": "n8n",
+        "roomAlias": "discussion-n8n"
+      },
+      "credentials": {
+        "matrixApi": "matrix"
+      }
+    },
+    {
+      "id": "77d16cb9-f8a8-4822-a1d9-5946611ad70a",
+      "name": "If Node",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        840,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$node[\"Matrix1\"].json[\"user_id\"]}}",
+              "value2": "={{$node[\"Matrix2\"].json[\"user_id\"]}}",
+              "operation": "notEqual"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "85bf2439-7f8d-49c7-81ae-905de0174a45",
+      "name": "Matrix3",
+      "notes": "This matrix node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.matrix",
+      "typeVersion": 1,
+      "position": [
+        990,
+        200
+      ],
+      "parameters": {
+        "roomId": "={{$node[\"Matrix\"].json[\"room_id\"]}}",
+        "userId": "={{$node[\"IF\"].json[\"user_id\"]}}",
+        "resource": "room",
+        "operation": "invite"
+      },
+      "credentials": {
+        "matrixApi": {
+          "id": null,
+          "name": "matrix"
+        }
+      }
+    },
+    {
+      "id": "043027df-a9b6-4f10-9eaf-c53b84471a4c",
+      "name": "Matrix4",
+      "notes": "This matrix node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.matrix",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        200
+      ],
+      "parameters": {
+        "text": "Welcome to n8n!",
+        "roomId": "={{$node[\"Matrix\"].json[\"room_id\"]}}"
+      },
+      "credentials": {
+        "matrixApi": {
+          "id": null,
+          "name": "matrix"
+        }
+      }
+    },
+    {
+      "id": "e97bff77-2c5d-4beb-bb0a-1c3e0e18fc89",
+      "name": "NoOp",
+      "notes": "This noOp node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        990,
+        400
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "eb34cf0a-460e-4ae0-8ca4-3e6bc7a0f7b3",
+      "name": "Matrix1",
+      "notes": "This matrix node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.matrix",
+      "typeVersion": 1,
+      "continueOnFail": true,
+      "position": [
+        540,
+        300
+      ],
+      "parameters": {
+        "resource": "account"
+      },
+      "credentials": {
+        "matrixApi": {
+          "id": null,
+          "name": "matrix"
+        }
+      }
+    },
+    {
+      "id": "7c05aae7-f929-4474-a21d-43d60ec69508",
+      "name": "Matrix2",
+      "notes": "This matrix node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.matrix",
+      "typeVersion": 1,
+      "position": [
+        690,
+        300
+      ],
+      "parameters": {
+        "roomId": "!cMUIsUgevrhCoeMkSG:matrix.org",
+        "filters": {},
+        "resource": "roomMember"
+      },
+      "credentials": {
+        "matrixApi": {
+          "id": null,
+          "name": "matrix"
+        }
+      }
+    },
+    {
+      "id": "error-24c6a549",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

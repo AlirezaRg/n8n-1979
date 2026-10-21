@@ -1,0 +1,44 @@
+{
+  "active": false,
+  "name": "Receive updates for events in ClickUp",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "3d7ee086-1dc5-4be2-95b2-b28ed10f92a2",
+      "name": "ClickUp Trigger",
+      "notes": "This clickUpTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.clickUpTrigger",
+      "typeVersion": 1,
+      "position": [
+        700,
+        250
+      ],
+      "parameters": {
+        "team": "",
+        "events": [
+          "*"
+        ],
+        "filters": {}
+      },
+      "credentials": {
+        "clickUpApi": ""
+      },
+      "webhookId": "f63ea205-21e4-46df-9dda-2213666af0c4"
+    },
+    {
+      "id": "error-dd8519ba",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

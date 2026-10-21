@@ -1,0 +1,107 @@
+{
+  "active": false,
+  "name": "Typeformtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "011a410d-ae29-4d17-aad0-7dbcafb4c31c",
+      "name": "Typeform Trigger",
+      "notes": "This typeformTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.typeformTrigger",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "formId": "UXuY0A"
+      },
+      "credentials": {
+        "typeformApi": ""
+      },
+      "webhookId": "dd4b3238-eab5-4260-b65a-37c66b9d4b8d"
+    },
+    {
+      "id": "6bf31c02-f6d4-43fd-a209-512594aca9e5",
+      "name": "If Node",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        850,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$node[\"Google Sheets\"].data[\"Severity\"]}}",
+              "value2": 7,
+              "operation": "larger"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "216e6327-e5a8-45b6-95b6-cb383808bc48",
+      "name": "Google Sheets",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "range": "Problems!A:D",
+        "sheetId": "17fzSFl1BZ1njldTfp5lvh8HtS0-pNXH66b7qGZIiGRU",
+        "operation": "append"
+      },
+      "credentials": {
+        "googleApi": ""
+      }
+    },
+    {
+      "id": "14cfe4cb-3ba7-4ee9-a56e-3d900859176c",
+      "name": "Send Email",
+      "notes": "This emailSend node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        400
+      ],
+      "parameters": {
+        "text": "=Email: {{$node[\"IF\"].data[\"Email\"]}}\nName: {{$node[\"IF\"].data[\"Name\"]}}\nSeverity: {{$node[\"IF\"].data[\"Severity\"]}}\n\nProblem:\n{{$node[\"IF\"].data[\"Problem\"]}}",
+        "subject": "User Reported Problem",
+        "toEmail": "",
+        "fromEmail": ""
+      },
+      "credentials": {
+        "smtp": ""
+      }
+    },
+    {
+      "id": "5907ea03-c9fe-4c0e-8452-a507693e4f7e",
+      "name": "Slack",
+      "notes": "This slack node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        200
+      ],
+      "parameters": {
+        "text": "=Email: {{$node[\"IF\"].data[\"Email\"]}}\nName: {{$node[\"IF\"].data[\"Name\"]}}\nSeverity: {{$node[\"IF\"].data[\"Severity\"]}}\n\nProblem:\n{{$node[\"IF\"].data[\"Problem\"]}}",
+        "channel": "problems",
+        "attachments": [],
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": ""
+      }
+    }
+  ],
+  "connections": {}
+}

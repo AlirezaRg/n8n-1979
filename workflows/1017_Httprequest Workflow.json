@@ -1,0 +1,417 @@
+{
+  "active": false,
+  "name": "Httprequest Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "6aa059e4-e78f-4bbd-a707-994a39840f97",
+      "name": "Create Session",
+      "notesInFlow": true,
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -520,
+        240
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}",
+        "method": "POST",
+        "options": {},
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "identifier",
+              "value": "youruser.bsky.social"
+            },
+            {
+              "name": "password",
+              "value": "your-app-passord-here"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "143e37b0-de79-4329-99a2-51484c9609a8",
+      "name": "List followers",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -280,
+        240
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          },
+          "pagination": {
+            "pagination": {
+              "parameters": {
+                "parameters": [
+                  {
+                    "name": "cursor",
+                    "value": "={{ $response.body.cursor }}"
+                  }
+                ]
+              },
+              "maxRequests": 2,
+              "requestInterval": 250,
+              "limitPagesFetched": true
+            }
+          }
+        },
+        "sendQuery": true,
+        "sendHeaders": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "actor",
+              "value": "={{ $json.did }}"
+            },
+            {
+              "name": "limit",
+              "value": "100"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $item(\"0\").$node[\"Create Session\"].json[\"accessJwt\"] }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "f1436a63-a23f-4082-9209-12c21a26ad91",
+      "name": "Convert to File",
+      "notes": "This convertToFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        100,
+        620
+      ],
+      "parameters": {
+        "options": {
+          "fileName": "followers-basuracero.json"
+        },
+        "operation": "toJson"
+      }
+    },
+    {
+      "id": "f8beea47-6f36-4dfb-b2e7-bf94adb63e66",
+      "name": "Extract from File",
+      "notes": "This extractFromFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        100,
+        240
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "fromJson"
+      }
+    },
+    {
+      "id": "41658372-3054-4909-850b-3bffd1b1b79c",
+      "name": "Split Out",
+      "notes": "This splitOut node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        520,
+        240
+      ],
+      "parameters": {
+        "options": {
+          "destinationFieldName": "did"
+        },
+        "fieldToSplitOut": "newDids"
+      }
+    },
+    {
+      "id": "c94aa8e9-06db-4b24-a20a-5615b7129023",
+      "name": "Loop Over Items",
+      "notes": "This splitInBatches node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        740,
+        240
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "4d1c6a2f-3acd-4783-96d4-693ced06fd97",
+      "name": "Wait",
+      "webhookId": "b1608475-db84-4f23-acd6-d003f5094afd",
+      "notes": "This wait node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -100,
+        620
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "e4125cb8-8eb5-4cf0-b00d-e7ce4ec8236e",
+      "name": "Find new followers",
+      "notes": "This code node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "alwaysOutputData": true,
+      "position": [
+        280,
+        240
+      ],
+      "parameters": {
+        "jsCode": "// Datos de entrada\nconst listFollowers = $('List followers').all()[0].json.followers;\nconst extractFromFile = $('Extract from File').all()[0].json.data[0].followers;\n\n// Verificar que tenemos acceso a los datos\nconsole.log('listFollowers length:', Array.isArray(listFollowers) ? listFollowers.length : 'no es array');\nconsole.log('extractFromFile length:', Array.isArray(extractFromFile) ? extractFromFile.length : 'no es array');\n\n// Mostrar algunos ejemplos de cada lista\nconsole.log('Ejemplo de listFollowers:', listFollowers?.slice(0, 2));\nconsole.log('Ejemplo de extractFromFile:', extractFromFile?.slice(0, 2));\n\n// Crear conjunto de DIDs del archivo extra�do\nconst existingDids = new Set(extractFromFile?.map(item => item.did) || []);\nconsole.log('DIDs existentes:', Array.from(existingDids).slice(0, 5));\n\n// Filtrar listFollowers\nconst newFollowers = listFollowers?.filter(follower => !existingDids.has(follower.did)) || [];\n\nreturn {\n  json: {\n    debug: {\n      listFollowersCount: listFollowers?.length || 0,\n      extractFromFileCount: extractFromFile?.length || 0,\n      existingDidsCount: existingDids.size,\n      newFollowersCount: newFollowers.length\n    },\n    newFollowers,\n    newDids: newFollowers.map(follower => follower.did),\n    count: newFollowers.length\n  }\n}"
+      }
+    },
+    {
+      "id": "a28accb5-ee47-431f-83e4-376425e9899e",
+      "name": "Read followers from file",
+      "notes": "This readWriteFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        240
+      ],
+      "parameters": {
+        "options": {},
+        "fileSelector": "=followers-{{ $('Create Session').item.json.handle }}.json"
+      }
+    },
+    {
+      "id": "aa2ab5e1-eb6f-4657-9a9a-66417ffa421e",
+      "name": "Save followers to file",
+      "notes": "This readWriteFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        280,
+        620
+      ],
+      "parameters": {
+        "options": {
+          "append": false
+        },
+        "fileName": "=followers-{{ $('Create Session').item.json.handle }}.json",
+        "operation": "write"
+      }
+    },
+    {
+      "id": "9a4fb5e5-f2f6-4aa1-846e-8d6460ad7765",
+      "name": "Define welcome message",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        980,
+        260
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "afe7fe9b-3bd4-4429-afe9-81e5fe934e07",
+              "name": "text",
+              "type": "string",
+              "value": "Hello, thanks for your follow. You can read more about my over my site:"
+            },
+            {
+              "id": "97590cd1-9d85-442b-baa3-bad849ff9be0",
+              "name": "link",
+              "type": "string",
+              "value": "{{ $env.WEBHOOK_URL }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "594ce66f-acbd-4c31-806c-382aa9a98ed0",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        920,
+        160
+      ],
+      "parameters": {
+        "width": 230,
+        "height": 266,
+        "content": "### 2. Define your welcome message and link here"
+      }
+    },
+    {
+      "id": "c24a7971-11a7-4164-9f2d-78335264f250",
+      "name": "Sticky Note3",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        220,
+        460
+      ],
+      "parameters": {
+        "width": 231,
+        "height": 338,
+        "content": "### 3. **Important** \n\nYou need to manually run \"Save followers to file\" once before the first time so you populate your list of existing followers"
+      }
+    },
+    {
+      "id": "c6e766cf-a118-4db0-8e3c-32662c40737b",
+      "name": "Send message",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1360,
+        260
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n  \"convoId\" : \"{{ $json.convo.id }}\",\n  \"message\" : {\n    \"text\" : \"{{ $('Define welcome message').item.json.text }}\\n\\n{{ $('Define welcome message').item.json.link }}\",\n    \"facets\" : [\n     {\n      \"index\" : {\n        \"byteStart\": {{ $('Define welcome message').item.json.text.length }},\n        \"byteEnd\": {{ $('Define welcome message').item.json.text.length + 3 + $('Define welcome message').item.json.link.length}}\n      },\n      \"features\": [\n          {\n            \"$type\": \"app.bsky.richtext.facet#link\",\n            \"uri\": \"{{ $('Define welcome message').item.json.link }}\"\n          }\n        ]\n      }\n    ]\n  }\n}",
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $item(\"0\").$node[\"Create Session\"].json[\"accessJwt\"] }}"
+            },
+            {
+              "name": "Atproto-Proxy",
+              "value": "did:web:api.bsky.chat#bsky_chat"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "33aa7e0c-58fe-4527-a94e-49bec0e06325",
+      "name": "Get conversation ID",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1200,
+        260
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "sendQuery": true,
+        "sendHeaders": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "members",
+              "value": "={{ $('Split Out').item.json.did }}"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $item(\"0\").$node[\"Create Session\"].json[\"accessJwt\"] }}"
+            },
+            {
+              "name": "Atproto-Proxy",
+              "value": "did:web:api.bsky.chat#bsky_chat"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "066f1d0d-319a-4676-9c0a-5b00d206ffd2",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -100
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 479,
+        "height": 307,
+        "content": "## Send a welcome private message to your new BlueSky followers\n\nThis flow will save your current followers in a file and check for new ones on the next execution, sending them the Defined message an link as a private message.\n\nOnce messages are sent, the new list of followers will be saved into the file.\n\n**Important: Follow the yellow notes in order before enabling the full flow for the first time**"
+      }
+    },
+    {
+      "id": "a61e301e-a0ca-48e9-9a46-05975662aa90",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        40
+      ],
+      "parameters": {
+        "width": 181,
+        "height": 364,
+        "content": "### 1. Define your Bluesky user and app password first\n\nThe App password should have access to private messages"
+      }
+    },
+    {
+      "id": "1b1dcd74-7a71-49e4-99e8-c079b692aca5",
+      "name": "Each 60 minutes",
+      "notes": "This scheduleTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -720,
+        240
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 60
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "6acf153c-cdc6-42c1-85f9-2692c8777eef",
+      "name": "No Operation, do nothing",
+      "notes": "This noOp node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        520,
+        620
+      ],
+      "parameters": {}
+    }
+  ],
+  "connections": {}
+}

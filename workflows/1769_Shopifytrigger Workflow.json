@@ -1,0 +1,40 @@
+{
+  "active": false,
+  "name": "Shopifytrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "16a141d0-dfa3-4653-8120-4d754bd9247d",
+      "name": "Shopify Trigger",
+      "webhookId": "fd11b3d8-ff82-4902-89cc-c93b36ae38e7",
+      "notes": "This shopifyTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.shopifyTrigger",
+      "typeVersion": 1,
+      "position": [
+        450,
+        450
+      ],
+      "parameters": {
+        "topic": "orders/create"
+      },
+      "credentials": {
+        "shopifyApi": "shopify_creds"
+      }
+    },
+    {
+      "id": "error-6d3ac7fc",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

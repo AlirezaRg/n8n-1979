@@ -1,0 +1,102 @@
+{
+  "active": false,
+  "name": "Add subscriber to form, create tag and subscriber to the tag",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "8680b093-4a01-4d3c-8431-1eede00cf41c",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        300,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "e4ab6ef0-9506-4bcf-aa6d-f87141b2bcd6",
+      "name": "ConvertKit",
+      "notes": "This convertKit node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.convertKit",
+      "typeVersion": 1,
+      "position": [
+        500,
+        300
+      ],
+      "parameters": {
+        "id": 1657198,
+        "email": "",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "convertKitApi": "convertkit"
+      }
+    },
+    {
+      "id": "9374e563-ba69-47c0-b405-a6b5d28a1dbb",
+      "name": "ConvertKit1",
+      "notes": "This convertKit node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.convertKit",
+      "typeVersion": 1,
+      "position": [
+        710,
+        300
+      ],
+      "parameters": {
+        "name": "",
+        "resource": "tag"
+      },
+      "credentials": {
+        "convertKitApi": {
+          "id": null,
+          "name": "convertkit"
+        }
+      }
+    },
+    {
+      "id": "10625451-3663-4b98-bae4-ee21974566be",
+      "name": "ConvertKit2",
+      "notes": "This convertKit node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.convertKit",
+      "typeVersion": 1,
+      "position": [
+        910,
+        300
+      ],
+      "parameters": {
+        "email": "={{$node[\"ConvertKit\"].json[\"subscriber\"][\"email_address\"]}}",
+        "tagId": 1850395,
+        "resource": "tagSubscriber",
+        "operation": "add",
+        "additionalFields": {
+          "fields": {
+            "field": []
+          }
+        }
+      },
+      "credentials": {
+        "convertKitApi": {
+          "id": null,
+          "name": "convertkit"
+        }
+      }
+    },
+    {
+      "id": "error-699ecc39",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

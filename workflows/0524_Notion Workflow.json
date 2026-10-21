@@ -1,0 +1,129 @@
+{
+  "active": false,
+  "name": "Notion Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "5f370508-861e-4861-98a0-369be07bf9af",
+      "name": "Notion",
+      "notes": "This notion node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 1,
+      "position": [
+        850,
+        400
+      ],
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": "",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "range": true,
+              "dateEnd": "={{$node[\"Function\"].json[\"payload\"][\"event\"][\"end_time\"]}}",
+              "dateStart": "={{$node[\"Function\"].json[\"payload\"][\"event\"][\"invitee_start_time\"]}}"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "emailValue": "={{$json[\"email\"][0][\"email\"]}}"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "title": "={{$json[\"full_name\"]}}"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "urlValue": "{{ $env.BASE_URL }}"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "peopleValue": [
+                "22ad678a-175a-405c-b504-978d7804ebb8"
+              ]
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "urlValue": "{{ $env.BASE_URL }}"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "urlValue": "{{ $env.BASE_URL }}"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "textContent": "={{$json[\"civility\"]}}"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "f58cbcbb-4fac-4951-aea7-ea7b39bbe702",
+      "name": "Dropcontact",
+      "notes": "This dropcontact node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.dropcontact",
+      "typeVersion": 1,
+      "position": [
+        650,
+        400
+      ],
+      "parameters": {
+        "email": "={{$json[\"payload\"][\"invitee\"][\"email\"]}}",
+        "options": {
+          "siren": true,
+          "language": "fr"
+        },
+        "additionalFields": {
+          "full_name": "={{$json[\"payload\"][\"invitee\"][\"name\"]}}",
+          "last_name": "={{$json[\"payload\"][\"invitee\"][\"last_name\"]}}",
+          "first_name": "={{$json[\"payload\"][\"invitee\"][\"first_name\"]}}"
+        }
+      },
+      "credentials": {
+        "dropcontactApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "1a8af995-e979-4291-80b2-eee7c3b4d79f",
+      "name": "Calendly Trigger",
+      "webhookId": "373a4555-1f42-4e31-8b58-a19d9a33e52c",
+      "notes": "This calendlyTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.calendlyTrigger",
+      "typeVersion": 1,
+      "position": [
+        460,
+        400
+      ],
+      "parameters": {
+        "events": [
+          "invitee.created"
+        ]
+      }
+    },
+    {
+      "id": "error-f6a10489",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

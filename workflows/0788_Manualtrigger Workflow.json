@@ -1,0 +1,54 @@
+{
+  "active": false,
+  "name": "Manualtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "1f7abe93-1330-4862-ac1c-d7eb1f8efdf7",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "007862bc-bad0-41a7-b869-12929176821a",
+      "name": "Mailgun",
+      "notes": "This mailgun node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.mailgun",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "text": "This is a test message ",
+        "subject": "This is a Subject",
+        "toEmail": "user2@example.com",
+        "fromEmail": "user@example.com"
+      },
+      "credentials": {
+        "mailgunApi": "mailgun-creds"
+      }
+    },
+    {
+      "id": "error-d6cb4ca9",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

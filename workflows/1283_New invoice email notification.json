@@ -1,0 +1,185 @@
+{
+  "active": false,
+  "name": "New invoice email notification",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "trigger-f3c426cb",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        100
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "dfb1296d-d8c8-4a41-99b2-d7bea36f97f1",
+      "name": "Check for new emails",
+      "notes": "This emailReadImap node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 1,
+      "position": [
+        500,
+        300
+      ],
+      "parameters": {
+        "format": "resolved",
+        "mailbox": "Inbox",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "credentials": {
+        "imap": {
+          "id": "{{ $credentials.imap.id }}",
+          "name": "GMAIL"
+        }
+      }
+    },
+    {
+      "id": "6fb96f70-a339-4d0e-b6a6-707c4f957874",
+      "name": "If email body contains invoice",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        700,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"text\"].toLowerCase()}}",
+              "value2": "invoice",
+              "operation": "contains"
+            }
+          ]
+        },
+        "combineOperation": "any"
+      }
+    },
+    {
+      "id": "3d6db6df-1cc1-4467-bafc-95f03782c854",
+      "name": "Extract the total amount",
+      "notes": "This mindee node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.mindee",
+      "typeVersion": 1,
+      "position": [
+        900,
+        280
+      ],
+      "parameters": {
+        "rawData": true,
+        "resource": "invoice",
+        "binaryPropertyName": "attachment_0"
+      },
+      "credentials": {
+        "mindeeInvoiceApi": {
+          "id": "{{ $credentials.mindeeInvoiceApi.id }}",
+          "name": "Mindee Invoice account"
+        }
+      }
+    },
+    {
+      "id": "7af57f82-440f-45ae-b85d-deb06db53014",
+      "name": "Send new invoice notification",
+      "notes": "This slack node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        1580,
+        300
+      ],
+      "parameters": {
+        "text": ":new: There is a new invoice to pay :new:",
+        "channel": "team-accounts",
+        "blocksUi": {
+          "blocksValues": []
+        },
+        "attachments": [
+          {
+            "color": "#FFBF00",
+            "fields": {
+              "item": [
+                {
+                  "short": true,
+                  "title": "Amount",
+                  "value": "={{$node[\"If Amount > 1000\"].json[\"predictions\"][0][\"total_incl\"][\"amount\"]}}"
+                },
+                {
+                  "short": false,
+                  "title": "From",
+                  "value": "={{$node[\"Check for new emails\"].json[\"from\"][\"value\"][0][\"address\"]}}"
+                },
+                {
+                  "short": true,
+                  "title": "Subject",
+                  "value": "={{$node[\"Check for new emails\"].json[\"subject\"]}}"
+                }
+              ]
+            },
+            "footer": "=*Date:* {{$node[\"Check for new emails\"].json[\"date\"]}}"
+          }
+        ],
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": {
+          "id": "{{ $credentials.slackApi.id }}",
+          "name": "Slack Access Token"
+        }
+      }
+    },
+    {
+      "id": "f31ee170-6780-4738-a707-96616914bc1a",
+      "name": "Send email to finance manager",
+      "notes": "This emailSend node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        120
+      ],
+      "parameters": {
+        "text": "Hi,\n\nThere is a new high value invoice to be paid that you may need to approve.\n\n~ n8n workflow",
+        "options": {},
+        "subject": "New high value invoice",
+        "toEmail": "finance-manager@company.tld",
+        "fromEmail": "n8n@noreply.tld",
+        "attachments": "attachment_0"
+      },
+      "credentials": {
+        "smtp": {
+          "id": "{{ $credentials.smtp.id }}",
+          "name": "mailtrap"
+        }
+      }
+    },
+    {
+      "id": "f5af4e40-c66a-4b3b-9c3b-30fe9e364b1b",
+      "name": "If Amount > 1000",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        280
+      ],
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json[\"predictions\"][0][\"total_incl\"][\"amount\"]}}",
+              "value2": 1000,
+              "operation": "larger"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,154 @@
+{
+  "active": false,
+  "name": "Insert and update data in Airtable",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "2dc81718-e745-4156-8d6e-e4ad2c7ad530",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        500,
+        350
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "3f66f5dd-eb98-4c3b-af40-45119b5d764c",
+      "name": "Airtable",
+      "notes": "This airtable node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        900,
+        350
+      ],
+      "parameters": {
+        "table": "Table 1",
+        "options": {},
+        "operation": "append",
+        "application": ""
+      },
+      "credentials": {
+        "airtableApi": "Airtable Credentials n8n"
+      }
+    },
+    {
+      "id": "50409437-9ec8-41c5-8252-115f660ad801",
+      "name": "Airtable1",
+      "notes": "This airtable node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        350
+      ],
+      "parameters": {
+        "table": "={{$node[\"Airtable\"].parameter[\"table\"]}}",
+        "operation": "list",
+        "application": "={{$node[\"Airtable\"].parameter[\"application\"]}}",
+        "additionalOptions": {
+          "filterByFormula": "Name='n8n'"
+        }
+      },
+      "credentials": {
+        "airtableApi": {
+          "id": null,
+          "name": "Airtable Credentials n8n"
+        }
+      }
+    },
+    {
+      "id": "8ef3e72b-0160-4bc3-8757-e4ff2dbf9aa4",
+      "name": "Set",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        700,
+        350
+      ],
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "ID",
+              "value": 3
+            }
+          ],
+          "string": [
+            {
+              "name": "Name",
+              "value": "n8n"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "070e38f9-9260-4118-9851-3cd180b6ce30",
+      "name": "Set1",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        350
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "Name",
+              "value": "nodemation"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "c26d31ee-19b7-4247-87b5-ff7a5e22c919",
+      "name": "Airtable2",
+      "notes": "This airtable node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        350
+      ],
+      "parameters": {
+        "id": "={{$node[\"Airtable1\"].json[\"id\"]}}",
+        "table": "={{$node[\"Airtable\"].parameter[\"table\"]}}",
+        "options": {},
+        "operation": "update",
+        "application": "={{$node[\"Airtable\"].parameter[\"application\"]}}"
+      },
+      "credentials": {
+        "airtableApi": {
+          "id": null,
+          "name": "Airtable Credentials n8n"
+        }
+      }
+    },
+    {
+      "id": "error-2c9ddf11",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

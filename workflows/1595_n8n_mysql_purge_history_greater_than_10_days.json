@@ -1,0 +1,72 @@
+{
+  "active": false,
+  "name": "n8n_mysql_purge_history_greater_than_10_days",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "199a3ed7-a9a9-4179-b644-568018c2dc91",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "45b6edb0-422f-41aa-9209-b0a2071bda9f",
+      "name": "MySQL",
+      "notes": "This mySql node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "query": "DELETE FROM execution_entity \nWHERE DATE(stoppedAt) < DATE_SUB(CURDATE(), INTERVAL 30 DAY)",
+        "operation": "executeQuery"
+      },
+      "credentials": {
+        "mySql": "n8n"
+      }
+    },
+    {
+      "id": "558f5fca-18d5-44bd-adbc-829fa828d9ad",
+      "name": "Cron",
+      "notes": "This cron node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        250,
+        460
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 7
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "error-cf33a401",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

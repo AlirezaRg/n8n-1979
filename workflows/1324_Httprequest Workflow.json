@@ -1,0 +1,114 @@
+{
+  "active": false,
+  "name": "Httprequest Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "e4929773-39f9-4b8a-b462-235c37514479",
+      "name": "Get Elastic Alert",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        620,
+        440
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "973a8254-5ec0-4ea0-95b5-7e6a0f0625ab",
+      "name": "Send Email Notification",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        220
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}",
+        "options": {
+          "bodyContentType": "json"
+        },
+        "requestMethod": "POST",
+        "authentication": "{{ $credentials.oAuth2 }}",
+        "jsonParameters": true,
+        "bodyParametersJson": "={\n  \"message\": {\n    \"subject\": \"PRISM Elastic Alert: {{$json[\"alert_name\"]}}\",\n    \"body\": {\n      \"contentType\": \"HTML\",\n      \"content\": \"Hello,<br><br>An alert has been triggered:<br><strong>Alert Name:</strong> {{$json[\"alert_name\"]}}<br><strong>Severity:</strong> {{$json[\"severity\"]}}<br><strong>Timestamp:</strong> {{$json[\"timestamp\"]}}<br><br>Details:<br>{{$json[\"alert_message\"]}}<br><br>Regards,<br>PRISM Alert System\"\n    },\n    \"toRecipients\": [\n      {\n        \"emailAddress\": {\n          \"address\": \"user@example.com\"\n        }\n      }\n    ]\n  },\n  \"saveToSentItems\": \"true\"\n}"
+      }
+    },
+    {
+      "id": "f7f4feee-6854-4997-ae15-870cab4abdbb",
+      "name": "Schedule Trigger",
+      "notes": "This scheduleTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        380,
+        440
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      }
+    },
+    {
+      "id": "b8578c55-a052-43f2-9d6a-24d8084dae8a",
+      "name": "Response is not empty",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.1,
+      "position": [
+        840,
+        440
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "664216e6-c212-4f4b-8b09-60675c4fcd91",
+      "name": "No Operation, do nothing",
+      "notes": "This noOp node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        680
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "bcead903-56ed-4ae8-bff9-cec274b2fe71",
+      "name": "Loop Over Each Alert Items",
+      "notes": "This splitInBatches node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1100,
+        200
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "a5e55903-a245-4d70-88e7-14c1f18cde25",
+      "name": "No Operation, end of loop",
+      "notes": "This noOp node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        0
+      ],
+      "parameters": {}
+    }
+  ],
+  "connections": {}
+}

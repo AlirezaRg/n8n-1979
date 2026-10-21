@@ -1,0 +1,569 @@
+{
+  "active": false,
+  "name": "Httprequest Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "c499b8cc-7cc8-411d-9c22-d46c7654e169",
+      "name": "Mistral Upload",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        700,
+        -20
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "authentication": "{{ $credentials.predefinedCredentialType }}",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "purpose",
+              "value": "ocr"
+            },
+            {
+              "name": "file",
+              "parameterType": "formBinaryData",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "nodeCredentialType": "YOUR_CREDENTIAL_HERE"
+      },
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "EIl2QxhXAS9Hkg37",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "id": "08cbe4b7-2adc-4ea0-8dfc-af107369b1dd",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -540,
+        -20
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "965f294a-5d77-4190-ad4f-ff191aba0948",
+      "name": "Mistral Signed URL",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        -20
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "sendQuery": true,
+        "sendHeaders": true,
+        "authentication": "{{ $credentials.predefinedCredentialType }}",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "expiry",
+              "value": "24"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "nodeCredentialType": "YOUR_CREDENTIAL_HERE"
+      },
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "EIl2QxhXAS9Hkg37",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "id": "7abfb1f8-f6c8-4fd0-a78e-9d4b97a4d6bc",
+      "name": "Import PDF",
+      "notes": "This googleDrive node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        480,
+        -20
+      ],
+      "parameters": {
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "15BcE6nXto9lQDHPmwjm7y9JPerAVEutY"
+        },
+        "options": {},
+        "operation": "download"
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "yOwz41gMQclOadgu",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "id": "8942c6bf-4d86-4a95-aa4a-c819008e2534",
+      "name": "Import Image",
+      "notes": "This googleDrive node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        480,
+        200
+      ],
+      "parameters": {
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1a2FcRDWHHncMO8CYxD80uNUBGH1Sy1k2"
+        },
+        "options": {},
+        "operation": "download"
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "yOwz41gMQclOadgu",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "id": "94a1c3ca-1ca7-4bb1-9e7c-8314742423ab",
+      "name": "Mistral Upload1",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        700,
+        200
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "authentication": "{{ $credentials.predefinedCredentialType }}",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "purpose",
+              "value": "ocr"
+            },
+            {
+              "name": "file",
+              "parameterType": "formBinaryData",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "nodeCredentialType": "YOUR_CREDENTIAL_HERE"
+      },
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "EIl2QxhXAS9Hkg37",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "id": "9d075eec-ba0e-41e1-8bdc-a732bc0f9229",
+      "name": "Mistral Signed URL1",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        200
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "sendQuery": true,
+        "sendHeaders": true,
+        "authentication": "{{ $credentials.predefinedCredentialType }}",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "expiry",
+              "value": "24"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "nodeCredentialType": "YOUR_CREDENTIAL_HERE"
+      },
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "EIl2QxhXAS9Hkg37",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "id": "f623f066-fc70-40fa-b608-f28a75a8ac8c",
+      "name": "Mistral DOC OCR",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        -20
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n  \"model\": \"mistral-ocr-latest\",\n  \"document\": {\n    \"type\": \"document_url\",\n    \"document_url\": \"{{ $json.url }}\"\n  },\n  \"include_image_base64\": true\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "{{ $credentials.predefinedCredentialType }}",
+        "nodeCredentialType": "YOUR_CREDENTIAL_HERE"
+      },
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "EIl2QxhXAS9Hkg37",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "id": "15913796-e7c8-451a-8e7b-da7a3b10db02",
+      "name": "Mistral IMAGE OCR",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        200
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n  \"model\": \"mistral-ocr-latest\",\n  \"document\": {\n    \"type\": \"image_url\",\n    \"image_url\": \"{{ $json.url }}\"\n  }\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "{{ $credentials.predefinedCredentialType }}",
+        "nodeCredentialType": "YOUR_CREDENTIAL_HERE"
+      },
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "EIl2QxhXAS9Hkg37",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "id": "a79524ff-84f0-46db-bb8e-afc18f1ddd40",
+      "name": "Document URL",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -160,
+        -20
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1eb5f18b-eb06-48df-8491-d60de75b4855",
+              "name": "url",
+              "type": "string",
+              "value": "={{ $env.WEBHOOK_URL }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "72b89f33-a67c-4f73-9a78-e8ccd02fbc98",
+      "name": "Image URL",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -160,
+        200
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1eb5f18b-eb06-48df-8491-d60de75b4855",
+              "name": "url",
+              "type": "string",
+              "value": "={{ $env.WEBHOOK_URL }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "808ccbb3-0dae-4e2c-9166-bf40c589824a",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -160
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 680,
+        "height": 580,
+        "content": "### Example 1. Publicly Hosted Files\nThe default way to use Mistral OCR is to give it a public URL of the file you want processed. Great for your own semi-private docs or other people's. If you rather not expose files due to privacy concerns, then you'd want to check out example 2."
+      }
+    },
+    {
+      "id": "b968d6ab-9582-495d-84af-f75833701e2a",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        400,
+        -160
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 920,
+        "height": 560,
+        "content": "### Example 2. Privately Hosted via Mistral Cloud\nGive Mistral OCR private and secure access to your files by uploading them to Mistral cloud first. Retrieve the file using a signed URL and pass this to Mistral OCR. Benefit of storing via Mistral could be faster cache access and reduced latency for repeat docs."
+      }
+    },
+    {
+      "id": "f2c0b30a-49be-4850-b102-f23d0feac0ec",
+      "name": "Mistral DOC OCR1",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        60,
+        -20
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n  \"model\": \"mistral-ocr-latest\",\n  \"document\": {\n    \"type\": \"document_url\",\n    \"document_url\": \"{{ $json.url }}\"\n  }\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "{{ $credentials.predefinedCredentialType }}",
+        "nodeCredentialType": "YOUR_CREDENTIAL_HERE"
+      },
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "EIl2QxhXAS9Hkg37",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "id": "64a28537-e70b-48bc-b580-cc9d5a5a1b80",
+      "name": "Mistral IMAGE OCR1",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        60,
+        200
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n  \"model\": \"mistral-ocr-latest\",\n  \"document\": {\n    \"type\": \"image_url\",\n    \"image_url\": \"{{ $json.url }}\"\n  }\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "{{ $credentials.predefinedCredentialType }}",
+        "nodeCredentialType": "YOUR_CREDENTIAL_HERE"
+      },
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "EIl2QxhXAS9Hkg37",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "id": "3caaa30b-21f2-4643-93dd-8dff6f3c1920",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -740,
+        -440
+      ],
+      "parameters": {
+        "width": 380,
+        "height": 640,
+        "content": "## Document Parsing with Mistral OCR\nUp your structured document parsing game with Mistral's latest release... **Mistral-OCR**!\n* Designed to specifically parse PDF and image files.\n* Handles multiple-page documents and images up to 10k pixels.\n* Each page is conveniently transcribed as markdown only - there is no plain text output.\n* Incredible pricing at only $0.001 per page!\n\n### Requirements\n* You'll need a Mistral Cloud API Key\n* This template only works with the Mistral Cloud API for Mistral OCR."
+      }
+    },
+    {
+      "id": "bd4d0c9f-f4a6-4527-8f9d-5af90a2858c2",
+      "name": "Sticky Note3",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        -160
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 680,
+        "height": 580,
+        "content": "### Example 3. No need for Extraction? Talk Directly with the File!\nIt seems Mistral were also able to integrate OCR capabilities into its text models which allows you to carry out tasks such as document classification and sentiment analysis really quickly. Unfortunately, it doesn't work the same way with images - you have to use Pixtral but the results are really bad!"
+      }
+    },
+    {
+      "id": "c9a9d4bb-4ee6-413a-9f08-97fdcee22bf2",
+      "name": "Document URL1",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1520,
+        -20
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1eb5f18b-eb06-48df-8491-d60de75b4855",
+              "name": "url",
+              "type": "string",
+              "value": "={{ $env.WEBHOOK_URL }}"
+            },
+            {
+              "id": "c639fce3-6967-444d-be18-6c9ce802ef22",
+              "name": "query",
+              "type": "string",
+              "value": "what is the total number of deposits?"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "5de4d62c-af8f-4e6d-adbd-2f591a2165f7",
+      "name": "Document Understanding",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1740,
+        -20
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n  \"model\": \"mistral-small-latest\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"{{ $json.query }}\"\n        },\n        {\n          \"type\": \"document_url\",\n          \"document_url\": \"{{ $json.url }}\"\n        }\n      ]\n    }\n  ],\n  \"document_image_limit\": 8,\n  \"document_page_limit\": 64\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "{{ $credentials.predefinedCredentialType }}",
+        "nodeCredentialType": "YOUR_CREDENTIAL_HERE"
+      },
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "EIl2QxhXAS9Hkg37",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "id": "9a7bbff0-d446-469d-aa61-838e8c025ad5",
+      "name": "Image URL1",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1520,
+        200
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1eb5f18b-eb06-48df-8491-d60de75b4855",
+              "name": "url",
+              "type": "string",
+              "value": "={{ $env.WEBHOOK_URL }}"
+            },
+            {
+              "id": "639cd062-ebef-44ab-97a2-79ee388f8b41",
+              "name": "query",
+              "type": "string",
+              "value": "what is the total number of deposits?"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ca43d437-a373-4938-a0a8-8087a98d46a8",
+      "name": "Document Mis-Understanding?",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1740,
+        200
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n  \"model\": \"pixtral-large-latest\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"{{ $json.query }}\"\n        },\n        {\n          \"type\": \"image_url\",\n          \"image_url\": \"{{ $json.url }}\"\n        }\n      ]\n    }\n  ],\n  \"document_image_limit\": 8,\n  \"document_page_limit\": 64\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "{{ $credentials.predefinedCredentialType }}",
+        "nodeCredentialType": "YOUR_CREDENTIAL_HERE"
+      },
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "EIl2QxhXAS9Hkg37",
+          "name": "Mistral Cloud account"
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

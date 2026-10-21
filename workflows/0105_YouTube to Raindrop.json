@@ -1,0 +1,131 @@
+{
+  "active": false,
+  "name": "YouTube to Raindrop",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "6cd88172-3b77-4ac1-a41b-251fae9fd48b",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -610,
+        160
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "9cccacd5-5aee-422f-8712-0aa5fccb2400",
+      "name": "YouTube",
+      "notes": "This youTube node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        -440,
+        240
+      ],
+      "parameters": {
+        "part": [
+          "snippet"
+        ],
+        "options": {},
+        "resource": "playlistItem",
+        "operation": "getAll",
+        "playlistId": "CHANGE_ME"
+      },
+      "credentials": {
+        "youTubeOAuth2Api": "Google n8n"
+      }
+    },
+    {
+      "id": "3ffea276-4dc8-46d8-9596-4beb446f1df1",
+      "name": "Filter new items",
+      "notes": "This function node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        240
+      ],
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst newIds = items.map(item => item.json[\"resourceId\"][\"videoId\"]);\nconst oldIds = staticData.oldIds; \n\nif (!oldIds) {\n  staticData.oldIds = newIds;\n  return items;\n}\n\n\nconst actualNewIds = newIds.filter((id) => !oldIds.includes(id));\nconst actualNew = items.filter((data) => actualNewIds.includes(data.json[\"resourceId\"][\"videoId\"]));\nstaticData.oldIds = [...actualNewIds, ...oldIds];\n\nreturn actualNew;\n"
+      }
+    },
+    {
+      "id": "459b921c-d004-413e-b112-8ba76caac1a7",
+      "name": "Flatten JSON",
+      "notes": "This functionItem node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.functionItem",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        240
+      ],
+      "parameters": {
+        "functionCode": "item = item[\"snippet\"]\n\nreturn item;"
+      }
+    },
+    {
+      "id": "61ae5210-2575-47cb-9a18-b308e9706f59",
+      "name": "Raindrop Bookmark",
+      "notes": "This raindrop node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.raindrop",
+      "typeVersion": 1,
+      "position": [
+        40,
+        240
+      ],
+      "parameters": {
+        "link": "={{ $env.WEBHOOK_URL }}{{$json[\"resourceId\"][\"videoId\"]}}",
+        "resource": "bookmark",
+        "operation": "create",
+        "collectionId": 0,
+        "additionalFields": {
+          "tags": "youtube",
+          "title": "={{$json[\"videoOwnerChannelTitle\"]}} | {{$json[\"title\"]}}"
+        }
+      },
+      "credentials": {
+        "raindropOAuth2Api": "Raindrop"
+      }
+    },
+    {
+      "id": "41962cf7-abbe-4d16-82ad-08071c3ba119",
+      "name": "Every 30 mins",
+      "notes": "This cron node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        -610,
+        320
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "unit": "minutes",
+              "value": 30
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "error-dd3ffb64",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

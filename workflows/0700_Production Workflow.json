@@ -1,0 +1,285 @@
+{
+  "active": false,
+  "name": "Production Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "trigger-cfd54dfa",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        100
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-c53aacaf",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        560,
+        700
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "node-d7c8c227",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        960,
+        560
+      ],
+      "parameters": {
+        "range": "A:C",
+        "options": {
+          "usePathForKeyRow": true
+        },
+        "sheetId": "qwertz",
+        "operation": "append",
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "{{ $credentials.googleSheetsOAuth2Api.id }}",
+          "name": "google_sheets_oauth"
+        }
+      }
+    },
+    {
+      "id": "node-e3d74564",
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        760,
+        700
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "name",
+              "value": "={{$json[\"results\"][0][\"name\"][\"first\"]}} {{$json[\"results\"][0][\"name\"][\"last\"]}}"
+            },
+            {
+              "name": "country",
+              "value": "={{$json[\"results\"][0][\"location\"][\"country\"]}}"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "node-0e0da8a5",
+      "name": "Spreadsheet File",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 1,
+      "position": [
+        960,
+        840
+      ],
+      "parameters": {
+        "options": {
+          "fileName": "users_spreadsheet"
+        },
+        "operation": "toFile",
+        "fileFormat": "csv"
+      }
+    },
+    {
+      "id": "node-72d868d2",
+      "name": "Spreadsheet File1",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 1,
+      "position": [
+        960,
+        1200
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "node-f2236133",
+      "name": "Write Binary File",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        1200
+      ],
+      "parameters": {
+        "fileName": "randomusers.json"
+      }
+    },
+    {
+      "id": "node-bfa88368",
+      "name": "Move Binary Data1",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1,
+      "position": [
+        1160,
+        1200
+      ],
+      "parameters": {
+        "mode": "jsonToBinary",
+        "options": {}
+      }
+    },
+    {
+      "id": "node-5e9e22f2",
+      "name": "Gmail1",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        1420
+      ],
+      "parameters": {
+        "message": "Hello, attached is a JSON file with random user information.",
+        "subject": "JSON file with users",
+        "additionalFields": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "data"
+              }
+            ]
+          }
+        }
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "{{ $credentials.gmailOAuth2.id }}",
+          "name": "gmail"
+        }
+      }
+    },
+    {
+      "id": "node-4b26353b",
+      "name": "Google Sheets2",
+      "notesInFlow": true,
+      "notes": "Append data to sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        1760,
+        1420
+      ],
+      "parameters": {
+        "range": "A:C",
+        "options": {
+          "usePathForKeyRow": true
+        },
+        "sheetId": "qwertz",
+        "operation": "append",
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "{{ $credentials.googleSheetsOAuth2Api.id }}",
+          "name": "google_sheets_oauth"
+        }
+      }
+    },
+    {
+      "id": "node-5dd2195d",
+      "name": "Move Binary Data2",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        1420
+      ],
+      "parameters": {
+        "options": {},
+        "sourceKey": "attachment_0"
+      }
+    },
+    {
+      "id": "node-343bef63",
+      "name": "Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        560
+      ],
+      "parameters": {
+        "width": 320,
+        "height": 80,
+        "content": "## JSON > Google Sheets"
+      }
+    },
+    {
+      "id": "node-66ed1edf",
+      "name": "Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        860
+      ],
+      "parameters": {
+        "width": 320,
+        "height": 80,
+        "content": "## JSON > CSV"
+      }
+    },
+    {
+      "id": "node-c37297b3",
+      "name": "Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        580,
+        1220
+      ],
+      "parameters": {
+        "width": 320,
+        "height": 80,
+        "content": "## CSV > JSON file"
+      }
+    },
+    {
+      "id": "node-e95954c7",
+      "name": "Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        980,
+        1460
+      ],
+      "parameters": {
+        "width": 320,
+        "height": 80,
+        "content": "## JSON file > Google Sheets"
+      }
+    },
+    {
+      "id": "error-03261faf",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

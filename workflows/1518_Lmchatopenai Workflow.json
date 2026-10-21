@@ -1,0 +1,371 @@
+{
+  "active": false,
+  "name": "Lmchatopenai Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "33e94ee1-4244-4075-bb4b-93a99a2cacd9",
+      "name": "OpenAI Chat Model",
+      "notes": "This lmChatOpenAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.2,
+      "position": [
+        20,
+        560
+      ],
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "dd97266d-a039-4d8f-bc7d-fb439ad5a6d7",
+      "name": "When clicking \"Execute Workflow\"",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -180,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "c4d4a979-3182-46c9-b145-fa4e6ba57011",
+      "name": "Fetch Essay List",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        80,
+        0
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "2e2913f9-d01a-41e8-b1b8-9a981910db7b",
+      "name": "Extract essay names",
+      "notes": "This html node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        280,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "attribute": "href",
+              "cssSelector": "table table a",
+              "returnArray": true,
+              "returnValue": "attribute"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "c121dc65-37e3-49d4-b449-f28491e19a6f",
+      "name": "Split out into items",
+      "notes": "This splitOut node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        480,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "essay"
+      }
+    },
+    {
+      "id": "5644c48d-62b6-4e2d-ad25-013b55f5ec71",
+      "name": "Fetch essay texts",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        0
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "cd84596e-4046-4d33-9f43-cf464e5c5c01",
+      "name": "Limit to first 3",
+      "notes": "This limit node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        680,
+        0
+      ],
+      "parameters": {
+        "maxItems": 3
+      }
+    },
+    {
+      "id": "318aeeed-fcce-4de2-aa04-92033ef01f28",
+      "name": "Extract Text Only",
+      "notes": "This html node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        1200,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "cssSelector": "body",
+              "skipSelectors": "img,nav"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "0668851e-a31f-4e6e-8966-4544092e318e",
+      "name": "Sticky Note3",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -120
+      ],
+      "parameters": {
+        "width": 1071.752021563343,
+        "height": 285.66037735849045,
+        "content": "## Scrape latest Paul Graham essays"
+      }
+    },
+    {
+      "id": "cf9af24c-9e08-4f27-ad4e-509f72e54a9b",
+      "name": "Sticky Note5",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        -120
+      ],
+      "parameters": {
+        "width": 625,
+        "height": 607,
+        "content": "## Load into Milvus vector store"
+      }
+    },
+    {
+      "id": "95e9a59d-1832-4eb7-b58d-ba391c1acb1c",
+      "name": "When chat message received",
+      "webhookId": "cd2703a7-f912-46fe-8787-3fb83ea116ab",
+      "notes": "This chatTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.1,
+      "position": [
+        -200,
+        380
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "0076ea3d-e667-4df2-83c3-9de0d3de0498",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -380,
+        -160
+      ],
+      "parameters": {
+        "width": 280,
+        "height": 180,
+        "content": "## Step 1\n1. Set up a Milvus server based on [this guide]({{ $env.WEBHOOK_URL }} And then create a collection named `my_collection`.\n2. Click this workflow to load scrape and load Paul Graham essays to Milvus collection.\n"
+      }
+    },
+    {
+      "id": "e90a069e-cfd8-49f1-8fe6-a334bb920027",
+      "name": "Milvus Vector Store",
+      "notes": "This vectorStoreMilvus node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.1,
+      "position": [
+        1420,
+        0
+      ],
+      "parameters": {
+        "mode": "insert",
+        "options": {
+          "clearCollection": true
+        },
+        "milvusCollection": {
+          "__rl": true,
+          "mode": "list",
+          "value": "my_collection",
+          "cachedResultName": "my_collection"
+        }
+      }
+    },
+    {
+      "id": "d786c471-d564-4f25-beab-f1c7f4559f7a",
+      "name": "Default Data Loader",
+      "notes": "This documentDefaultDataLoader node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1460,
+        220
+      ],
+      "parameters": {
+        "options": {},
+        "jsonData": "={{ $('Extract Text Only').item.json.data }}",
+        "jsonMode": "expressionData"
+      }
+    },
+    {
+      "id": "26730b7b-2bb9-46f8-83c3-3d4ffdfdef57",
+      "name": "Embeddings OpenAI",
+      "notes": "This embeddingsOpenAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.2,
+      "position": [
+        1320,
+        240
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "de836110-4073-44d5-bbf3-d57f57525f69",
+      "name": "Recursive Character Text Splitter",
+      "notes": "This textSplitterRecursiveCharacterTextSplitter node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        340
+      ],
+      "parameters": {
+        "options": {},
+        "chunkSize": 6000
+      }
+    },
+    {
+      "id": "ddaa936e-416a-40e4-adf6-cf7ebfb8b094",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -380,
+        280
+      ],
+      "parameters": {
+        "width": 280,
+        "height": 120,
+        "content": "## Step 2\nChat with this QA Chain with Milvus retriever\n"
+      }
+    },
+    {
+      "id": "f5b7410f-37c7-40ff-b841-12ed04252317",
+      "name": "Embeddings OpenAI1",
+      "notes": "This embeddingsOpenAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.2,
+      "position": [
+        80,
+        860
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "7a5d1b3f-9b2c-4943-9b40-2a213e30159c",
+      "name": "Milvus Vector Store1",
+      "notes": "This vectorStoreMilvus node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.1,
+      "position": [
+        120,
+        720
+      ],
+      "parameters": {
+        "milvusCollection": {
+          "__rl": true,
+          "mode": "list",
+          "value": "my_collection",
+          "cachedResultName": "my_collection"
+        }
+      }
+    },
+    {
+      "id": "2402387f-e147-4239-9128-34af296e0012",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        360
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 574,
+        "height": 629,
+        "content": ""
+      }
+    },
+    {
+      "id": "3665ef25-e464-496a-84d6-980b96e78e9a",
+      "name": "Q&A Chain to Retrieve from Milvus and Answer Question",
+      "notes": "This chainRetrievalQa node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.5,
+      "position": [
+        120,
+        380
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "10bf4a2c-ee2b-4185-b1e5-29b8664078fb",
+      "name": "Milvus Vector Store Retriever",
+      "notes": "This retrieverVectorStore node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        260,
+        580
+      ],
+      "parameters": {}
+    }
+  ],
+  "connections": {}
+}

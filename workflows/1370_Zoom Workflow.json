@@ -1,0 +1,111 @@
+{
+  "active": false,
+  "name": "Zoom Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "156d50a1-5aa8-47a8-9276-0e97da3d519e",
+      "name": "Zoom",
+      "notes": "This zoom node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.zoom",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        580
+      ],
+      "parameters": {
+        "topic": "New Meeting",
+        "authentication": "{{ $credentials.oAuth2 }}",
+        "additionalFields": {
+          "type": 3,
+          "settings": {
+            "muteUponEntry": true,
+            "joinBeforeHost": true,
+            "participantVideo": true
+          },
+          "timeZone": "America/New_York"
+        }
+      }
+    },
+    {
+      "id": "c375f972-af19-4f00-b64c-128a3577a858",
+      "name": "Schedule Trigger",
+      "notes": "Cron trigger to reset zoom meeting on the auto-redirect link",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        580
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "daysInterval": 360,
+              "triggerAtHour": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "83b4ec39-ccd7-4d2c-bf2c-7b5def36955b",
+      "name": "Wordpress",
+      "notes": "This wordpress node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.wordpress",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        580
+      ],
+      "parameters": {
+        "pageId": "123 (Create a page in WP, copy the ID of the page, paste it here)",
+        "resource": "page",
+        "operation": "update",
+        "updateFields": {
+          "content": "=\n<meta http-equiv=\"refresh\" content=\"0;{{ $json.join_url }}\">\n<p>Redirecting, please wait a moment. Meeting will begin shortly&#8230;</p>"
+        }
+      }
+    },
+    {
+      "id": "346ac8fa-96c2-4efa-8fc2-30bb3c3b2285",
+      "name": "Slack",
+      "notes": "This slack node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [
+        1780,
+        580
+      ],
+      "parameters": {
+        "text": "=Zoom recurring meeting updated!\n{{ $('Zoom').item.json.join_url }}",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "abc123",
+          "cachedResultName": "my-slack-channel"
+        },
+        "otherOptions": {
+          "includeLinkToWorkflow": true
+        }
+      },
+      "webhookId": "a454683c-5660-4e08-ac01-4f39e12db276"
+    },
+    {
+      "id": "error-d7570b85",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

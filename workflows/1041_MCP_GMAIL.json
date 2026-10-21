@@ -1,0 +1,149 @@
+{
+  "active": false,
+  "name": "MCP_GMAIL",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "trigger-7f0d0c93",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        100
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "c13105ec-6ac3-4179-a331-da5214ced6e6",
+      "name": "SEND_EMAIL",
+      "webhookId": "7ecc72c7-8968-4e5c-ae5a-a3d41823ca73",
+      "notes": "This gmailTool node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        -260,
+        540
+      ],
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {},
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "descriptionType": "manual",
+        "toolDescription": "envia menssagems via API google"
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y4RWMfx2YG0VDaFJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "id": "0836faf7-59fd-41f5-9a54-3f467ed87db1",
+      "name": "REPLY_EMAIL",
+      "webhookId": "30c6020e-eceb-4381-9874-be21f34ceea2",
+      "notes": "This gmailTool node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        -120,
+        540
+      ],
+      "parameters": {
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {},
+        "messageId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_ID', ``, 'string') }}",
+        "operation": "reply",
+        "descriptionType": "manual"
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y4RWMfx2YG0VDaFJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "id": "892e89a7-8751-4c9f-87f3-a663ec0ca042",
+      "name": "GET_EMAIL",
+      "webhookId": "6b3f4e85-bdfe-4396-8ee7-5a73efc680fb",
+      "notes": "This gmailTool node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        540
+      ],
+      "parameters": {
+        "simple": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Simplify', ``, 'boolean') }}",
+        "options": {},
+        "messageId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_ID', ``, 'string') }}",
+        "operation": "get"
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y4RWMfx2YG0VDaFJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "id": "c1c2d8cd-6117-4238-b696-22da8f217f59",
+      "name": "SEND_AND_WAIT",
+      "webhookId": "1f8a82c1-cbd1-4f40-9820-2de005c0473f",
+      "notes": "This gmailTool node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        140,
+        540
+      ],
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {},
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "operation": "sendAndWait",
+        "responseType": "freeText"
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y4RWMfx2YG0VDaFJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "id": "89c8bc41-cbf9-4099-a3ac-6d5d7cd1a626",
+      "name": "MCP_GMAIL",
+      "webhookId": "82a7a338-618c-44f5-a1c3-f2e32b6b4833",
+      "notes": "This mcpTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "path": "/mcp/:tool/gmail"
+      }
+    },
+    {
+      "id": "error-a326f09d",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

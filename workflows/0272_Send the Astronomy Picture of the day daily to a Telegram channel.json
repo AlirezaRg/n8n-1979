@@ -1,0 +1,83 @@
+{
+  "active": false,
+  "name": "Send the Astronomy Picture of the day daily to a Telegram channel",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "772f815a-aaa8-4d09-8477-4192993686d6",
+      "name": "Cron",
+      "notes": "This cron node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 20
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "d5beae1d-e322-4972-9805-9f76fe54c70f",
+      "name": "NASA",
+      "notes": "This nasa node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.nasa",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "download": false,
+        "additionalFields": {}
+      },
+      "credentials": {
+        "nasaApi": "NASA"
+      }
+    },
+    {
+      "id": "1546dd9a-d5bb-402a-9edc-5c6203165955",
+      "name": "Telegram",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        850,
+        300
+      ],
+      "parameters": {
+        "file": "={{$node[\"NASA\"].json[\"url\"]}}",
+        "chatId": "-485365454",
+        "operation": "sendPhoto",
+        "additionalFields": {
+          "caption": "={{$node[\"NASA\"].json[\"title\"]}}"
+        }
+      },
+      "credentials": {
+        "telegramApi": "Telegram n8n bot"
+      },
+      "webhookId": "156f084f-2360-4081-84e8-f35b95bec878"
+    },
+    {
+      "id": "error-3ca5edcf",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

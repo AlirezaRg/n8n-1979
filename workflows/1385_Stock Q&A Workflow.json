@@ -1,0 +1,315 @@
+{
+  "active": false,
+  "name": "Stock Q&A Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "ec3b86be-4113-4fd5-8365-02adb67693e9",
+      "name": "Embeddings OpenAI1",
+      "notes": "This embeddingsOpenAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1960,
+        720
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "fOF5kro9BJ6KMQ7n",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "id": "42fd8020-3861-4d0f-a7a2-70e2c35f0bed",
+      "name": "On new manual Chat Message",
+      "disabled": true,
+      "notes": "This manualChatTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1620,
+        240
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "a9b48d04-691e-4537-90f8-d7a4aa6153af",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        120
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 903.0896125323785,
+        "height": 733.5099670584011,
+        "content": "## Step 2: Setup the Q&A \n### The incoming message from the webhook is queried from the Supabase Vector Store. The response is provided in the response webhook. "
+      }
+    },
+    {
+      "id": "472b4800-745a-4337-9545-163247f7e9ae",
+      "name": "Retrieval QA Chain",
+      "notes": "This chainRetrievalQa node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1880,
+        240
+      ],
+      "parameters": {
+        "query": "={{ $json.body.input }}"
+      }
+    },
+    {
+      "id": "e58bd82d-abc6-44ed-8e93-ec5436126d66",
+      "name": "Respond to Webhook",
+      "notes": "This respondToWebhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        2280,
+        240
+      ],
+      "parameters": {
+        "options": {},
+        "respondWith": "text",
+        "responseBody": "={{ $json.response.text }}"
+      }
+    },
+    {
+      "id": "04bbf01e-8269-47c7-897d-4ea94a1bd1c0",
+      "name": "Vector Store Retriever",
+      "notes": "This retrieverVectorStore node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2020,
+        440
+      ],
+      "parameters": {
+        "topK": 5
+      }
+    },
+    {
+      "id": "feee6d68-2e0d-4d40-897e-c1d833a13bf2",
+      "name": "Webhook1",
+      "webhookId": "679f4afb-189e-4f04-9dc0-439eec2ec5f1",
+      "notes": "This webhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        1620,
+        420
+      ],
+      "parameters": {
+        "path": "19f5499a-3083-4783-93a0-e8ed76a9f742",
+        "options": {},
+        "httpMethod": "POST",
+        "responseMode": "responseNode"
+      }
+    },
+    {
+      "id": "1b8d251f-7069-4d7d-b6d6-4bfa683d4ad1",
+      "name": "When clicking \"Execute Workflow\"",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        280,
+        260
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "b746a7a4-ed94-4332-bf7b-65aadcf54130",
+      "name": "Google Drive",
+      "notes": "This googleDrive node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        580,
+        260
+      ],
+      "parameters": {
+        "fileId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1LZezppYrWpMStr4qJXtoIX-Dwzvgehll",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "crowdstrike.pdf"
+        },
+        "options": {},
+        "operation": "download"
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "1tsDIpjUaKbXy0be",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "id": "83a7d470-f934-436d-ba3f-1ae7c776f5a5",
+      "name": "Binary to Document",
+      "notes": "This documentBinaryInputLoader node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        860,
+        480
+      ],
+      "parameters": {
+        "loader": "pdfLoader",
+        "options": {}
+      }
+    },
+    {
+      "id": "b52b4a90-99a1-49cc-a6f0-7551d6754496",
+      "name": "Recursive Character Text Splitter",
+      "notes": "This textSplitterRecursiveCharacterTextSplitter node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        860,
+        640
+      ],
+      "parameters": {
+        "options": {},
+        "chunkSize": 3000,
+        "chunkOverlap": 200
+      }
+    },
+    {
+      "id": "b525e130-2029-4f55-a603-1fdc05a19c17",
+      "name": "Embeddings OpenAI",
+      "notes": "This embeddingsOpenAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1160,
+        480
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "fOF5kro9BJ6KMQ7n",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "id": "5358c53f-55f9-431d-8956-c6bae7ad25bc",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        540,
+        120
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 772.0680602743597,
+        "height": 732.3675002130781,
+        "content": "## Step 1: Upserting the PDF\n### Fetch file from Google Drive, split it into chunks and insert into Supabase index\n\n"
+      }
+    },
+    {
+      "id": "fb91e2da-0eeb-47a5-aa49-65bf56986857",
+      "name": "Qdrant Vector Store",
+      "notes": "This vectorStoreQdrant node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        940,
+        260
+      ],
+      "parameters": {
+        "mode": "insert",
+        "options": {},
+        "qdrantCollection": {
+          "__rl": true,
+          "mode": "id",
+          "value": "=crowd"
+        }
+      },
+      "credentials": {
+        "qdrantApi": {
+          "id": "U5CpjAgFeXziP3I1",
+          "name": "QdrantApi account"
+        }
+      }
+    },
+    {
+      "id": "89e14837-d1fc-4b1e-9ebc-7cf3e7fd9a70",
+      "name": "Qdrant Vector Store1",
+      "notes": "This vectorStoreQdrant node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1980,
+        600
+      ],
+      "parameters": {
+        "qdrantCollection": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.body.company }}"
+        }
+      },
+      "credentials": {
+        "qdrantApi": {
+          "id": "U5CpjAgFeXziP3I1",
+          "name": "QdrantApi account"
+        }
+      }
+    },
+    {
+      "id": "c619245b-5ea0-4354-974d-21ec6b8efa93",
+      "name": "OpenAI Chat Model",
+      "notes": "This lmChatOpenAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1880,
+        460
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "fOF5kro9BJ6KMQ7n",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "id": "e4aa780d-8069-4308-a61f-82ed876af71a",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        120
+      ],
+      "parameters": {
+        "color": 6,
+        "width": 710.9124489067698,
+        "height": 726.4452519516944,
+        "content": "## Start here: Step-by Step Youtube Tutorial :star:\n\n[![Building an AI Crew to Analyze Financial Data with CrewAI and n8n]({{ $env.WEBHOOK_URL }}]({{ $env.WEBHOOK_URL }}\n"
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,41 @@
+{
+  "active": false,
+  "name": "Coppertrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "3fe122e5-9f5c-4d78-ba90-bd6e30606fa3",
+      "name": "Copper Trigger",
+      "webhookId": "493ce79a-6a08-4062-86d9-7f4618b6c1ea",
+      "notes": "This copperTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.copperTrigger",
+      "typeVersion": 1,
+      "position": [
+        890,
+        400
+      ],
+      "parameters": {
+        "event": "new",
+        "resource": "project"
+      },
+      "credentials": {
+        "copperApi": "copper_creds"
+      }
+    },
+    {
+      "id": "error-16bfa15f",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,63 @@
+{
+  "active": false,
+  "name": "Lemlisttrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "4b6fc9f9-fb7d-429b-af60-3a7421f9402c",
+      "name": "Lemlist Trigger",
+      "webhookId": "e1e29f99-7222-488a-826f-5af50ffe7505",
+      "notes": "This lemlistTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.lemlistTrigger",
+      "typeVersion": 1,
+      "position": [
+        410,
+        160
+      ],
+      "parameters": {
+        "event": "emailsReplied",
+        "options": {
+          "campaignId": "cam_H5pYEryq6mRKBiy5v"
+        }
+      },
+      "credentials": {
+        "lemlistApi": "Lemlist API Credentials"
+      }
+    },
+    {
+      "id": "7f6120aa-9905-4455-98eb-0a8e18f0e999",
+      "name": "Mattermost",
+      "notes": "This mattermost node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.mattermost",
+      "typeVersion": 1,
+      "position": [
+        610,
+        160
+      ],
+      "parameters": {
+        "message": "={{$json[\"firstName\"]}} has replied back to your {{$json[\"campaignName\"]}}. Below is the reply:\n> {{$json[\"text\"]}}",
+        "channelId": "qx9yo1i9z3bg5qcy5a1oxnh69c",
+        "attachments": [],
+        "otherOptions": {}
+      },
+      "credentials": {
+        "mattermostApi": "Mattermost Credentials"
+      }
+    },
+    {
+      "id": "error-c27f4119",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

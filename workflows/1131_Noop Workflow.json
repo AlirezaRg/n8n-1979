@@ -1,0 +1,600 @@
+{
+  "active": false,
+  "name": "Noop Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "3af140c3-03eb-4eeb-ad31-71f94bc37790",
+      "name": "Loop to next call",
+      "notes": "This noOp node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        4820,
+        120
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "8904df21-c993-4c3d-84e6-4418990cb52f",
+      "name": "Execute Workflow Trigger",
+      "notes": "This executeWorkflowTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        700,
+        -40
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "d85f05bd-c680-4b41-b67a-8126b3ed29b0",
+      "name": "Create Notion DB Page",
+      "notes": "This notion node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "retryOnFail": true,
+      "waitBetweenTries": 3000,
+      "position": [
+        3240,
+        60
+      ],
+      "parameters": {
+        "title": "={{ $json.metaData.title }}",
+        "options": {
+          "icon": "??"
+        },
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1a85b6e0-c94f-81a3-aa21-e3ccf8296d72",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Sales Call Summaries Demo"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "date": "={{ $json.metaData.started }}"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "urlValue": "{{ $env.BASE_URL }}"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "textContent": "={{ $json.metaData.CompanyName }}"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "title": "={{ $json.metaData.title }}"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "textContent": "={{ $json.metaData.GongCallID }}"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "textContent": "={{ $json.sfOpp[0].SFOppId }}"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "selectValue": "={{ $json.sfOpp[0].sfStage }}"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "textContent": "={{ $json.sfOpp[0].companyAccountId }}"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "checkboxValue": "={{ $json.sfOpp[0].IsWon }}"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "checkboxValue": "={{ $json.sfOpp[0].IsClosed }}"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "selectValue": "={{ $json.sfOpp[0].Employees }}"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "multiSelectValue": "={{ $json.Attendees.internalNames }}"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "urlValue": "{{ $env.BASE_URL }}"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "urlValue": "{{ $env.BASE_URL }}"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "notionApi": {
+          "id": "2B3YIiD4FMsF9Rjn",
+          "name": "Angelbot Notion"
+        }
+      }
+    },
+    {
+      "id": "739aaf26-6807-4f09-a7a5-50b9605e76cb",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        620,
+        -280
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 1240,
+        "height": 600,
+        "content": "## Process Queue Logic\nIf the run fails for any reason, it can be rerun on only the remaining calls, allowing for greater resilisience in api calls. The main issue I ran into was Notion rate limiting."
+      }
+    },
+    {
+      "id": "cb8ecb7b-6e90-4394-8161-5b327c17d9c5",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2700,
+        -280
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 1360,
+        "height": 600,
+        "content": "## Loop over calls for analysis and Create Parent \n## DB Object to relate other DB objects to\nThe output is a structured JSON object that is then \npassed into a subworkflow for processing in a linear fashion. "
+      }
+    },
+    {
+      "id": "49b472b7-d47e-4057-9c43-4b471605059f",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4080,
+        -340
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 420,
+        "height": 660,
+        "content": "## Pass Parent Notion ID and Call data into AI Subworkflow for final prompt processing\nThis allows for multiple agents to process and generate structured data from the calls."
+      }
+    },
+    {
+      "id": "b1c39cf4-b101-4e7f-9c74-da43e09769fd",
+      "name": "Sticky Note3",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4520,
+        -340
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 520,
+        "height": 660,
+        "content": "## Alert on Progress\nIn Slack, a progress alert is generated and updated in real time to keep the company updated on the progress of the call processing. "
+      }
+    },
+    {
+      "id": "0ed6b796-8817-461f-958f-49ad2b4157cb",
+      "name": "Sticky Note5",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3460,
+        -600
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 600,
+        "height": 300,
+        "content": "## Alert Slack Job Complete\nSince this runs in the background, this alerts the team that job finished successfully. "
+      }
+    },
+    {
+      "id": "e537ba92-c909-4da6-b1b0-d5d1fb643bd3",
+      "name": "Sticky Note6",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        260,
+        -500
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 340,
+        "height": 820,
+        "content": "![Callforge]({{ $env.WEBHOOK_URL }}\n## CallForge - The AI Gong Sales Call Processor\nCallForge allows you to extract important information for different departments from your Sales Gong Calls. \n\n### Call Processor\nThis is where the parent object in notion is generated to store the AI Call data once it's generated. This is done first so that it can be passed into multiple sub objects for storage. Once that's done, it's passed into the AI Processor."
+      }
+    },
+    {
+      "id": "af52e980-56a5-4875-878a-495898b345ec",
+      "name": "Sticky Note7",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1880,
+        -360
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 800,
+        "height": 300,
+        "content": "## Alert Slack Job Started\nSince this runs in the background, this alerts the team that job has begun successfully."
+      }
+    },
+    {
+      "id": "67d4605b-f6d5-41ff-bbe1-90e002456fc1",
+      "name": "Post Slack Receipt",
+      "webhookId": "11dd0884-adc7-40f4-a8a3-f3082a0324fc",
+      "notes": "This slack node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [
+        2260,
+        -220
+      ],
+      "parameters": {
+        "text": "=Queu Started, Processing {{ $json.data.length }} calls.",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "C080KBCK1TL",
+          "cachedResultName": "project-call-forge-alerts"
+        },
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": {
+          "id": "OfRxDxHFIqk1q44a",
+          "name": "Knowledge Ninja n8n labs auth"
+        }
+      }
+    },
+    {
+      "id": "6d779b87-ce83-40bd-b068-9082f6849429",
+      "name": "AI Team Processor",
+      "notes": "This executeWorkflow node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        4160,
+        -40
+      ],
+      "parameters": {
+        "options": {},
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "4Uol9xlNKyNH213f",
+          "cachedResultName": "AI Team Processor Demo"
+        }
+      }
+    },
+    {
+      "id": "59848476-c4ec-47ec-9b1c-f206c0749b1e",
+      "name": "Update Slack Progress",
+      "webhookId": "d69dcd59-add1-4fd1-99c0-eee5c6a7fc4f",
+      "notes": "This slack node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [
+        4580,
+        -40
+      ],
+      "parameters": {
+        "ts": "={{ $('Loop Over Calls').item.json.slackdata[0].message.ts }}",
+        "text": "=Queu Started, Processing calls.\nProgress: {{$node[\"Loop Over Calls\"].context[\"currentRunIndex\"]+1;}}/{{ $('Reduce down to One object').item.json.data.length }}",
+        "channelId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "C080KBCK1TL"
+        },
+        "operation": "update",
+        "otherOptions": {},
+        "updateFields": {}
+      },
+      "credentials": {
+        "slackApi": {
+          "id": "OfRxDxHFIqk1q44a",
+          "name": "Knowledge Ninja n8n labs auth"
+        }
+      }
+    },
+    {
+      "id": "32a2235e-cbdd-45e2-9cb4-991ea1397274",
+      "name": "Merge call data and parent notion id",
+      "notes": "This merge node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        3720,
+        -40
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {},
+        "combineBy": "combineByPosition"
+      }
+    },
+    {
+      "id": "6f91bc31-3249-45f6-9114-7e1d8347cf89",
+      "name": "Reduce down to 1 object",
+      "notes": "This aggregate node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        980,
+        100
+      ],
+      "parameters": {
+        "options": {},
+        "aggregate": "aggregateAllItemData"
+      }
+    },
+    {
+      "id": "1d23b540-696c-4d3e-8c23-fac6a84bc6f3",
+      "name": "Get all older Calls",
+      "notes": "This notion node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1220,
+        100
+      ],
+      "parameters": {
+        "options": {},
+        "resource": "databasePage",
+        "operation": "getAll",
+        "returnAll": true,
+        "databaseId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1a85b6e0-c94f-81a3-aa21-e3ccf8296d72",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Sales Call Summaries Demo"
+        }
+      },
+      "credentials": {
+        "notionApi": {
+          "id": "2B3YIiD4FMsF9Rjn",
+          "name": "Angelbot Notion"
+        }
+      }
+    },
+    {
+      "id": "50a3f35e-7637-4eb2-ae9e-11f214307dc0",
+      "name": "Isolate Only Call IDs",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1440,
+        100
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "328e6ac8-88f3-4c2f-b8e8-d4a0756efd24",
+              "name": "Call ID",
+              "type": "string",
+              "value": "={{ $json.property_gong_call_id ? $json.property_gong_call_id : \"none\" }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "fb5c0970-3a05-4c38-8568-6ed175520db5",
+      "name": "Only Process New Calls",
+      "notes": "This compareDatasets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.compareDatasets",
+      "typeVersion": 2.3,
+      "position": [
+        1680,
+        -40
+      ],
+      "parameters": {
+        "options": {},
+        "resolve": "preferInput1",
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "metaData.GongCallID",
+              "field2": "Call ID"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "e4c8d925-af53-4855-a002-cbc02c45a9c8",
+      "name": "Reduce down to One object",
+      "notes": "This aggregate node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2020,
+        -220
+      ],
+      "parameters": {
+        "options": {},
+        "aggregate": "aggregateAllItemData"
+      }
+    },
+    {
+      "id": "b6fb9553-42f3-46ca-a0b5-a97288e99e17",
+      "name": "Bundle Slack Message Data",
+      "notes": "This aggregate node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2480,
+        -220
+      ],
+      "parameters": {
+        "options": {},
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "slackdata"
+      }
+    },
+    {
+      "id": "ba121e87-d25f-4867-848d-37b353db7ddb",
+      "name": "Merge Slack and Call Data",
+      "notes": "This merge node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        2800,
+        -80
+      ],
+      "parameters": {
+        "mode": "combine",
+        "options": {},
+        "combineBy": "combineAll"
+      }
+    },
+    {
+      "id": "bfd969e7-87a1-42cd-b23a-2b550772e171",
+      "name": "Loop Over Calls",
+      "notes": "This splitInBatches node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        3020,
+        -80
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "1f7dea30-dffe-4cc2-a912-c73ed1c8db50",
+      "name": "Bundle Notion Parent Object Data",
+      "notes": "This aggregate node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        3440,
+        60
+      ],
+      "parameters": {
+        "options": {},
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "notionData"
+      }
+    },
+    {
+      "id": "e2e2108c-00e0-48c8-8c5c-ef86edc93481",
+      "name": "Bundle Processed Calls",
+      "notes": "This aggregate node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        3540,
+        -480
+      ],
+      "parameters": {
+        "options": {},
+        "aggregate": "aggregateAllItemData"
+      }
+    },
+    {
+      "id": "21884d73-45fd-4bb0-b3b6-e225383b5f62",
+      "name": "Post Completed Calls Message",
+      "webhookId": "9d4f5a56-5be9-4373-8961-3627498713dd",
+      "notes": "This slack node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [
+        3840,
+        -480
+      ],
+      "parameters": {
+        "text": "=Queu Processed, {{ $json.data.length }} calls successfully added to Database.",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "C080KBCK1TL",
+          "cachedResultName": "project-call-forge-alerts"
+        },
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": {
+          "id": "OfRxDxHFIqk1q44a",
+          "name": "Knowledge Ninja n8n labs auth"
+        }
+      }
+    },
+    {
+      "id": "error-a231d74c",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Post Slack Receipt": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Slack Progress": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post Completed Calls Message": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

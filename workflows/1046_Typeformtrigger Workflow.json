@@ -1,0 +1,345 @@
+{
+  "active": false,
+  "name": "Typeformtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "73899714-936e-4ba0-9cc3-b77e0120b3ec",
+      "name": "Typeform Trigger",
+      "webhookId": "4aed5e4f-e2af-4bf1-b0eb-0fb44c3cc05e",
+      "notes": "This typeformTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.typeformTrigger",
+      "typeVersion": 1,
+      "position": [
+        140,
+        200
+      ],
+      "parameters": {
+        "formId": ""
+      },
+      "credentials": {
+        "typeformApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "49111827-a9eb-4e16-8983-d77604d50235",
+      "name": "Slack1",
+      "notes": "This slack node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        300
+      ],
+      "parameters": {
+        "text": "?? An existing lead has just subscribed!",
+        "channel": "",
+        "attachments": [],
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "9da5beb7-2c6f-4ad9-b526-ddda95eaad4f",
+      "name": "Airtable - Contact List",
+      "notes": "This airtable node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "executeOnce": false,
+      "alwaysOutputData": true,
+      "position": [
+        540,
+        200
+      ],
+      "parameters": {
+        "table": "Contacts",
+        "operation": "list",
+        "returnAll": false,
+        "application": "",
+        "additionalOptions": {
+          "fields": [],
+          "filterByFormula": "=fullName=\"{{$json[\"full_name\"]}}\""
+        }
+      },
+      "credentials": {
+        "airtableApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "ade0a867-0687-4a05-9d63-eb92489eb09f",
+      "name": "Airtable - Update Contacts1",
+      "notes": "This airtable node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        1150,
+        300
+      ],
+      "parameters": {
+        "id": "={{$node[\"Airtable - Contact List\"].json[\"id\"]}}",
+        "table": "Contacts",
+        "fields": [
+          "firstName",
+          "lastName",
+          "linkedInProfile",
+          "Email",
+          "Phone",
+          "website",
+          "LinkedIn Company",
+          "Industry",
+          "Address"
+        ],
+        "options": {
+          "typecast": true
+        },
+        "operation": "update",
+        "application": "",
+        "updateAllFields": false
+      },
+      "credentials": {
+        "airtableApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "6e53b877-6bb3-483f-b93d-078ed10e8e11",
+      "name": "Slack",
+      "notes": "This slack node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        100
+      ],
+      "parameters": {
+        "text": "=?? A new lead has just subscribed!",
+        "channel": "",
+        "attachments": [],
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "3d3abcf3-5ff7-41db-afb0-297e2ab17725",
+      "name": "Set - Contacts to update",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        940,
+        100
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "firstName",
+              "value": "={{$node[\"Dropcontact\"].json[\"first_name\"]}}"
+            },
+            {
+              "name": "lastName",
+              "value": "={{$node[\"Dropcontact\"].json[\"last_name\"]}}"
+            },
+            {
+              "name": "linkedInProfile",
+              "value": "={{$node[\"Dropcontact\"].json[\"linkedin\"]}}"
+            },
+            {
+              "name": "Email",
+              "value": "={{$node[\"Dropcontact\"].json[\"email\"][0][\"email\"]}}"
+            },
+            {
+              "name": "Phone",
+              "value": "={{$node[\"Dropcontact\"].json[\"phone\"]}}"
+            },
+            {
+              "name": "website",
+              "value": "={{$node[\"Dropcontact\"].json[\"website\"]}}"
+            },
+            {
+              "name": "LinkedIn Company",
+              "value": "={{$node[\"Dropcontact\"].json[\"company_linkedin\"]}}"
+            },
+            {
+              "name": "Industry",
+              "value": "={{$node[\"Dropcontact\"].json[\"naf5_des\"]}}"
+            },
+            {
+              "name": "Address",
+              "value": "={{$node[\"Dropcontact\"].json[\"siret_address\"]}}, {{$node[\"Dropcontact\"].json[\"siret_zip\"]}} {{$node[\"Dropcontact\"].json[\"siret_city\"]}}"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": true
+        }
+      }
+    },
+    {
+      "id": "a817e0d3-7701-42c0-99c2-decad75dad1b",
+      "name": "Dropcontact",
+      "notes": "This dropcontact node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.dropcontact",
+      "typeVersion": 1,
+      "position": [
+        340,
+        200
+      ],
+      "parameters": {
+        "email": "=",
+        "options": {
+          "siren": true,
+          "language": "fr"
+        },
+        "additionalFields": {
+          "company": "={{$json[\"and your company ?\"]}}",
+          "website": "={{$node[\"Typeform Trigger\"].json[\"tell me more... What's your website ?\"]}}",
+          "last_name": "={{$json[\"Hi [field:1c6436830dfffbf1], what's your last name ?\"]}}",
+          "first_name": "={{$json[\"First, what's your name?\"]}}"
+        }
+      },
+      "credentials": {
+        "dropcontactApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "911b8c2b-390a-4838-b87a-4173ede6790c",
+      "name": "Contact ID empty ?",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "position": [
+        730,
+        200
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"id\"]}}",
+              "operation": "isEmpty"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "3366af5a-8874-4f7e-ba14-d8f011d18949",
+      "name": "Airtable - Create Contacts",
+      "notes": "This airtable node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        1150,
+        100
+      ],
+      "parameters": {
+        "table": "Contacts",
+        "options": {
+          "typecast": true
+        },
+        "operation": "append",
+        "application": ""
+      },
+      "credentials": {
+        "airtableApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "id": "4fe74e05-6b73-4da3-b958-fc8fff86ea79",
+      "name": "Set - Contacts to create",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        940,
+        300
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "firstName",
+              "value": "={{$node[\"Dropcontact\"].json[\"first_name\"]}}"
+            },
+            {
+              "name": "lastName",
+              "value": "={{$node[\"Dropcontact\"].json[\"last_name\"]}}"
+            },
+            {
+              "name": "linkedInProfile",
+              "value": "={{$node[\"Dropcontact\"].json[\"linkedin\"]}}"
+            },
+            {
+              "name": "Email",
+              "value": "={{$node[\"Dropcontact\"].json[\"email\"][0][\"email\"]}}"
+            },
+            {
+              "name": "Phone",
+              "value": "={{$node[\"Dropcontact\"].json[\"phone\"]}}"
+            },
+            {
+              "name": "website",
+              "value": "={{$node[\"Dropcontact\"].json[\"website\"]}}"
+            },
+            {
+              "name": "LinkedIn Company",
+              "value": "={{$node[\"Dropcontact\"].json[\"company_linkedin\"]}}"
+            },
+            {
+              "name": "Industry",
+              "value": "={{$node[\"Dropcontact\"].json[\"naf5_des\"]}}"
+            },
+            {
+              "name": "Address",
+              "value": "={{$node[\"Dropcontact\"].json[\"siret_address\"]}}, {{$node[\"Dropcontact\"].json[\"siret_zip\"]}} {{$node[\"Dropcontact\"].json[\"siret_city\"]}}"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": true
+        }
+      }
+    },
+    {
+      "id": "error-0f5037f1",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

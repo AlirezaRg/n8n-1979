@@ -1,0 +1,77 @@
+{
+  "active": false,
+  "name": "Readbinaryfile Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "trigger-67d82f67",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        100
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "d0c97447-6890-4304-89a4-e04420cba1ce",
+      "name": "Read Binary File",
+      "notes": "This readBinaryFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        450,
+        650
+      ],
+      "parameters": {
+        "filePath": "spreadsheet.xls"
+      }
+    },
+    {
+      "id": "68c6ce6a-ed48-4009-95d3-34217d674e5c",
+      "name": "Spreadsheet File1",
+      "notes": "This spreadsheetFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 1,
+      "position": [
+        600,
+        650
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "103ac1ab-c52a-4d44-be1f-6d987aa0a69c",
+      "name": "Insert Rows1",
+      "notes": "This postgres node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [
+        750,
+        650
+      ],
+      "parameters": {
+        "table": "product",
+        "columns": "name,ean"
+      },
+      "credentials": {
+        "postgres": "postgres"
+      }
+    },
+    {
+      "id": "error-a152b20a",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

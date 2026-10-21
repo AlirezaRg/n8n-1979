@@ -1,0 +1,117 @@
+{
+  "active": false,
+  "name": "Httprequest Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "df9d04c7-2116-421a-9061-f3ae9118817a",
+      "name": "Convert web page to PDF",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        560,
+        240
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "sendHeaders": true,
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "{{ $env.WEBHOOK_URL }}"
+            }
+          ]
+        },
+        "genericAuthType": "httpQueryAuth",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/octet-stream"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "WdAklDMod8fBEMRk",
+          "name": "Query Auth account"
+        }
+      }
+    },
+    {
+      "id": "2f559bbd-54ca-40db-bb7c-3a00481a017d",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        380,
+        240
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "d265d2b7-0079-4db8-a208-88bbeb965475",
+      "name": "Read/Write Files from Disk",
+      "notes": "This readWriteFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        960,
+        240
+      ],
+      "parameters": {
+        "options": {},
+        "fileName": "document.pdf",
+        "operation": "write",
+        "dataPropertyName": "=data"
+      }
+    },
+    {
+      "id": "6e17fb0d-cc52-4e33-b0e0-7256cdef1240",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        520,
+        80
+      ],
+      "parameters": {
+        "width": 218,
+        "height": 132,
+        "content": "## Authentication\nConversion requests must be authenticated. Please create \n[ConvertAPI account to get authentication secret]({{ $env.API_BASE_URL }}"
+      }
+    },
+    {
+      "id": "13d9a34a-7516-4fb2-9e5b-62cc8f5259ac",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        500,
+        420
+      ],
+      "parameters": {
+        "width": 281,
+        "content": "## Set Url to Webpage\nSet the url to the webpage, that should be converted to pdf in the parameter `url`"
+      }
+    }
+  ],
+  "connections": {}
+}

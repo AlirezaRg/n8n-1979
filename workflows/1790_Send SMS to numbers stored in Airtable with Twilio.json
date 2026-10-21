@@ -1,0 +1,73 @@
+{
+  "active": false,
+  "name": "Send SMS to numbers stored in Airtable with Twilio",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "b3b49885-b2f0-4b51-9ffb-4e4dd0c17d80",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "5b6dc4ae-cbb4-4d12-8596-0e466988d0d1",
+      "name": "Airtable",
+      "notes": "This airtable node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "table": "",
+        "operation": "list",
+        "application": "",
+        "additionalOptions": {}
+      },
+      "credentials": {
+        "airtableApi": ""
+      }
+    },
+    {
+      "id": "ff269555-4c45-4225-81af-a09c4a9ee5cb",
+      "name": "Twilio",
+      "notes": "This twilio node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "to": "={{$node[\"Airtable\"].json[\"fields\"][\"Number\"]}}",
+        "from": "",
+        "message": "=Hello, {{$node[\"Airtable\"].json[\"fields\"][\"Name\"]}}!\nSending this SMS from n8n!"
+      },
+      "credentials": {
+        "twilioApi": ""
+      }
+    },
+    {
+      "id": "error-883163d5",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

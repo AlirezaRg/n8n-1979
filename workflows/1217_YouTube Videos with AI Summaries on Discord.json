@@ -1,0 +1,200 @@
+{
+  "active": false,
+  "name": "YouTube Videos with AI Summaries on Discord",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "48c87027-7eea-40b9-a73c-4e002b748783",
+      "name": "YouTube Video Trigger",
+      "notes": "This rssFeedReadTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        560,
+        220
+      ],
+      "parameters": {
+        "feedUrl": "{{ $env.WEBHOOK_URL }}",
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "56166228-b365-4043-b48c-098b4de71f6f",
+      "name": "Retrieve Caption Data",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        780,
+        220
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "options": {},
+        "sendQuery": true,
+        "authentication": "{{ $credentials.predefinedCredentialType }}",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "videoId",
+              "value": "={{ $json.id.match(/(?:[^:]*:){2}\\s*(.*)/)[1] }}"
+            },
+            {
+              "name": "part",
+              "value": "snippet"
+            }
+          ]
+        },
+        "nodeCredentialType": "YOUR_CREDENTIAL_HERE"
+      },
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "uy3xy1Ks2ATwRGr4",
+          "name": "Creator Magic - YouTube account"
+        }
+      }
+    },
+    {
+      "id": "c029ac6f-3071-4045-83f6-2dede0c1f358",
+      "name": "Download Captions",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1220,
+        220
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "authentication": "{{ $credentials.predefinedCredentialType }}",
+        "nodeCredentialType": "YOUR_CREDENTIAL_HERE"
+      },
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "uy3xy1Ks2ATwRGr4",
+          "name": "Creator Magic - YouTube account"
+        }
+      }
+    },
+    {
+      "id": "8b45dc14-f10f-4b50-8ca6-a9d0ccfee4dc",
+      "name": "Caption File Conversion",
+      "notes": "This extractFromFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        220
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "text",
+        "destinationKey": "YOUR_CREDENTIAL_HERE"
+      }
+    },
+    {
+      "id": "6527adb4-9087-40eb-b63a-8c4cdf5d0a40",
+      "name": "Caption Summary with ChatGPT",
+      "notes": "This openAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.3,
+      "position": [
+        1660,
+        220
+      ],
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-3.5-turbo",
+          "cachedResultName": "GPT-3.5-TURBO"
+        },
+        "options": {},
+        "messages": {
+          "values": [
+            {
+              "content": "=Summarise this transcript into three bullet points to sum up what the video is about and why someone should watch it: {{ $json[\"content\"] }}"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "QpdCHVaJVRd9NNYl",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "id": "2c83f230-bc37-4efb-9ee9-842bcefa0ef4",
+      "name": "Post to Discord",
+      "notes": "This discord node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        2000,
+        220
+      ],
+      "parameters": {
+        "content": "=?? New Video Alert! ??\n\n**{{ $('YouTube Video Trigger').item.json[\"title\"] }}**\n\n*What's it about?*\n\n{{ $json[\"message\"][\"content\"] }}\n\n[Watch NOW]({{ $('YouTube Video Trigger').item.json[\"link\"] }}) and remember to share your thoughts!",
+        "options": {},
+        "authentication": "{{ $credentials.webhook }}"
+      },
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "QQxpAIskycvb8fIE",
+          "name": "Discord Webhook account"
+        }
+      },
+      "webhookId": "5360d19e-3efa-46a3-b639-50edaef45e23"
+    },
+    {
+      "id": "8408887e-1d89-402c-b350-93d5f96f4dea",
+      "name": "Find English Captions",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        1000,
+        220
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "eaf7dcb5-91cf-4405-917b-38845f0ef78d",
+              "name": "caption",
+              "type": "object",
+              "value": "={{ $jmespath( $json.items, \"[?snippet.language == 'en'] | [0]\" ) }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "71cc0977-1695-4797-9df2-b0a98e41d3de",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        500,
+        -20
+      ],
+      "parameters": {
+        "width": 448.11859838274916,
+        "height": 417.2722371967648,
+        "content": "### Summarise Your YouTube Videos with AI for Discord\n\n??? [Watch the Video Tutorial]({{ $env.WEBHOOK_URL }}\n\n* Add your [YouTube channel ID]({{ $env.WEBHOOK_URL }} to the URL in the first node: `{{ $env.WEBHOOK_URL }}`.\n\n* Ensure authorization with the YouTube channel that you want to download captions from."
+      }
+    }
+  ],
+  "connections": {}
+}

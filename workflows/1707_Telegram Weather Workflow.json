@@ -1,0 +1,82 @@
+{
+  "active": false,
+  "name": "Telegram Weather Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "bb69d680-0d18-4473-8826-745ed2ce0734",
+      "name": "Telegram Trigger",
+      "notes": "This telegramTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [
+        270,
+        220
+      ],
+      "parameters": {
+        "updates": [
+          "message"
+        ]
+      },
+      "credentials": {
+        "telegramApi": "Telegram"
+      },
+      "webhookId": "3b2242c2-dc99-4f14-bc0a-1f3282bcd1e6"
+    },
+    {
+      "id": "8f3c8f51-ff03-49fc-9f92-e8288886f98a",
+      "name": "OpenWeatherMap",
+      "notes": "This openWeatherMap node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.openWeatherMap",
+      "typeVersion": 1,
+      "position": [
+        480,
+        220
+      ],
+      "parameters": {
+        "cityName": "berlin,de"
+      },
+      "credentials": {
+        "openWeatherMapApi": "OpenWeatherMap"
+      }
+    },
+    {
+      "id": "1fb4a176-0931-4bab-92c7-e11b5314ae46",
+      "name": "Telegram",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        670,
+        220
+      ],
+      "parameters": {
+        "text": "=Right now, we have {{$node[\"OpenWeatherMap\"].json[\"weather\"][0][\"description\"]}}. The temperature is {{$node[\"OpenWeatherMap\"].json[\"main\"][\"temp\"]}}�C but it really feels like {{$node[\"OpenWeatherMap\"].json[\"main\"][\"feels_like\"]}}�C ??",
+        "chatId": "={{$node[\"Telegram Trigger\"].json[\"message\"][\"chat\"][\"id\"]}}",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": null,
+          "name": "Telegram"
+        }
+      },
+      "webhookId": "bc5e8f45-5f47-4f7f-bf9f-e5685adc8fa8"
+    },
+    {
+      "id": "error-b3c23c57",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

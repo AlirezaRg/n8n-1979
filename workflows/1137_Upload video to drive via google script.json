@@ -1,0 +1,66 @@
+{
+  "active": false,
+  "name": "Upload video to drive via google script",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "b89e494d-f85d-4ad5-b0ba-5699f59a58d5",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -300,
+        -40
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "061597f1-d57d-4733-bc9f-3a3070bd5e95",
+      "name": "Rename Uploaded Video",
+      "notes": "This googleDrive node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        180,
+        -40
+      ],
+      "parameters": {
+        "fileId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "={{ $json.driveUrl }}"
+        },
+        "options": {},
+        "operation": "update",
+        "newUpdatedFileName": "Music Video 1"
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "l8Cc2MEVE7foBfbK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "id": "7e8ff194-fdb7-43e4-afde-bba466ac9dd3",
+      "name": "Send URL to GDrive Script and Upload",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -60,
+        -40
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "{\n  \"videoUrl\": \"{{ $env.API_BASE_URL }}\",\n  \"secret\": \"your-strong-secret-here\"\n}",
+        "sendBody": true,
+        "specifyBody": "json"
+      }
+    }
+  ],
+  "connections": {}
+}

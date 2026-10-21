@@ -1,0 +1,193 @@
+{
+  "active": false,
+  "name": "Shopifytrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "5cb9cd37-a73d-4f3f-b4dd-4b56e79f4056",
+      "name": "On order updated",
+      "webhookId": "0972ce92-d800-4049-ab60-7c71898ecbfa",
+      "notes": "This shopifyTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.shopifyTrigger",
+      "typeVersion": 1,
+      "position": [
+        380,
+        200
+      ],
+      "parameters": {
+        "topic": "orders/updated"
+      },
+      "credentials": {
+        "shopifyApi": {
+          "id": "{{ $credentials.shopifyApi.id }}",
+          "name": "Shopify account"
+        }
+      }
+    },
+    {
+      "id": "720e35c7-387e-428a-8930-0dfb67536382",
+      "name": "Keep only userId",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        860,
+        280
+      ],
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "userId",
+              "value": "={{ $json[\"vid\"] }}"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "3bb1f676-6733-4c1f-b3d0-4604f8baa0c8",
+      "name": "New Order, deal not found",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        220
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json}}",
+              "operation": "isEmpty"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "7f4b86a1-9ea7-4c5d-a336-eea2ec6dc341",
+      "name": "Do Nothing",
+      "notes": "This noOp node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        320
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "f60c88f1-8dab-498e-9f18-d7842dfa60c6",
+      "name": "Create new deal",
+      "notes": "This hubspot node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        120
+      ],
+      "parameters": {
+        "stage": "closedwon",
+        "authentication": "{{ $credentials.oAuth2 }}",
+        "additionalFields": {
+          "amount": "={{ $node[\"Add Hubspot userId to data\"].json[\"current_total_price\"] }}",
+          "dealName": "={{ $node[\"Add Hubspot userId to data\"].json[\"name\"] }}",
+          "closeDate": "={{ $node[\"Add Hubspot userId to data\"].json[\"created_at\"] }}",
+          "associatedVids": "={{ $node[\"Add Hubspot userId to data\"].json[\"userId\"] }}"
+        }
+      },
+      "credentials": {
+        "hubspotOAuth2Api": {
+          "id": "{{ $credentials.hubspotOAuth2Api.id }}",
+          "name": "HubSpot account"
+        }
+      }
+    },
+    {
+      "id": "3d9de7e0-8cd4-4cea-a78c-8a862c32edeb",
+      "name": "Find if order already exists as deal",
+      "notes": "This hubspot node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "position": [
+        1340,
+        220
+      ],
+      "parameters": {
+        "operation": "search",
+        "authentication": "{{ $credentials.oAuth2 }}",
+        "additionalFields": {
+          "query": "={{ $json[\"name\"] }}"
+        }
+      },
+      "credentials": {
+        "hubspotOAuth2Api": {
+          "id": "{{ $credentials.hubspotOAuth2Api.id }}",
+          "name": "HubSpot account"
+        }
+      }
+    },
+    {
+      "id": "f85b698a-872a-477b-9466-e35622b381a2",
+      "name": "Add Hubspot userId to data",
+      "notes": "This merge node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        220
+      ],
+      "parameters": {
+        "mode": "mergeByIndex"
+      }
+    },
+    {
+      "id": "11502ac7-1e57-4614-9dd5-31f5fc62c91c",
+      "name": "Create or update contact",
+      "notes": "This hubspot node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 1,
+      "position": [
+        640,
+        280
+      ],
+      "parameters": {
+        "email": "={{ $json[\"contact_email\"] }}",
+        "resource": "contact",
+        "authentication": "{{ $credentials.oAuth2 }}",
+        "additionalFields": {
+          "city": "={{ $json[\"customer\"][\"default_address\"][\"city\"] }}",
+          "country": "={{ $json[\"customer\"][\"default_address\"][\"country\"] }}",
+          "lastName": "={{ $json[\"customer\"][\"default_address\"][\"last_name\"] }}",
+          "firstName": "={{ $json[\"customer\"][\"default_address\"][\"first_name\"] }}"
+        }
+      },
+      "credentials": {
+        "hubspotOAuth2Api": {
+          "id": "{{ $credentials.hubspotOAuth2Api.id }}",
+          "name": "HubSpot account"
+        }
+      }
+    },
+    {
+      "id": "error-c41fbad1",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

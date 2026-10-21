@@ -1,0 +1,81 @@
+{
+  "active": false,
+  "name": "Receive the weather information of any city",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-fe99167d",
+      "name": "Webhook",
+      "webhookId": "45690b6a-2b01-472d-8839-5e83a74858e5",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        580,
+        340
+      ],
+      "parameters": {
+        "path": "45690b6a-2b01-472d-8839-5e83a74858e5",
+        "options": {},
+        "responseData": "allEntries",
+        "responseMode": "lastNode"
+      }
+    },
+    {
+      "id": "node-97d0b2c1",
+      "name": "OpenWeatherMap",
+      "type": "n8n-nodes-base.openWeatherMap",
+      "typeVersion": 1,
+      "position": [
+        770,
+        340
+      ],
+      "parameters": {
+        "cityName": "={{$node[\"Webhook\"].json[\"query\"][\"city\"]}}"
+      },
+      "credentials": {
+        "openWeatherMapApi": ""
+      }
+    },
+    {
+      "id": "node-f4097362",
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        970,
+        340
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "temp",
+              "value": "={{$node[\"OpenWeatherMap\"].json[\"main\"][\"temp\"]}}"
+            },
+            {
+              "name": "description",
+              "value": "={{$node[\"OpenWeatherMap\"].json[\"weather\"][0][\"description\"]}}"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "error-1d0ecff5",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

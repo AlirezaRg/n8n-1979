@@ -1,0 +1,121 @@
+{
+  "active": false,
+  "name": "New WooCommerce refund to Slack",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "3d900b59-e613-4414-a4f9-f6dda14af39e",
+      "name": "Order Updated",
+      "webhookId": "f7736be3-e978-4a17-b936-7ce9f8ccdb72",
+      "notes": "This wooCommerceTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.wooCommerceTrigger",
+      "typeVersion": 1,
+      "position": [
+        320,
+        500
+      ],
+      "parameters": {
+        "event": "order.updated"
+      },
+      "credentials": {
+        "wooCommerceApi": {
+          "id": "{{ $credentials.wooCommerceApi.id }}",
+          "name": "WooCommerce account"
+        }
+      }
+    },
+    {
+      "id": "a297415f-8300-403c-b978-fe8e0ad076af",
+      "name": "If Refund and Over 100",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        540,
+        500
+      ],
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json[\"total\"]}}",
+              "value2": 100,
+              "operation": "largerEqual"
+            }
+          ],
+          "string": [
+            {
+              "value1": "={{$json[\"status\"]}}",
+              "value2": "refunded"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "979152c4-218e-4344-b11f-fda192f3fbae",
+      "name": "Send to Slack",
+      "notes": "This slack node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        780,
+        480
+      ],
+      "parameters": {
+        "text": ":x: A refund has been issued :x:",
+        "channel": "woo-commerce",
+        "blocksUi": {
+          "blocksValues": []
+        },
+        "attachments": [
+          {
+            "color": "#FF0000",
+            "fields": {
+              "item": [
+                {
+                  "short": true,
+                  "title": "Order ID",
+                  "value": "={{$json[\"id\"]}}"
+                },
+                {
+                  "short": true,
+                  "title": "Status",
+                  "value": "={{$json[\"status\"]}}"
+                },
+                {
+                  "short": true,
+                  "title": "Total",
+                  "value": "={{$json[\"currency_symbol\"]}}{{$json[\"total\"]}}"
+                }
+              ]
+            },
+            "footer": "=*Order updated:* {{$json[\"date_modified\"]}}"
+          }
+        ],
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": {
+          "id": "{{ $credentials.slackApi.id }}",
+          "name": "Slack Access Token"
+        }
+      }
+    },
+    {
+      "id": "error-6d133683",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

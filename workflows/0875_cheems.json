@@ -1,0 +1,133 @@
+{
+  "active": false,
+  "name": "cheems",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "f31c96cc-09f3-47c2-bc26-2cdf536eb00f",
+      "name": "Cron",
+      "notes": "This cron node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 9,
+              "mode": "everyWeek",
+              "weekday": "6"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "b9bd0ead-75d8-426e-a176-904b4cdc85b2",
+      "name": "Discord",
+      "notes": "This discord node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "text": "It's Wednesday, my dudes!\n{{ $env.WEBHOOK_URL }}",
+        "webhookUri": "{{ $env.API_BASE_URL }}"
+      }
+    },
+    {
+      "id": "6bbd8c49-4472-4863-b31a-8a506fe3fe69",
+      "name": "Cron1",
+      "notes": "This cron node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        450,
+        140
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 9,
+              "mode": "everyWeek",
+              "weekday": "5"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "9143f78a-5474-4541-8cb7-854f7e1a107f",
+      "name": "Discord1",
+      "notes": "This discord node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 1,
+      "position": [
+        650,
+        140
+      ],
+      "parameters": {
+        "text": "It's Friday, Friday\nGotta get down on Friday!\n{{ $env.WEBHOOK_URL }}",
+        "webhookUri": "{{ $env.API_BASE_URL }}"
+      }
+    },
+    {
+      "id": "5ffff03d-43ac-4d2b-ab55-0836dafd1033",
+      "name": "Cron2",
+      "notes": "This cron node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        820,
+        300
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "unit": "minutes",
+              "value": 30
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "dbf1c5f2-9dee-4702-80ab-61cb802095ff",
+      "name": "Discord2",
+      "notes": "This discord node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 1,
+      "position": [
+        1020,
+        300
+      ],
+      "parameters": {
+        "text": "And with this, I sleep. Good night Pogger friends :)\n{{ $env.WEBHOOK_URL }}",
+        "webhookUri": "{{ $env.API_BASE_URL }}"
+      }
+    },
+    {
+      "id": "error-a2b476bd",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

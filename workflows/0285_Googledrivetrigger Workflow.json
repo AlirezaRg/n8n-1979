@@ -1,0 +1,117 @@
+{
+  "active": false,
+  "name": "Googledrivetrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "0feb2324-889c-404d-9131-d63e8d0ba893",
+      "name": "Google Drive Trigger",
+      "notes": "This googleDriveTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        480,
+        1480
+      ],
+      "parameters": {
+        "event": "fileUpdated",
+        "options": {},
+        "triggerOn": "specificFolder",
+        "folderToWatch": "{{ $env.WEBHOOK_URL }}[your_id]"
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "{{ $credentials.googleDriveOAuth2Api.id }}",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "id": "b163b0d1-ef02-49c2-a49b-75dfe4fd5923",
+      "name": "Merge",
+      "notes": "This merge node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 1,
+      "position": [
+        680,
+        1560
+      ],
+      "parameters": {
+        "mode": "removeKeyMatches",
+        "propertyName1": "name.value",
+        "propertyName2": "Key.value"
+      }
+    },
+    {
+      "id": "df8098c9-ee36-4740-aa23-01120882112a",
+      "name": "AWS S3  - get",
+      "notes": "This awsS3 node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 1,
+      "position": [
+        480,
+        1660
+      ],
+      "parameters": {
+        "options": {},
+        "operation": "getAll",
+        "bucketName": "mybucket"
+      },
+      "credentials": {
+        "aws": {
+          "id": "{{ $credentials.aws.id }}",
+          "name": "aws"
+        }
+      }
+    },
+    {
+      "id": "3f7495b5-e7c8-4f2e-82c4-bca01bc33c7d",
+      "name": "AWS S3 - upload",
+      "notes": "This awsS3 node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 1,
+      "position": [
+        860,
+        1560
+      ],
+      "parameters": {
+        "tagsUi": {
+          "tagsValues": [
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "value": "gdrive"
+            }
+          ]
+        },
+        "fileName": "={{$json[\"name\"]}}",
+        "operation": "upload",
+        "binaryData": false,
+        "bucketName": "mybucket",
+        "additionalFields": {
+          "serverSideEncryption": "AES256"
+        }
+      },
+      "credentials": {
+        "aws": {
+          "id": "{{ $credentials.aws.id }}",
+          "name": "aws"
+        }
+      }
+    },
+    {
+      "id": "error-c4bfeeb7",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

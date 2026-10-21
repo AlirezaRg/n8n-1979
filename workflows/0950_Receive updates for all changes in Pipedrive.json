@@ -1,0 +1,38 @@
+{
+  "active": false,
+  "name": "Receive updates for all changes in Pipedrive",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "96b222cf-2cd0-4b82-8e6f-1a274b378ad0",
+      "name": "Pipedrive Trigger",
+      "notes": "This pipedriveTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.pipedriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        750,
+        250
+      ],
+      "parameters": {},
+      "credentials": {
+        "pipedriveApi": ""
+      },
+      "webhookId": "de76b07b-bae5-4b48-b415-e66e9fcd4bca"
+    },
+    {
+      "id": "error-75eabd78",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,156 @@
+{
+  "active": false,
+  "name": "Typeformtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "9b6cfb94-3333-4fc1-96f9-a3f1df04d18e",
+      "name": "Typeform Trigger",
+      "webhookId": "ad8a87ef-d293-4e48-8d36-838d69ebce0f",
+      "notes": "This typeformTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.typeformTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        400
+      ],
+      "parameters": {
+        "formId": "fBYjtY5e"
+      },
+      "credentials": {
+        "typeformApi": ""
+      }
+    },
+    {
+      "id": "1ffc1443-4150-41ab-8b90-d83cc81698bb",
+      "name": "Google Cloud Natural Language",
+      "notes": "This googleCloudNaturalLanguage node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleCloudNaturalLanguage",
+      "typeVersion": 1,
+      "position": [
+        200,
+        400
+      ],
+      "parameters": {
+        "content": "={{$json[\"Any suggestions for us? \"]}}",
+        "options": {}
+      },
+      "credentials": {
+        "googleCloudNaturalLanguageOAuth2Api": ""
+      }
+    },
+    {
+      "id": "7306a3bb-551a-4142-91f5-1c533ca16dcf",
+      "name": "If Node",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        400,
+        400
+      ],
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$node[\"Google Cloud Natural Language\"].json[\"documentSentiment\"][\"score\"]}}",
+              "operation": "larger"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "da864668-f74c-4082-a2b1-b5aed0990798",
+      "name": "Notion",
+      "notes": "This notion node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 1,
+      "position": [
+        600,
+        300
+      ],
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": "b7d1130a-3756-4bb3-aa56-0c77bf416437",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "title": "={{$node[\"Typeform Trigger\"].json[\"Name\"]}}"
+            },
+            {
+              "key": "YOUR_CREDENTIAL_HERE",
+              "textContent": "={{$node[\"Typeform Trigger\"].json[\"Any suggestions for us? \"]}}"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "notionApi": ""
+      }
+    },
+    {
+      "id": "a7f6248c-8cfc-49eb-bb29-6e15ea340408",
+      "name": "Slack",
+      "notes": "This slack node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        800,
+        300
+      ],
+      "parameters": {
+        "channel": "general",
+        "blocksUi": {
+          "blocksValues": []
+        },
+        "attachments": [
+          {
+            "text": "={{$node[\"Typeform Trigger\"].json[\"Any suggestions for us? \"]}}",
+            "title": "={{$node[\"Typeform Trigger\"].json[\"Name\"]}} {{$node[\"Google Cloud Natural Language\"].json[\"documentSentiment\"][\"score\"]}}"
+          }
+        ],
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": ""
+      }
+    },
+    {
+      "id": "dd66da2d-9b60-4373-a309-b202483cc082",
+      "name": "Trello",
+      "notes": "This trello node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        600,
+        500
+      ],
+      "parameters": {
+        "name": "=Score: {{$json[\"documentSentiment\"][\"score\"]}}",
+        "listId": "5fbb9e2eb1d5cc0a8a7ab8ac",
+        "description": "=Score: {{$json[\"documentSentiment\"][\"score\"]}}\nFeedback: {{$node[\"Typeform Trigger\"].json[\"Any suggestions for us? \"]}}\nUser: {{$node[\"Typeform Trigger\"].json[\"Name\"]}}",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "trelloApi": ""
+      }
+    },
+    {
+      "id": "error-4587fc96",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

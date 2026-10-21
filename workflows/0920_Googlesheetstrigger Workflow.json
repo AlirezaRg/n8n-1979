@@ -1,0 +1,122 @@
+{
+  "active": false,
+  "name": "Googlesheetstrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "21da7bb6-6544-4756-9d0a-ab8ae21650d4",
+      "name": "Google Sheets Trigger",
+      "notes": "This googleSheetsTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        -20
+      ],
+      "parameters": {
+        "event": "rowAdded",
+        "options": {},
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Sheet1"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1SP8Y-qffC96ZV3ueVUYWP5pjqtaycaM7Kbv5L-ztw5g",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "URL list"
+        }
+      }
+    },
+    {
+      "id": "39a9a0a3-13c7-4271-bca4-31848201e48b",
+      "name": "Take a screenshot of a website",
+      "notes": "This websiteScreenshot node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        160,
+        -20
+      ],
+      "parameters": {
+        "urlInput": "{{ $env.BASE_URL }}"
+      }
+    },
+    {
+      "id": "1dc3cb1a-99ee-4e85-b628-0f4a77149728",
+      "name": "Store Screenshots",
+      "notes": "This googleDrive node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        400,
+        -20
+      ],
+      "parameters": {
+        "name": "={{ $json.Title }}.png",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "options": {},
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1oFbmzgG2fsRix45r5JtowYjAdwskJ0P6",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "screenshots"
+        }
+      }
+    },
+    {
+      "id": "error-4b6b96c8",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Screenshots": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

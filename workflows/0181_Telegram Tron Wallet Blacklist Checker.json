@@ -1,0 +1,151 @@
+{
+  "active": false,
+  "name": "Telegram Tron Wallet Blacklist Checker",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "fbd55c61-91ad-43e7-aa89-c30d14fc3b92",
+      "name": "Telegram Trigger",
+      "webhookId": "b384e76e-5f33-452c-b4eb-13a8d5fc377e",
+      "notes": "This telegramTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        -40
+      ],
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "utGUX9B8SmbwjN5s",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "f7b2d70e-9a5c-4a31-b445-68e9a37cfdb3",
+      "name": "Telegram Send Message",
+      "webhookId": "4148b55e-c227-491c-8a3a-f9579c604cc3",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1160,
+        -60
+      ],
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "additionalFields": {
+          "reply_to_message_id": "={{ $('Telegram Trigger').item.json.message.message_id }}"
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "utGUX9B8SmbwjN5s",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "2ed30255-373c-485b-bffe-ab3682ddb3b8",
+      "name": "Check Wallet Address Format",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        60,
+        -40
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "bc914e89-d74c-479e-9246-f028a9efe2bc",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              },
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "T[A-Za-z1-9]{33}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "8a05f33e-71bd-4053-b182-baf721a3a650",
+      "name": "Tron BlackList Stable Token Api Request",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        380,
+        -60
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "f4e89604-4721-45b9-a7e6-57d0d1e77a10",
+      "name": "Check Api Response",
+      "notes": "This code node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        760,
+        -60
+      ],
+      "parameters": {
+        "jsCode": "const response = items[0].json;\nlet message;\n\nif (response.total && response.total > 0) {\n  message = `???? **This Wallet is Blacklisted!** ????: ${response.data[0].blackAddress}`;\n} else {\n  message = `??? **This Wallet is NOT Blacklisted!** ???.`;\n}\n\nreturn [\n  {\n    json: {\n      text: message,\n    },\n  },\n];"
+      }
+    },
+    {
+      "id": "71e16929-f5f8-4d71-8fa0-d5230e4e7b5a",
+      "name": "Set Error Message (Wallet Address Format)",
+      "notes": "This code node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        320
+      ],
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      text: 'Please enter your wallet address correctly and completely.',\n    },\n  },\n];"
+      }
+    },
+    {
+      "id": "34835c57-19bf-49c2-935c-74deb0c5c3f0",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -340,
+        -200
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 1760,
+        "height": 700,
+        "content": "## TRON USDT Blacklist Checker\n**This template checks USDT wallets on the TRON blockchain and queries whether they have been blacklisted.**"
+      }
+    }
+  ],
+  "connections": {}
+}

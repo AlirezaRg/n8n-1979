@@ -1,0 +1,111 @@
+{
+  "active": false,
+  "name": "Snowflake CSV",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "da710a80-484b-4fe3-80fa-e699bb6499ad",
+      "name": "When clicking \"Execute Workflow\"",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        440,
+        380
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "f419ebfb-9eae-4fea-b05b-aabc97b5f47f",
+      "name": "HTTP Request",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        640,
+        380
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "fe45e2a2-b50f-4459-a8ee-78615239dee0",
+      "name": "Spreadsheet File",
+      "notes": "This spreadsheetFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 1,
+      "position": [
+        820,
+        380
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "54e31892-c8e1-423c-a24a-8e5eb1312b0a",
+      "name": "Set",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        380
+      ],
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "first_name",
+              "value": "={{ $json.first_name }}"
+            },
+            {
+              "name": "id",
+              "value": "={{ $json.id }}"
+            }
+          ],
+          "string": [
+            {
+              "name": "last_name",
+              "value": "={{ $json.last_name }}"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": false
+        },
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "c482d8e8-0792-4b61-a2e0-d437c9fe9062",
+      "name": "Snowflake",
+      "notes": "This snowflake node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.snowflake",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        380
+      ],
+      "parameters": {
+        "table": "users",
+        "columns": "id,first_name,last_name"
+      },
+      "credentials": {
+        "snowflake": {
+          "id": "{{ $credentials.snowflake.id }}",
+          "name": "Snowflake account"
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,148 @@
+{
+  "active": false,
+  "name": "itemMatching() example",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "ba0e23f6-aec6-4c22-8e7c-ab4fc65c7767",
+      "name": "When clicking \"Execute Workflow\"",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        640,
+        500
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "8434c3b4-5b80-48e5-803b-b84eb750b2c5",
+      "name": "Customer Datastore (n8n training)",
+      "notes": "This n8nTrainingCustomerDatastore node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.n8nTrainingCustomerDatastore",
+      "typeVersion": 1,
+      "position": [
+        880,
+        500
+      ],
+      "parameters": {
+        "operation": "getAllPeople",
+        "returnAll": true
+      }
+    },
+    {
+      "id": "4750754a-92a6-44d2-a353-22fbb51a4d00",
+      "name": "Code",
+      "notes": "This code node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        500
+      ],
+      "parameters": {
+        "language": "python",
+        "pythonCode": "for i,item in enumerate(_input.all()):\n  _input.all()[i].json.restoreEmail = _('Customer Datastore (n8n training)').itemMatching(i).json.email\n\nreturn _input.all();"
+      }
+    },
+    {
+      "id": "9ac437bd-0d0d-4d92-845a-a1c9a7976d4d",
+      "name": "Edit Fields",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [
+        1180,
+        500
+      ],
+      "parameters": {
+        "fields": {
+          "values": [
+            {
+              "name": "name",
+              "stringValue": "={{ $json.name }}"
+            }
+          ]
+        },
+        "include": "none",
+        "options": {}
+      }
+    },
+    {
+      "id": "d59c512c-2dca-4960-b287-b4908713b0a3",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        820,
+        400
+      ],
+      "parameters": {
+        "height": 304,
+        "content": "## Generate example data"
+      }
+    },
+    {
+      "id": "fad37032-13cc-461e-b48e-a2f470d07823",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        398
+      ],
+      "parameters": {
+        "height": 303,
+        "content": "## Reduce the data\n\nRemove all data except the names"
+      }
+    },
+    {
+      "id": "d0751fce-d9f0-40bf-aeb2-9dbc5d0e9bdb",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1380,
+        400
+      ],
+      "parameters": {
+        "height": 304,
+        "content": "## Restore\n\nRestore the email address data"
+      }
+    },
+    {
+      "id": "2b1a67e9-60d6-411e-8ae7-94b02da6be34",
+      "name": "Sticky Note3",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        430,
+        220
+      ],
+      "parameters": {
+        "width": 352,
+        "height": 264,
+        "content": "## About this workflow\n\nThis workflow provides a simple example of how to use `itemMatching(itemIndex: Number)` in the Code node to retrieve linked items from earlier in the workflow.\n\nThis example uses JavaScript. Refer to [Retrieve linked items from earlier in the workflow]({{ $env.WEBHOOK_URL }} for the Python code.\n"
+      }
+    },
+    {
+      "id": "error-d87f606a",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

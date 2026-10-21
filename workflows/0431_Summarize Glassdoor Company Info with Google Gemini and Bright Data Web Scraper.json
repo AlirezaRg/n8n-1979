@@ -1,0 +1,324 @@
+{
+  "active": false,
+  "name": "Summarize Glassdoor Company Info with Google Gemini and Bright Data Web Scraper",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "b2f9fc15-9ccb-48be-ba3c-3a6033c39246",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "72ab6042-72f1-486e-9095-d17de2f441f4",
+      "name": "Google Gemini Chat Model",
+      "notesInFlow": true,
+      "notes": "Gemini Experimental Model",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        -180
+      ],
+      "parameters": {
+        "options": {},
+        "modelName": "models/gemini-2.0-flash-thinking-exp-01-21"
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YeO7dHZnuGBVQKVZ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "id": "58ac3287-2b92-4f09-85a3-9d5393dd9d2a",
+      "name": "Default Data Loader",
+      "notes": "This documentDefaultDataLoader node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        -177.5
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "ad734713-959c-4e09-ac19-4df6b102678e",
+      "name": "Recursive Character Text Splitter",
+      "notes": "This textSplitterRecursiveCharacterTextSplitter node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1528,
+        20
+      ],
+      "parameters": {
+        "options": {},
+        "chunkOverlap": 100
+      }
+    },
+    {
+      "id": "350d4391-4ac2-469e-87ce-e3b84926f350",
+      "name": "If Node",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        -350
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "6a7e5360-4cb5-4806-892e-5c85037fa71c",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "ready"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "43449263-a73e-4d49-8c0f-3d36569e1d65",
+      "name": "Set Snapshot Id",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        440,
+        -275
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2c3369c6-9206-45d7-9349-f577baeaf189",
+              "name": "snapshot_id",
+              "type": "string",
+              "value": "={{ $json.snapshot_id }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "040aae51-d79d-408c-9d03-b6b81ed9e752",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -580
+      ],
+      "parameters": {
+        "width": 400,
+        "height": 200,
+        "content": "## Note\n\nDeals with the Glassdoor data extraction by using the Bright Data Web Scrapper API.\n\nThe summarization chain is being used to demonstrate the usage of the N8N AI capabilities."
+      }
+    },
+    {
+      "id": "885986ae-e9e6-48fe-816c-e8fd6f549158",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        480,
+        -580
+      ],
+      "parameters": {
+        "width": 420,
+        "height": 200,
+        "content": "## LLM Usages\n\nGoogle Gemini Flash Exp model is being used.\n\nSummarization Chain is being used for summarization of the content"
+      }
+    },
+    {
+      "id": "165e3335-cc5e-49d1-9eb5-7f196c5669aa",
+      "name": "Check Snapshot Status",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        -280
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "sendHeaders": true,
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "genericAuthType": "httpHeaderAuth",
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "kdbqXuxIR8qIxF7y",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "id": "b0125317-c557-4c38-b9b8-97528a75acb1",
+      "name": "Download the Snapshot Response",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        -400
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {
+          "timeout": 10000
+        },
+        "sendQuery": true,
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "genericAuthType": "httpHeaderAuth",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "format",
+              "value": "json"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "kdbqXuxIR8qIxF7y",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "id": "ec6a6d52-0e67-4100-9b7a-966029628d8e",
+      "name": "Wait for 30 seconds",
+      "webhookId": "8f2ad619-abe4-4e4e-8de7-9046d4cf3082",
+      "notes": "This wait node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1100,
+        -175
+      ],
+      "parameters": {
+        "amount": 30
+      }
+    },
+    {
+      "id": "0d77c2a9-b820-4943-a215-3f3663842b92",
+      "name": "Summarization of Glassdoor Response",
+      "notes": "This chainSummarization node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 2,
+      "position": [
+        1336,
+        -400
+      ],
+      "parameters": {
+        "options": {},
+        "operationMode": "documentLoader"
+      }
+    },
+    {
+      "id": "f3753c8f-bd1d-454a-b77e-b2237030219d",
+      "name": "Configure Webhook Notification",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1720,
+        -400
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}",
+        "options": {},
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "summary",
+              "value": "={{ $json.response.text }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "d5cfc596-c2b8-486f-b410-8d537fca1cf6",
+      "name": "HTTP Request to Glassdoor",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "[\n  {\n    \"url\": \"{{ $env.WEBHOOK_URL }}\"\n  }\n]",
+        "sendBody": true,
+        "sendQuery": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "genericAuthType": "httpHeaderAuth",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "dataset_id",
+              "value": "gd_l7j0bx501ockwldaqf"
+            },
+            {
+              "name": "include_errors",
+              "value": "true"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "kdbqXuxIR8qIxF7y",
+          "name": "Header Auth account"
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

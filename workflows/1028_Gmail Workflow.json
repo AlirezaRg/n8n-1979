@@ -1,0 +1,131 @@
+{
+  "active": false,
+  "name": "Gmail Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "4074dda0-993b-4b63-8502-3db09a920e42",
+      "name": "Send Gmail",
+      "notes": "This gmail node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1520,
+        260
+      ],
+      "parameters": {
+        "sendTo": "nico@n8n.io",
+        "message": "={{ $json.html }}",
+        "options": {
+          "appendAttribution": true
+        },
+        "subject": "new stable version of n8n released"
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y4RWMfx2YG0VDaFJ",
+          "name": "Gmail account"
+        }
+      },
+      "webhookId": "f5693de8-f809-4178-9df7-cf7d71b2c8ae"
+    },
+    {
+      "id": "01364110-5482-416f-abab-32ddbb9c3123",
+      "name": "Fetch Github Repo Releases",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        840,
+        260
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "fb96efc1-e615-4378-80c5-1ddafff3a4e8",
+      "name": "Split Out Content",
+      "notes": "This splitOut node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        260
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "body"
+      }
+    },
+    {
+      "id": "ca540fee-a2dc-4780-95d1-6a0a5b8dc6fa",
+      "name": "Convert Markdown to HTML",
+      "notes": "This markdown node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        260
+      ],
+      "parameters": {
+        "mode": "markdownToHtml",
+        "options": {},
+        "markdown": "={{ $json.body }}",
+        "destinationKey": "YOUR_CREDENTIAL_HERE"
+      }
+    },
+    {
+      "id": "e0e74830-bb7b-4b1f-9a1e-e7eb01a5cecb",
+      "name": "Daily Trigger",
+      "notes": "This scheduleTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        580,
+        260
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      }
+    },
+    {
+      "id": "d90f0d15-de3b-4997-9a36-f6ee08d5aea2",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        740,
+        160
+      ],
+      "parameters": {
+        "width": 288,
+        "height": 300,
+        "content": "Change **url** for Github Repo here"
+      }
+    },
+    {
+      "id": "f3b1af79-9946-4588-bae9-839f712a7d12",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        160
+      ],
+      "parameters": {
+        "width": 288,
+        "height": 300,
+        "content": "Change **to Email** here"
+      }
+    }
+  ],
+  "connections": {}
+}

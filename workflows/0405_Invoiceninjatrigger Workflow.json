@@ -1,0 +1,40 @@
+{
+  "active": false,
+  "name": "Invoiceninjatrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "41a23d9f-11bc-4458-8f99-78f16081296e",
+      "name": "Invoice Ninja Trigger",
+      "webhookId": "97be21b3-ebf5-48cf-b291-5d954657a544",
+      "notes": "This invoiceNinjaTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.invoiceNinjaTrigger",
+      "typeVersion": 1,
+      "position": [
+        890,
+        400
+      ],
+      "parameters": {
+        "event": "create_invoice"
+      },
+      "credentials": {
+        "invoiceNinjaApi": "invoice_ninja_creds"
+      }
+    },
+    {
+      "id": "error-9ca23ec6",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

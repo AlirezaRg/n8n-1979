@@ -1,0 +1,53 @@
+{
+  "active": false,
+  "name": "Look up a person using their email in Clearbit",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "546e1cbd-4da1-4c66-893e-88b24237537e",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "fb1cc73e-b994-459a-af42-dd5af9b3e203",
+      "name": "Clearbit",
+      "notes": "This clearbit node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.clearbit",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "email": "",
+        "resource": "person",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "clearbitApi": ""
+      }
+    },
+    {
+      "id": "error-305eb18b",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

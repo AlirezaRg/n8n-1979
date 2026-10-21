@@ -1,0 +1,131 @@
+{
+  "active": false,
+  "name": "Expense Tracker App",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-a4d4f599",
+      "name": "Get Receipt",
+      "webhookId": "b51cc683-1ef6-412f-9885-91e65f151cc0",
+      "type": "n8n-nodes-base.typeformTrigger",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "formId": ""
+      },
+      "credentials": {
+        "typeformApi": ""
+      }
+    },
+    {
+      "id": "node-4c59a47b",
+      "name": "Get Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "responseFormat": "file"
+      }
+    },
+    {
+      "id": "node-2f016d62",
+      "name": "Extract Information",
+      "type": "n8n-nodes-base.mindee",
+      "typeVersion": 1,
+      "position": [
+        850,
+        300
+      ],
+      "parameters": {},
+      "credentials": {
+        "mindeeReceiptApi": ""
+      }
+    },
+    {
+      "id": "node-01711083",
+      "name": "Set Information",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        300
+      ],
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "Amount",
+              "value": "={{$node[\"Extract Information\"].json[\"total\"]}}"
+            }
+          ],
+          "string": [
+            {
+              "name": "Merchant",
+              "value": "={{$node[\"Extract Information\"].json[\"merchant\"]}}"
+            },
+            {
+              "name": "Date",
+              "value": "={{$node[\"Extract Information\"].json[\"date\"]}}"
+            },
+            {
+              "name": "Time",
+              "value": "={{$node[\"Extract Information\"].json[\"time\"]}}"
+            },
+            {
+              "name": "Receipt URL",
+              "value": "={{$node[\"Get Receipt\"].json[\"Upload receipt\"]}}"
+            },
+            {
+              "name": "Category",
+              "value": "={{$node[\"Extract Information\"].json[\"category\"]}}"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "node-9a350249",
+      "name": "Store Information",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        1250,
+        300
+      ],
+      "parameters": {
+        "table": "Expenses",
+        "options": {},
+        "operation": "append",
+        "application": ""
+      },
+      "credentials": {
+        "airtableApi": ""
+      }
+    },
+    {
+      "id": "error-8baef28e",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

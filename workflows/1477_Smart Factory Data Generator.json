@@ -1,0 +1,101 @@
+{
+  "active": false,
+  "name": "Smart Factory Data Generator",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "trigger-1971d0eb",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        100
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "4933a756-e41d-44dc-b327-6cbdb451cdc1",
+      "name": "Set",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "values": {
+          "number": [],
+          "string": [
+            {
+              "name": "machine_id.name",
+              "value": "n8n_cr8"
+            },
+            {
+              "name": "temperature_celsius",
+              "value": "={{Math.floor(Math.random() * 100);}}"
+            },
+            {
+              "name": "machine_id.uptime",
+              "value": "={{Math.floor(Math.random() * 100);}}"
+            },
+            {
+              "name": "time_stamp",
+              "value": "={{Date.now();}}"
+            }
+          ],
+          "boolean": []
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "0af4bac6-6e02-4bdf-944d-a2ae2f9004d0",
+      "name": "Interval",
+      "notes": "This interval node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.interval",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "d23e22ae-7d10-456e-bebe-260ed7ff4305",
+      "name": "AMQP Sender",
+      "notes": "This amqp node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.amqp",
+      "typeVersion": 1,
+      "position": [
+        850,
+        300
+      ],
+      "parameters": {
+        "sink": "berlin_factory_01",
+        "options": {
+          "dataAsObject": true
+        }
+      },
+      "credentials": {
+        "amqp": ""
+      }
+    },
+    {
+      "id": "error-3657846c",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

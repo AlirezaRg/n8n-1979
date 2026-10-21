@@ -1,0 +1,128 @@
+{
+  "active": false,
+  "name": "Compare 2 SQL datasets",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "df04c503-d4af-4e8f-bcc3-f1fd02d3a332",
+      "name": "When clicking \"Execute Workflow\"",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        780,
+        340
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "6fe78ae6-7325-4062-ab58-457dc1d985c4",
+      "name": "Compare Datasets",
+      "notes": "This compareDatasets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.compareDatasets",
+      "typeVersion": 2.3,
+      "position": [
+        1560,
+        320
+      ],
+      "parameters": {
+        "options": {
+          "multipleMatches": "all"
+        },
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "customerNumber",
+              "field2": "customerNumber"
+            },
+            {
+              "field1": "year",
+              "field2": "year"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "0dae008c-242d-4757-a5a4-a075bde54cb6",
+      "name": "Orders from 2003 and 2004",
+      "notes": "This mySql node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        1080,
+        220
+      ],
+      "parameters": {
+        "query": "SELECT customerNumber, SUM(amount) as Total, COUNT(*) as ordercount, YEAR(paymentDate) as year\nFROM payments\nWHERE YEAR(paymentDate) = '2003' OR YEAR(paymentDate) = '2004'\nGROUP BY customerNumber, year\n;",
+        "options": {},
+        "operation": "executeQuery"
+      },
+      "credentials": {
+        "mySql": {
+          "id": "EEPqCgKBDiRRZ3ua",
+          "name": "db4free MySQL"
+        }
+      }
+    },
+    {
+      "id": "c162e9b5-6e26-4a81-b90d-a5709e73019c",
+      "name": "Orders from 2004 and 2005",
+      "notes": "This mySql node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        1080,
+        440
+      ],
+      "parameters": {
+        "query": "SELECT customerNumber, SUM(amount) as Total, COUNT(*) as ordercount, YEAR(paymentDate) as year\nFROM payments\nWHERE YEAR(paymentDate) = '2004' OR YEAR(paymentDate) = '2005'\nGROUP BY customerNumber, year\n;",
+        "options": {},
+        "operation": "executeQuery"
+      },
+      "credentials": {
+        "mySql": {
+          "id": "EEPqCgKBDiRRZ3ua",
+          "name": "db4free MySQL"
+        }
+      }
+    },
+    {
+      "id": "05547a67-2c53-43df-8abd-ee356f12742b",
+      "name": "Change ordercount",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        1300,
+        440
+      ],
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "ordercount",
+              "value": 1
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "error-e37ebd42",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

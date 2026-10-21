@@ -1,0 +1,110 @@
+{
+  "active": false,
+  "name": "My workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "9cea6c37-968a-4d14-b1a4-568c76f57b6a",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        320,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "0f04229d-627a-4578-bc87-51a88d1a6793",
+      "name": "Send Email",
+      "notes": "This emailSend node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        300
+      ],
+      "parameters": {
+        "options": {
+          "allowUnauthorizedCerts": true
+        },
+        "subject": "Certificate For Course",
+        "toEmail": "={{$node[\"SplitInBatches\"].json[\"email\"]}}",
+        "fromEmail": "bhavabhuthi@riseup.net",
+        "attachments": "data"
+      },
+      "credentials": {
+        "smtp": {
+          "id": "{{ $credentials.smtp.id }}",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "id": "d8bab283-7cfc-4171-9ca4-34ded995f26e",
+      "name": "Read Binary File",
+      "notes": "This readBinaryFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "alwaysOutputData": false,
+      "position": [
+        560,
+        300
+      ],
+      "parameters": {
+        "filePath": "/home/shashikanth/Documents/Cert-Gen-Test/data.csv",
+        "dataPropertyName": "csv"
+      }
+    },
+    {
+      "id": "0223eee7-67fb-445d-ace1-6dab5f7d893c",
+      "name": "Spreadsheet File",
+      "notes": "This spreadsheetFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 1,
+      "position": [
+        840,
+        300
+      ],
+      "parameters": {
+        "options": {
+          "headerRow": true
+        },
+        "binaryPropertyName": "csv"
+      }
+    },
+    {
+      "id": "de35b2a0-d006-4897-b926-161e866ba817",
+      "name": "SplitInBatches",
+      "notes": "This splitInBatches node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        300
+      ],
+      "parameters": {
+        "options": {
+          "reset": false
+        },
+        "batchSize": 5
+      }
+    },
+    {
+      "id": "55a34e5f-c214-4b89-af26-ecfc10ec27ed",
+      "name": "Read Binary File1",
+      "notes": "This readBinaryFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        300
+      ],
+      "parameters": {
+        "filePath": "=/home/shashikanth/Documents/Cert-Gen-Test/generator-output/{{$json[\"name\"]}}.png"
+      }
+    }
+  ],
+  "connections": {}
+}

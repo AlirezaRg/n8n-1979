@@ -1,0 +1,176 @@
+{
+  "active": false,
+  "name": "Production Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-8dfb5b44",
+      "name": "Webhook",
+      "webhookId": "45e2593e-f25d-4be5-9b50-4a7c1e566a9e",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "path": "45e2593e-f25d-4be5-9b50-4a7c1e566a9e",
+        "options": {},
+        "httpMethod": "POST",
+        "responseMode": "lastNode"
+      }
+    },
+    {
+      "id": "node-ef241065",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        850,
+        200
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "responseFormat": "string"
+      }
+    },
+    {
+      "id": "node-5d52cfb0",
+      "name": "Check type",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json[\"body\"][\"type\"]}}",
+              "value2": 1,
+              "operation": "notEqual"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-92c98b8f",
+      "name": "Extract Title",
+      "type": "n8n-nodes-base.htmlExtract",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        200
+      ],
+      "parameters": {
+        "options": {},
+        "extractionValues": {
+          "values": [
+            {
+              "key": "title",
+              "cssSelector": "title"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-de84233d",
+      "name": "Add Link to Notion",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 1,
+      "position": [
+        1250,
+        200
+      ],
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": "8a1638ce-da33-41b7-8fd9-37a4c272ba95",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Name|title",
+              "title": "={{$json[\"title\"]}}"
+            },
+            {
+              "key": "Link|url",
+              "urlValue": "{{ $env.BASE_URL }}"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "notionApi": "Notion API Credentials"
+      }
+    },
+    {
+      "id": "node-d29c5dec",
+      "name": "Reply on Discord",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1450,
+        200
+      ],
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "type",
+              "value": 4
+            }
+          ],
+          "string": [
+            {
+              "name": "data.content",
+              "value": "Added Link to notion"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "node-132d0bac",
+      "name": "Register URL",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        850,
+        410
+      ],
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "type",
+              "value": 1
+            }
+          ],
+          "string": []
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "error-e39409e4",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,144 @@
+{
+  "active": false,
+  "name": "Httprequest Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "8a36e8d4-a3bf-44e1-894a-db00bad99151",
+      "name": "Fetch Github Repo Releases",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "alwaysOutputData": false,
+      "position": [
+        880,
+        240
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "4803248b-3ff7-4994-a105-3d8ef68bd45d",
+      "name": "Daily Trigger",
+      "notes": "This scheduleTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        380,
+        240
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      }
+    },
+    {
+      "id": "0b2122d7-18cf-49b8-b10e-a8132df8ceb9",
+      "name": "RepoConfig",
+      "notes": "This code node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        620,
+        240
+      ],
+      "parameters": {
+        "jsCode": "return [\n  {\n    \"github-org\": \"n8n-io\",\n    \"github-repo\": \"n8n\"\n  },\n  {\n    \"github-org\": \"home-assistant\",\n    \"github-repo\": \"core\"\n  }\n];"
+      }
+    },
+    {
+      "id": "60918b67-76bb-4c9e-bc84-845d59fced76",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        540,
+        100
+      ],
+      "parameters": {
+        "width": 269,
+        "height": 278,
+        "content": "### Setup repos here to check releases for.\n\nAdd a new json object to the array setting the org and repo, these will be used by the following nodes"
+      }
+    },
+    {
+      "id": "66fbb663-cd52-471c-be8b-4175f754d02d",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        120
+      ],
+      "parameters": {
+        "height": 254,
+        "content": "### Setup Slack notification\n\nUpdate this node to customise your Slack notification"
+      }
+    },
+    {
+      "id": "9b04cdd2-e369-4862-b376-9945e93c0aaf",
+      "name": "Wether Release is new",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1080,
+        240
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "014670a7-6f9e-466c-a403-24ad4e230dff",
+              "operator": {
+                "type": "dateTime",
+                "operation": "after"
+              },
+              "leftValue": "={{ $json.published_at.toDateTime() }}",
+              "rightValue": "={{ DateTime.utc().minus(1, 'days') }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "4ad55bb4-89d2-4f1d-bcb5-fe60aa4f8c79",
+      "name": "Send Message",
+      "notes": "This slack node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [
+        1380,
+        220
+      ],
+      "parameters": {
+        "text": "=:tada: New release for *{{ $('RepoConfig').item.json[\"github-repo\"] }}* - {{ $('Fetch Github Repo Releases').item.json[\"name\"] }}\n\n{{ $json.body.slice(0, 500) }}\n\n{{ $('Fetch Github Repo Releases').item.json[\"url\"] }}",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "#dk-test"
+        },
+        "otherOptions": {
+          "mrkdwn": true
+        }
+      },
+      "webhookId": "cf50e5e3-5f41-41cd-96dc-aeb36fed620e"
+    }
+  ],
+  "connections": {}
+}

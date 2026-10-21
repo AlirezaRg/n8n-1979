@@ -1,0 +1,45 @@
+{
+  "active": false,
+  "name": "Boxtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "f8aada0f-8e2e-43d2-a0f2-cf898dd5bdf5",
+      "name": "Box Trigger",
+      "webhookId": "0e56bb0c-8e81-42de-a902-c0ab31834bd8",
+      "notes": "This boxTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.boxTrigger",
+      "typeVersion": 1,
+      "position": [
+        1027,
+        368
+      ],
+      "parameters": {
+        "events": [
+          "FOLDER.MOVED",
+          "FOLDER.DOWNLOADED"
+        ],
+        "targetId": "118847708963",
+        "targetType": "file"
+      },
+      "credentials": {
+        "boxOAuth2Api": "box_creds"
+      }
+    },
+    {
+      "id": "error-7e63894b",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

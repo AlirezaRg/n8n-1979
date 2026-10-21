@@ -1,0 +1,56 @@
+{
+  "active": false,
+  "name": "Publish post to a publication",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "6c0abc94-b172-4314-9be7-e31e07b17d5c",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        600,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "3ab286a3-383f-4a48-86d4-c2594509c67c",
+      "name": "Medium",
+      "notes": "This medium node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.medium",
+      "typeVersion": 1,
+      "position": [
+        800,
+        300
+      ],
+      "parameters": {
+        "title": "",
+        "content": "",
+        "publication": true,
+        "contentFormat": "",
+        "publicationId": "",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "mediumApi": "medium"
+      }
+    },
+    {
+      "id": "error-650aa6c6",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

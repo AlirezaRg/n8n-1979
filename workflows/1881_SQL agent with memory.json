@@ -1,0 +1,211 @@
+{
+  "active": false,
+  "name": "SQL agent with memory",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "3544950e-4d8e-46ca-8f56-61c152a5cae3",
+      "name": "Window Buffer Memory",
+      "notes": "This memoryBufferWindow node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.2,
+      "position": [
+        1220,
+        500
+      ],
+      "parameters": {
+        "contextWindowLength": 10
+      }
+    },
+    {
+      "id": "743cc4e7-5f24-4adc-b872-7241ee775bd0",
+      "name": "OpenAI Chat Model",
+      "notes": "This lmChatOpenAi node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        500
+      ],
+      "parameters": {
+        "model": "gpt-4-turbo",
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "rveqdSfp7pCRON1T",
+          "name": "Ted's Tech Talks OpenAi"
+        }
+      }
+    },
+    {
+      "id": "cc30066c-ad2c-4729-82c1-a6b0f4214dee",
+      "name": "When clicking \"Test workflow\"",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        500,
+        -80
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "0deacd0d-45cb-4738-8da0-9d1251858867",
+      "name": "Get chinook.zip example",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        700,
+        -80
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "61f34708-f8ed-44a9-8522-6042d28511ae",
+      "name": "Extract zip file",
+      "notes": "This compression node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.compression",
+      "typeVersion": 1.1,
+      "position": [
+        900,
+        -80
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "6a12d9ac-f1b7-4267-8b34-58cdb9d347bb",
+      "name": "Save chinook.db locally",
+      "notes": "This readWriteFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        -80
+      ],
+      "parameters": {
+        "options": {},
+        "fileName": "./chinook.db",
+        "operation": "write",
+        "dataPropertyName": "file_0"
+      }
+    },
+    {
+      "id": "701d1325-4186-4185-886a-3738163db603",
+      "name": "Load local chinook.db",
+      "notes": "This readWriteFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        620,
+        360
+      ],
+      "parameters": {
+        "options": {},
+        "fileSelector": "./chinook.db"
+      }
+    },
+    {
+      "id": "d7b3813d-8180-4ff1-87a4-bd54a03043af",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        440,
+        -280.9454545454546
+      ],
+      "parameters": {
+        "width": 834.3272727272731,
+        "height": 372.9454545454546,
+        "content": "## Run this part only once\nThis section:\n* downloads the example zip file from {{ $env.WEBHOOK_URL }}\n* extracts the archive (it contains only a single file)\n* saves the extracted `chinook.db` SQLite database locally\n\nNow you can use chat to \"talk\" to your data!"
+      }
+    },
+    {
+      "id": "6bd25563-2c59-44c2-acf9-407bd28a15cf",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        400,
+        240
+      ],
+      "parameters": {
+        "width": 558.5454545454544,
+        "height": 297.89090909090913,
+        "content": "## On every chat message:\n* the local SQLite database is loaded\n* JSON from Chat Trigger is combined with SQLite binary data"
+      }
+    },
+    {
+      "id": "2be63956-236e-46f7-b8e4-0f55e2e25a5c",
+      "name": "Combine chat input with the binary",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        820,
+        360
+      ],
+      "parameters": {
+        "mode": "raw",
+        "options": {
+          "includeBinary": true
+        },
+        "jsonOutput": "={{ $('Chat Trigger').item.json }}\n"
+      }
+    },
+    {
+      "id": "7f4c9adb-eab4-40d7-ad2e-44f2c0e3e30a",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        980,
+        120
+      ],
+      "parameters": {
+        "width": 471.99692219161466,
+        "height": 511.16641410437836,
+        "content": "### LangChain SQL Agent can make several queries before producing the final answer.\nTry these examples:\n1. \"Please describe the database\". This input usually requires just 1 query + an extra observation to produce a final answer.\n2. \"What are the revenues by genre?\". This input will launch a series of Agent actions, because it needs to make several queries.\n\nThe final answer is stored in the memory and will be recalled on the next input from the user."
+      }
+    },
+    {
+      "id": "ac819eb5-13b2-4280-b9d6-06ec1209700e",
+      "name": "AI Agent",
+      "notes": "This agent node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1.6,
+      "position": [
+        1020,
+        360
+      ],
+      "parameters": {
+        "agent": "sqlAgent",
+        "options": {},
+        "dataSource": "sqlite"
+      }
+    },
+    {
+      "id": "5ecaa3eb-e93e-4e41-bbc0-98a8c2b2d463",
+      "name": "Chat Trigger",
+      "webhookId": "fb565f08-a459-4ff9-8249-1ede58599660",
+      "notes": "This chatTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        420,
+        360
+      ],
+      "parameters": {}
+    }
+  ],
+  "connections": {}
+}

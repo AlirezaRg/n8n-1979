@@ -1,0 +1,139 @@
+{
+  "active": false,
+  "name": "Httprequest Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "28409b8d-3ae2-4cdb-a4ba-b0af9f31c1f2",
+      "name": "HTTP Request",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        940,
+        440
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "authentication": "{{ $credentials.predefinedCredentialType }}",
+        "nodeCredentialType": "YOUR_CREDENTIAL_HERE"
+      },
+      "credentials": {
+        "githubApi": {
+          "id": "{{ $credentials.githubApi.id }}",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "id": "aa604a92-7691-4b25-bbd0-ce42b8147fd8",
+      "name": "Search PR user in Pipedrive by email",
+      "notes": "This pipedrive node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "position": [
+        1220,
+        440
+      ],
+      "parameters": {
+        "term": "={{ $json[\"email\"]}}",
+        "resource": "person",
+        "operation": "search",
+        "additionalFields": {
+          "fields": "email"
+        }
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "{{ $credentials.pipedriveApi.id }}",
+          "name": "Pipedrive account"
+        }
+      }
+    },
+    {
+      "id": "444a840f-3d34-48c4-b539-fe23a2a2a39c",
+      "name": "person exists",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1460,
+        440
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"name\"]}}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "b713ebee-0346-453e-bc1e-5dec1c74057f",
+      "name": "Pipedrive",
+      "notes": "This pipedrive node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 1,
+      "position": [
+        1780,
+        340
+      ],
+      "parameters": {
+        "content": "=Created a PR \n{{$node[\"ON Pull Request\"].json[\"body\"][\"pull_request\"][\"html_url\"]}}",
+        "resource": "note",
+        "additionalFields": {
+          "person_id": "={{ $json[\"id\"] }}"
+        }
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "{{ $credentials.pipedriveApi.id }}",
+          "name": "Pipedrive account"
+        }
+      }
+    },
+    {
+      "id": "72b08b20-5b30-4f06-bf7e-34ab28421455",
+      "name": "NoOp",
+      "notes": "This noOp node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1780,
+        540
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "e0a1b859-16d4-4884-a17a-6e857fdbe8d4",
+      "name": "ON Pull Request",
+      "webhookId": "ec0c326f-4ccd-4c07-8653-ec0fe23765d5",
+      "notes": "This githubTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.githubTrigger",
+      "typeVersion": 1,
+      "position": [
+        640,
+        440
+      ],
+      "parameters": {
+        "owner": "John-n8n",
+        "events": [
+          "pull_request"
+        ],
+        "repository": "DemoRepo"
+      },
+      "credentials": {
+        "githubApi": {
+          "id": "{{ $credentials.githubApi.id }}",
+          "name": "GitHub account"
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

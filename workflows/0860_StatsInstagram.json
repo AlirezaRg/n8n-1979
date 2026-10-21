@@ -1,0 +1,113 @@
+{
+  "active": false,
+  "name": "StatsInstagram",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "6c68dda1-1b0f-4ff6-b28b-7a8b43917ebd",
+      "name": "Mattermost",
+      "notes": "This mattermost node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.mattermost",
+      "typeVersion": 1,
+      "position": [
+        1030,
+        290
+      ],
+      "parameters": {
+        "message": "=Bonjour ! Voici les stats de notre Instagram {{$json[\"Compte\"]}} en ce beau matin du {{$node[\"Date & Time\"].json[\"day_today\"]}} {{$node[\"Date & Time\"].json[\"data\"]}}\nLe nombre de Followers est de : {{$json[\"Followers\"]}}\nNous avons r�alis� : {{$json[\"Posts\"]}} posts, \nBravo !",
+        "channelId": "xxxxxxx",
+        "attachments": [],
+        "otherOptions": {}
+      },
+      "credentials": {
+        "mattermostApi": "API"
+      }
+    },
+    {
+      "id": "3adecc96-d306-421b-bf67-a6d1b65c2d06",
+      "name": "Date & Time",
+      "notes": "This dateTime node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 1,
+      "position": [
+        640,
+        290
+      ],
+      "parameters": {
+        "value": "={{$json[\"date_today\"]}}",
+        "custom": true,
+        "options": {},
+        "toFormat": "DD-MM-YYYY"
+      }
+    },
+    {
+      "id": "8e0d1528-2d29-4f7d-b2bc-5a244f9d37a2",
+      "name": "Cron",
+      "notes": "This cron node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        310,
+        290
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 8
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "0004af5b-f3b7-4f6f-909a-849b0b0d1b42",
+      "name": "Get the date today",
+      "notes": "This function node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        470,
+        290
+      ],
+      "parameters": {
+        "functionCode": "var date = new Date().toISOString();\nvar day = new Date().getDay();\nconst weekday = [\"Dimanche\", \"Lundi\", \"Mardi\", \"Mercredi\", \"Jeudi\", \"Vendredi\", \"Samedi\"];\n\nitems[0].json.date_today = date;\nitems[0].json.day_today = weekday[day];\n\nreturn items;\n"
+      }
+    },
+    {
+      "id": "b5c90006-795f-4630-a6de-3cf3031f6e98",
+      "name": "Read data on Google Sheets",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        850,
+        290
+      ],
+      "parameters": {
+        "range": "cells",
+        "options": {},
+        "sheetId": "sheetID",
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": "GoogleAPI"
+      }
+    },
+    {
+      "id": "error-a9cec680",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

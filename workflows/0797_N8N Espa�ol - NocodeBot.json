@@ -1,0 +1,162 @@
+{
+  "active": false,
+  "name": "N8N Espa�ol - NocodeBot",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-f2c7f300",
+      "name": "HTTP Request",
+      "notesInFlow": true,
+      "notes": "Lee los datos de Strapi",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        630,
+        350
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "node-a8b9345d",
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        950,
+        280
+      ],
+      "parameters": {
+        "text": "=------------------------------------------------       \n<b>{{$node[\"HTTP Request\"].json[\"0\"][\"Name\"].toUpperCase()}} </b>\n------------------------------------------------\n|-<b>Descripci�n:</b>\n|<pre>{{$node[\"Execute Command\"].json[\"stdout\"]}}</pre>",
+        "chatId": "={{$node[\"Telegram Trigger\"].json[\"message\"][\"chat\"][\"id\"]}}",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "credentials": {
+        "telegramApi": "NocodeTranslateBot"
+      },
+      "webhookId": "6a0b49f0-2b90-486e-bf3d-1d5b0b91e8b6"
+    },
+    {
+      "id": "node-8866852d",
+      "name": "Telegram1",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        800,
+        130
+      ],
+      "parameters": {
+        "file": "={{$json[\"0\"][\"Img\"]}}",
+        "chatId": "={{$node[\"Telegram Trigger\"].json[\"message\"][\"chat\"][\"id\"]}}",
+        "operation": "sendPhoto",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": null,
+          "name": "NocodeTranslateBot"
+        }
+      },
+      "webhookId": "46a70123-ae97-4053-9597-f75fef25ef6d"
+    },
+    {
+      "id": "node-fb3bd5c5",
+      "name": "Execute Command",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        790,
+        390
+      ],
+      "parameters": {
+        "command": "=/usr/bin/translate --brief -t {{$node[\"Telegram Trigger\"].json[\"message\"][\"from\"][\"language_code\"]}} \"{{$json[\"0\"][\"Description\"]}}\""
+      }
+    },
+    {
+      "id": "node-848c0d66",
+      "name": "Telegram Trigger",
+      "webhookId": "9673bd65-53ef-4561-bfe1-a55fab0f77b0",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [
+        290,
+        130
+      ],
+      "parameters": {
+        "updates": [
+          "*"
+        ],
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": null,
+          "name": "NocodeTranslateBot"
+        }
+      }
+    },
+    {
+      "id": "node-9a1b4f0e",
+      "name": "Saludos-IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        450,
+        270
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$node[\"Telegram Trigger\"].json[\"message\"][\"text\"]}}",
+              "value2": "/start"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-a3bedb89",
+      "name": "S-Telegram2",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        630,
+        130
+      ],
+      "parameters": {
+        "text": "=Hola, **{{$json[\"message\"][\"chat\"][\"first_name\"]}}**  ??\nEste bot ha sido desarrollado para @comunidadn8n\nPuedes escribir el nombre de alguna herramienta No-Code y si la tenemos registrada en nuestra Base de datos te responderemos con la descripci�n en tu idioma.\n\nPuedes probar escribiendo alguno de estos nombres:\n\n- Airtable\n- Stripe\n- Webflow",
+        "chatId": "={{$node[\"Telegram Trigger\"].json[\"message\"][\"chat\"][\"id\"]}}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": null,
+          "name": "NocodeTranslateBot"
+        }
+      },
+      "webhookId": "caefa654-749b-42ae-8f72-767c331ec388"
+    },
+    {
+      "id": "error-ff7f5e22",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

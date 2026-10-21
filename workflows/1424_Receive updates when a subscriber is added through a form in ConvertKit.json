@@ -1,0 +1,41 @@
+{
+  "active": false,
+  "name": "Receive updates when a subscriber is added through a form in ConvertKit",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "137b7728-7ea8-4709-8c32-8fe1ba22c100",
+      "name": "ConvertKit Trigger",
+      "webhookId": "55336480-7be1-4432-8fc8-d860572c1c18",
+      "notes": "This convertKitTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.convertKitTrigger",
+      "typeVersion": 1,
+      "position": [
+        690,
+        260
+      ],
+      "parameters": {
+        "event": "formSubscribe",
+        "formId": 1657198
+      },
+      "credentials": {
+        "convertKitApi": "convertkit"
+      }
+    },
+    {
+      "id": "error-5a488409",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

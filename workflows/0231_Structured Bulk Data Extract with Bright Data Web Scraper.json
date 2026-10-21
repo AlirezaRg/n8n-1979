@@ -1,0 +1,388 @@
+{
+  "active": false,
+  "name": "Structured Bulk Data Extract with Bright Data Web Scraper",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "1bdca5ae-1e56-4cf2-a8dc-e135a6a2dfec",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -900,
+        -395
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "533968cd-1329-4a86-8875-478600ed82b7",
+      "name": "If Node",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        200,
+        -470
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "6a7e5360-4cb5-4806-892e-5c85037fa71c",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "ready"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "83991fdf-0402-4de3-bbb5-7050e3e9fb62",
+      "name": "Set Snapshot Id",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -240,
+        -395
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2c3369c6-9206-45d7-9349-f577baeaf189",
+              "name": "snapshot_id",
+              "type": "string",
+              "value": "={{ $json.snapshot_id }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "408a36af-decb-49b3-a95e-a2df0b6eea5f",
+      "name": "Download Snapshot",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        -520
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {
+          "timeout": 10000
+        },
+        "sendQuery": true,
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "genericAuthType": "httpHeaderAuth",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "format",
+              "value": "json"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "kdbqXuxIR8qIxF7y",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "id": "9d6cd882-c287-46ca-bc1e-df6b995fc422",
+      "name": "Wait",
+      "webhookId": "631cd5de-36b3-4264-88ae-45b30e2c2ccc",
+      "notes": "This wait node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        420,
+        -295
+      ],
+      "parameters": {
+        "amount": 30
+      }
+    },
+    {
+      "id": "c9cf847a-6399-4c93-a901-30f1c0e7408a",
+      "name": "Check on the errors",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        420,
+        -520
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "b267071c-7102-407b-a98d-f613bcb1a106",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $json.errors.toString() }}",
+              "rightValue": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "b648614e-c33e-4818-8348-e95df56928c7",
+      "name": "Check Snapshot Status",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -20,
+        -395
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "sendHeaders": true,
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "genericAuthType": "httpHeaderAuth",
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "kdbqXuxIR8qIxF7y",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "id": "408a1584-666f-471e-bfcd-c4d857319688",
+      "name": "Initiate a Webhook Notification",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1080,
+        -520
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}",
+        "options": {},
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "response",
+              "value": "={{ $json.data[0] }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "6548a794-a4fd-4050-b07d-bc7ca4517882",
+      "name": "Aggregate JSON Response",
+      "notes": "This aggregate node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        860,
+        -520
+      ],
+      "parameters": {
+        "options": {},
+        "aggregate": "aggregateAllItemData"
+      }
+    },
+    {
+      "id": "c84e195c-edd2-4f59-8986-516d116b7352",
+      "name": "Set Dataset Id, Request URL",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -680,
+        -400
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c16061c8-c829-4bd3-b335-e79c605665f2",
+              "name": "dataset_id",
+              "type": "string",
+              "value": "gd_l7q7dkf244hwjntr0"
+            },
+            {
+              "id": "a4594c55-e39e-4a9e-80d6-d39370001e20",
+              "name": "request",
+              "type": "string",
+              "value": "[{     \"url\": \"{{ $env.WEBHOOK_URL }}\"   }]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ceae108e-ed78-40c5-8e58-7013591ccaad",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -900,
+        -700
+      ],
+      "parameters": {
+        "width": 520,
+        "height": 280,
+        "content": "## Note\n\nDeals with the Amazon web scraping by utilizing Bright Data Web Scraper Product.\n\n\n**Please make sure to set the Bright Data \n -> Dataset Id, Request URL and update the Webhook Notification URL**\n\nRefer \n- {{ $env.WEBHOOK_URL }}\n- {{ $env.WEBHOOK_URL }}"
+      }
+    },
+    {
+      "id": "1f55cffa-abd9-437b-bc9d-3fe0d8b02454",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        -600
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 720,
+        "height": 500,
+        "content": "## Wait until the Snapshot is ready"
+      }
+    },
+    {
+      "id": "d8ba0f62-80a9-4e66-b70c-086ee5992df6",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -900,
+        -220
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 660,
+        "content": "## Who can benefit?\nData analysts, scientists, engineers, and developers seeking efficient methods to collect and analyze web data for AI, ML, big data applications, and more will find Scraper APIs particularly beneficial."
+      }
+    },
+    {
+      "id": "7fdffafd-f256-4760-b001-a42b5198dbad",
+      "name": "Create a binary data",
+      "notes": "This function node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        -720
+      ],
+      "parameters": {
+        "functionCode": "items[0].binary = {\n  data: {\n    data: new Buffer(JSON.stringify(items[0].json, null, 2)).toString('base64')\n  }\n};\nreturn items;"
+      }
+    },
+    {
+      "id": "934ab31a-cfb9-4e97-8d86-92cd95dd219c",
+      "name": "Write the file to disk",
+      "notes": "This readWriteFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        -720
+      ],
+      "parameters": {
+        "options": {},
+        "fileName": "d:\\bulk_data.json",
+        "operation": "write"
+      }
+    },
+    {
+      "id": "1130523a-b598-425e-acf1-417ae8699f66",
+      "name": "HTTP Request to the specified URL",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -460,
+        -395
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={{ $json.request }}",
+        "sendBody": true,
+        "sendQuery": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "authentication": "{{ $credentials.genericCredentialType }}",
+        "genericAuthType": "httpHeaderAuth",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "dataset_id",
+              "value": "={{ $json.dataset_id }}"
+            },
+            {
+              "name": "format",
+              "value": "json"
+            },
+            {
+              "name": "uncompressed_webhook",
+              "value": "true"
+            }
+          ]
+        },
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "kdbqXuxIR8qIxF7y",
+          "name": "Header Auth account"
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

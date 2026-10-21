@@ -1,0 +1,185 @@
+{
+  "active": false,
+  "name": "Syncro Alert to OpsGenie",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-62eae5b8",
+      "name": "Webhook",
+      "webhookId": "fromsyncro",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        460,
+        380
+      ],
+      "parameters": {
+        "path": "fromsyncro",
+        "options": {},
+        "httpMethod": "POST",
+        "responseData": "allEntries",
+        "responseMode": "lastNode"
+      }
+    },
+    {
+      "id": "node-7e1db27d",
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        780,
+        380
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "AlertID",
+              "value": "={{$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"id\"]}}"
+            },
+            {
+              "name": "Description",
+              "value": "={{$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"computer_name\"]}} ({{$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"customer\"][\"business_then_name\"]}}): {{$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"formatted_output\"]}}"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "node-aac49461",
+      "name": "Create Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1180,
+        260
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "requestMethod": "POST",
+        "authentication": "{{ $credentials.headerAuth }}",
+        "bodyParametersUi": {
+          "parameter": [
+            {
+              "name": "message",
+              "value": "={{$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"computer_name\"]}} ({{$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"customer\"][\"business_then_name\"]}}): {{$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"formatted_output\"]}}"
+            },
+            {
+              "name": "alias",
+              "value": "={{$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"id\"]}}"
+            },
+            {
+              "name": "description",
+              "value": "={{$node[\"Webhook\"].json[\"body\"][\"text\"]}}\n{{$node[\"Webhook\"].json[\"body\"][\"link\"]}}"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": null,
+          "name": "OpsGenie"
+        }
+      }
+    },
+    {
+      "id": "node-4e7a4353",
+      "name": "Close Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1180,
+        460
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "requestMethod": "POST",
+        "authentication": "{{ $credentials.headerAuth }}",
+        "bodyParametersUi": {
+          "parameter": [
+            {
+              "name": "note",
+              "value": "Issue resolved automatically according to Syncro."
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": null,
+          "name": "OpsGenie"
+        }
+      }
+    },
+    {
+      "id": "node-a91ad03c",
+      "name": "NoOp",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        780,
+        560
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-b91dae22",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        940,
+        380
+      ],
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"resolved\"]}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-5e44d89b",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        620,
+        380
+      ],
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "value2": "agent_offline_trigger"
+            }
+          ]
+        },
+        "value1": "={{$node[\"Webhook\"].json[\"body\"][\"attributes\"][\"properties\"][\"trigger\"]}}",
+        "dataType": "string"
+      }
+    },
+    {
+      "id": "error-6004a0a2",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

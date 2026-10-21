@@ -1,0 +1,88 @@
+{
+  "active": false,
+  "name": "Googlesheets Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "trigger-26723884",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        100
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "66c603fe-c6a7-4e03-a96b-6f5c77a4e216",
+      "name": "Google Sheets1",
+      "notesInFlow": true,
+      "notes": "Append data to sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        980,
+        -120
+      ],
+      "parameters": {
+        "range": "A:C",
+        "options": {
+          "usePathForKeyRow": true
+        },
+        "sheetId": "qwertz",
+        "operation": "append",
+        "authentication": "{{ $credentials.oAuth2 }}"
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "{{ $credentials.googleSheetsOAuth2Api.id }}",
+          "name": "google_sheets_oauth"
+        }
+      }
+    },
+    {
+      "id": "b23923c6-5697-47c9-8de6-df66f6be9432",
+      "name": "read json file",
+      "notes": "This readBinaryFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        620,
+        -120
+      ],
+      "parameters": {
+        "filePath": "/username/users_spreadsheet.json"
+      }
+    },
+    {
+      "id": "e19ccfea-2ab4-4709-bf07-87424670df21",
+      "name": "move binary data 2",
+      "notes": "This moveBinaryData node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1,
+      "position": [
+        800,
+        -120
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "error-69f9f5dc",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,109 @@
+{
+  "active": false,
+  "name": "Get SSL Certificate",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "ccc61507-0e95-4644-a1c2-dd6aadfdd836",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        290
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "733aa9dd-d792-45b8-bfcf-496476a59875",
+      "name": "Create Domain Item",
+      "notes": "This functionItem node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.functionItem",
+      "typeVersion": 1,
+      "position": [
+        450,
+        290
+      ],
+      "parameters": {
+        "functionCode": "item.domain = \"n8n.io\";\nreturn item;"
+      }
+    },
+    {
+      "id": "8d1f370c-f77e-42b7-9132-451a3c3ff171",
+      "name": "Get SSL Certificate",
+      "notes": "This uproc node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.uproc",
+      "typeVersion": 1,
+      "position": [
+        650,
+        290
+      ],
+      "parameters": {
+        "tool": "getDomainCertificate",
+        "group": "internet",
+        "domain": "= {{$node[\"Create Domain Item\"].json[\"domain\"]}}",
+        "additionalOptions": {}
+      },
+      "credentials": {
+        "uprocApi": "miquel-uproc"
+      }
+    },
+    {
+      "id": "8c82b84b-c365-43fc-9ae3-8b6bdd71636e",
+      "name": "Send Expired Alarm",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1070,
+        270
+      ],
+      "parameters": {
+        "text": "=The certificate of the domain {{$node[\"Create Domain Item\"].json[\"domain\"]}} has expired!",
+        "chatId": "-1415703867",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": "test killia bot"
+      },
+      "webhookId": "f898a6a6-881a-494b-9021-5911549ec21d"
+    },
+    {
+      "id": "6ab0e2ec-4ec8-4377-a4fe-e8d8550c2191",
+      "name": "Certificate  has  expired?",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        840,
+        290
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$node[\"Get SSL Certificate\"].json[\"message\"][\"valid\"]+\"\"}}",
+              "value2": "false"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "error-1d3c3367",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,173 @@
+{
+  "active": false,
+  "name": "Image-Based Data Extraction API using Gemini AI",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "e3448003-5c62-4da6-8fcc-6817915dcbb8",
+      "name": "Webhook",
+      "webhookId": "18118afb-7fd2-47a5-a474-50813c5b20c8",
+      "notes": "This webhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        40,
+        40
+      ],
+      "parameters": {
+        "path": "data-extractor",
+        "options": {},
+        "responseMode": "responseNode"
+      }
+    },
+    {
+      "id": "3682c6bf-3442-4fba-ab6c-ae29e361ef93",
+      "name": "Respond to Webhook",
+      "notes": "This respondToWebhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1180,
+        40
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "bfa352d0-68a9-4f33-be54-254a5df22664",
+      "name": "Get image from URL",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        280,
+        40
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "c6c8de12-08dc-42e8-9c0e-86e04c7cacc0",
+      "name": "Call Gemini API (Flash Lite) with Image",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        760,
+        40
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"role\": \"user\",\n      \"parts\": [\n        {\n          \"inlineData\": {\n            \"data\": \"{{$json.data1}}\",\n            \"mimeType\": \"image/jpeg\"\n          }\n        }\n      ]\n    },\n    {\n      \"role\": \"user\",\n      \"parts\": [\n        {\n          \"text\": \"check this\"\n        }\n      ]\n    }\n  ],\n  \"systemInstruction\": {\n    \"role\": \"user\",\n    \"parts\": [\n      {\n        \"text\": \"{{ $('Webhook').first().json.body.Requirement}}\"\n      }\n    ]\n  },\n  \"generationConfig\": {\n    \"temperature\": 1,\n    \"topK\": 40,\n    \"topP\": 0.95,\n    \"maxOutputTokens\": 8192,\n    \"responseMimeType\": \"application/json\",\n    \"responseSchema\": {\n      \"type\": \"object\",\n      \"properties\": {{ $('Webhook').first().json.body.properties.toJsonString()}}\n    }\n  }\n}\n",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "{{ $credentials.predefinedCredentialType }}",
+        "nodeCredentialType": "YOUR_CREDENTIAL_HERE"
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "MhMVz0OkKPSPX2Wn",
+          "name": "Gemini API Srinivasan Online"
+        }
+      }
+    },
+    {
+      "id": "06b0f807-aeba-44d6-bb1d-dfa1d50e1082",
+      "name": "Edit fields to output required data alone",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        980,
+        40
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4a2f1343-4b5d-4de8-b04b-5640e0a38d27",
+              "name": "result",
+              "type": "string",
+              "value": "={{ $json.candidates[0].content.parts[0].text.parseJson()}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "8c69dba2-f67c-4f8b-be18-02a414fd2ead",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        20,
+        280
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 820,
+        "height": 420,
+        "content": "## Sample API Call (cURL) \n```\ncurl --request GET \\\n  --url {{ $env.WEBHOOK_URL }} \\\n  --data '{\n  \"image_url\":\"{{ $env.WEBHOOK_URL }}\",\n  \"Requirement\":\"extract the details from the image\",\n  \"properties\": {\n        \"PAN Number\": {\n          \"type\": \"string\"\n        },\n        \"Name\": {\n          \"type\": \"string\"\n        },\n        \"Date of Birth\": {\n          \"type\": \"string\"\n        },\n        \"Valid\": {\n          \"type\": \"boolean\"\n        }\n      }\n}'\n```"
+      }
+    },
+    {
+      "id": "8839f0d7-306f-4dc2-aca5-6ca529e1a2ff",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        20,
+        740
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 1240,
+        "height": 140,
+        "content": "## Sample Output\n```\n{\n  \"result\": \"{\\\"Date of Birth\\\":\\\"23/11/1974\\\",\\\"Name\\\":\\\"RAHUL GUPTA\\\",\\\"PAN Number\\\":\\\"ABCDE1234F\\\",\\\"Valid\\\":true}\"\n}\n```"
+      }
+    },
+    {
+      "id": "df733e11-f194-4878-a514-47ddc9811281",
+      "name": "Sticky Note2",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        40,
+        -520
+      ],
+      "parameters": {
+        "width": 940,
+        "height": 440,
+        "content": "## Convert the workflow into an Endpoint\n\nThis n8n workflow provides a ready-to-use API endpoint for extracting structured data from images. The API takes an image URL as input, processes it using an AI-powered OCR model, and returns relevant extracted details in a structured JSON format.\n\n- The workflow converts the image to base64 before processing.\n- It utilizes an AI-powered model (Gemini API) for text extraction.\n- The output is formatted to include only the required fields.\n- You can customize the extraction criteria by modifying the request parameters.\n- Supports integration with various applications for automated data entry and processing.\n\nIt can be used for various use cases, such as:\n\n- Document OCR (ID cards, invoices, receipts)\n- Text Extraction from Images\n- Automated Form Processing\n- Business Card Data Extraction\n\nSimply send a GET request with an image URL, define the extraction requirements, and receive structured JSON data in response.\n\n"
+      }
+    },
+    {
+      "id": "aecf7331-6341-411e-8906-e42fc0ef264a",
+      "name": "Transform image to base64",
+      "notes": "This extractFromFile node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        520,
+        40
+      ],
+      "parameters": {
+        "options": {
+          "encoding": "ascii"
+        },
+        "operation": "binaryToPropery",
+        "destinationKey": "YOUR_CREDENTIAL_HERE"
+      }
+    }
+  ],
+  "connections": {}
+}

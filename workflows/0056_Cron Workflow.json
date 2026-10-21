@@ -1,0 +1,162 @@
+{
+  "active": false,
+  "name": "Cron Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "bb404988-831e-444a-b83b-33657c8c1019",
+      "name": "Cron",
+      "notes": "This cron node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        560,
+        350
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "4a33c7c9-561b-4c16-ac28-e1363eb7c865",
+      "name": "Pipedrive",
+      "notes": "This pipedrive node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 1,
+      "position": [
+        760,
+        250
+      ],
+      "parameters": {
+        "resource": "person",
+        "operation": "getAll",
+        "returnAll": true,
+        "additionalFields": {}
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "{{ $credentials.pipedriveApi.id }}",
+          "name": "pipedrive_api"
+        }
+      }
+    },
+    {
+      "id": "322d89a7-309b-409d-80a0-5b2c1dd6ccb5",
+      "name": "Update Pipedrive",
+      "notes": "This pipedrive node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 1,
+      "position": [
+        1160,
+        250
+      ],
+      "parameters": {
+        "name": "={{$json[\"properties\"][\"firstname\"][\"value\"]}}",
+        "resource": "person",
+        "additionalFields": {
+          "email": [
+            "={{$json[\"identity-profiles\"][0][\"identities\"][0][\"value\"]}}"
+          ]
+        }
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "{{ $credentials.pipedriveApi.id }}",
+          "name": "pipedrive_api"
+        }
+      }
+    },
+    {
+      "id": "b5f2fa39-a07d-40fa-8a9b-6e14fe54f1bf",
+      "name": "HubSpot",
+      "notes": "This hubspot node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 1,
+      "position": [
+        760,
+        450
+      ],
+      "parameters": {
+        "resource": "contact",
+        "operation": "getAll",
+        "returnAll": true,
+        "additionalFields": {}
+      },
+      "credentials": {
+        "hubspotApi": {
+          "id": "{{ $credentials.hubspotApi.id }}",
+          "name": "hubspot_account"
+        }
+      }
+    },
+    {
+      "id": "f6f3cf2b-8fa3-4a1c-8af7-f943a1aac299",
+      "name": "Update HubSpot",
+      "notes": "This hubspot node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 1,
+      "position": [
+        1160,
+        450
+      ],
+      "parameters": {
+        "email": "={{$json[\"email\"][0][\"value\"]}}",
+        "resource": "contact",
+        "additionalFields": {
+          "firstName": "={{$json[\"first_name\"]}}"
+        }
+      },
+      "credentials": {
+        "hubspotApi": {
+          "id": "{{ $credentials.hubspotApi.id }}",
+          "name": "hubspot_account"
+        }
+      }
+    },
+    {
+      "id": "bd127add-05b2-49e4-9d70-faae15a78b5a",
+      "name": "Merge1",
+      "notes": "This merge node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 1,
+      "position": [
+        960,
+        250
+      ],
+      "parameters": {
+        "mode": "removeKeyMatches",
+        "propertyName1": "identity-profiles[0].identities[0].value",
+        "propertyName2": "email[0].value"
+      }
+    },
+    {
+      "id": "011aa57c-6a3f-42a3-b140-97ad1ba74d37",
+      "name": "Merge2",
+      "notes": "This merge node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 1,
+      "position": [
+        960,
+        450
+      ],
+      "parameters": {
+        "mode": "removeKeyMatches",
+        "propertyName1": "email[0].value",
+        "propertyName2": "identity-profiles[0].identities[0].value"
+      }
+    },
+    {
+      "id": "error-3f00e700",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

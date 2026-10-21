@@ -1,0 +1,163 @@
+{
+  "active": false,
+  "name": "Splitout Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "551a3a1f-07ad-48aa-bc9a-18f39c883929",
+      "name": "Split Out",
+      "notes": "This splitOut node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        940,
+        180
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "toplevel.CompleteSuggestion"
+      }
+    },
+    {
+      "id": "f451dc0d-a78d-4ba6-adcf-c1180502a904",
+      "name": "Aggregate",
+      "notes": "This aggregate node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        180
+      ],
+      "parameters": {
+        "options": {},
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "Keywords"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ccad69b0-7f88-490e-bfbd-50ef702f48ce",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        350.13991769547397,
+        134.716049382716
+      ],
+      "parameters": {
+        "color": 4,
+        "width": 1323.884773662551,
+        "height": 224.79012345679018,
+        "content": "* Generating keywords for your SEO"
+      }
+    },
+    {
+      "id": "9ed26e36-e05a-416e-a517-3f5d07718256",
+      "name": "Receive Keyword",
+      "webhookId": "76a63718-b3cb-4141-bc55-efa614d13f1d",
+      "notes": "This webhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        400,
+        180
+      ],
+      "parameters": {
+        "path": "76a63718-b3cb-4141-bc55-efa614d13f1d",
+        "options": {},
+        "responseMode": "lastNode"
+      }
+    },
+    {
+      "id": "51aa0811-7f31-4476-9460-4eacad81e469",
+      "name": "Autogenerate Keywords",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        600,
+        180
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "f3bd360c-bf72-4e5f-92ec-ca08c8e4daed",
+      "name": "Format Keywords",
+      "notes": "This xml node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        760,
+        180
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "17bef508-47e1-482b-8dc1-aeb1f6faca63",
+      "name": "Clean Keywords",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        1100,
+        180
+      ],
+      "parameters": {
+        "options": {
+          "ignoreConversionErrors": true
+        },
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fb95058f-0c20-4249-8a45-7b935fde1874",
+              "name": "Keywords",
+              "type": "array",
+              "value": "={{ $json.suggestion.data }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "81e3ced0-d3b7-4019-a6a7-5e940ad33df1",
+      "name": "return Keywords",
+      "notes": "This respondToWebhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        180
+      ],
+      "parameters": {
+        "options": {},
+        "respondWith": "allIncomingItems"
+      }
+    },
+    {
+      "id": "fafc57a6-64e1-4463-bbf0-c9dccd880345",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        360,
+        380
+      ],
+      "parameters": {
+        "width": 767.7695473251028,
+        "content": "* If you are using this one, just copy the this webhook url {{ $env.WEBHOOK_URL }}\n* All you need is to change the keyword to e your desired keyword and you will be good to go\n\n* You can use the keyword with a space and the results will be the same"
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,160 @@
+{
+  "active": false,
+  "name": "Production Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-d2334a95",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        500
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$node[\"HTML Extract Data\"].data[\"title\"]}}",
+              "value2": "Show HN:",
+              "operation": "contains"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-4a44d66f",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [
+        1450,
+        400
+      ],
+      "parameters": {
+        "text": "={{$node[\"Function\"].data[\"emailText\"]}}",
+        "options": {},
+        "subject": "Trending Show HN"
+      }
+    },
+    {
+      "id": "node-91d4e891",
+      "name": "Cron",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        250,
+        500
+      ],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 13
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-9b5c108c",
+      "name": "Function",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1250,
+        400
+      ],
+      "parameters": {
+        "functionCode": "let emailText = 'Currently trending \"Show HN\":\\n\\n';\n\nfor (let item of items) {\n  emailText += `${item.json.rank} ${item.json.title}\\n${item.json.url}\\n\\n`;\n}\n\nreturn [{json: {emailText}}]\n"
+      }
+    },
+    {
+      "id": "node-bc2e1982",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        450,
+        500
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "responseFormat": "string"
+      }
+    },
+    {
+      "id": "node-62359a3b",
+      "name": "HTML Extract Items",
+      "type": "n8n-nodes-base.htmlExtract",
+      "typeVersion": 1,
+      "position": [
+        650,
+        500
+      ],
+      "parameters": {
+        "options": {},
+        "extractionValues": {
+          "values": [
+            {
+              "key": "item",
+              "cssSelector": "tr.athing",
+              "returnArray": true,
+              "returnValue": "html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-42d60b40",
+      "name": "HTML Extract Data",
+      "type": "n8n-nodes-base.htmlExtract",
+      "typeVersion": 1,
+      "position": [
+        850,
+        500
+      ],
+      "parameters": {
+        "options": {},
+        "dataPropertyName": "item",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "title",
+              "cssSelector": "a"
+            },
+            {
+              "key": "url",
+              "attribute": "href",
+              "cssSelector": "a.storylink",
+              "returnValue": "attribute"
+            },
+            {
+              "key": "rank",
+              "cssSelector": ".rank"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "error-26d2dd22",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

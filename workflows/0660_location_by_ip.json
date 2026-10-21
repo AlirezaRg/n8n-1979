@@ -1,0 +1,138 @@
+{
+  "active": false,
+  "name": "location_by_ip",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "f9e043a0-c800-458b-9b1b-77b9bdf40a02",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        440,
+        510
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "c936eca1-6f7e-4132-af5d-7829b0616205",
+      "name": "Get Location By IP",
+      "notes": "This uproc node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.uproc",
+      "typeVersion": 1,
+      "position": [
+        850,
+        510
+      ],
+      "parameters": {
+        "ip": "={{$node[\"Create IP and Email Item\"].json[\"ip\"]}}",
+        "tool": "getLocationByIp",
+        "group": "geographic",
+        "additionalOptions": {}
+      },
+      "credentials": {
+        "uprocApi": "miquel-uproc"
+      }
+    },
+    {
+      "id": "2cfddaf5-eb79-4820-91c0-a5aea49e34da",
+      "name": "User in Spain?",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        510
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$node[\"Get Location By IP\"].json[\"message\"][\"country_code\"]}}",
+              "value2": "ES"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "fd136836-2c01-487b-ac4c-dc10cdf6180c",
+      "name": "Create IP and Email Item",
+      "notes": "This functionItem node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.functionItem",
+      "typeVersion": 1,
+      "position": [
+        640,
+        510
+      ],
+      "parameters": {
+        "functionCode": "item.ip = \"83.46.131.46\";\nitem.email = \"miquel@uproc.io\";\n\nreturn item;"
+      }
+    },
+    {
+      "id": "528ee4a5-6c54-4f67-8fba-0a0462d57ff0",
+      "name": "Send English Email",
+      "notes": "This awsSes node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.awsSes",
+      "typeVersion": 1,
+      "position": [
+        1270,
+        650
+      ],
+      "parameters": {
+        "body": "Hi,\n\nThank you for your signup!",
+        "subject": "Welcome aboard",
+        "fromEmail": "sample@uproc.io",
+        "toAddresses": [
+          "={{$node[\"Create IP and Email Item\"].json[\"email\"]}}"
+        ],
+        "additionalFields": {}
+      },
+      "credentials": {
+        "aws": "ses"
+      }
+    },
+    {
+      "id": "96395561-aed3-43d1-a4bf-e05444188cb7",
+      "name": "Send Spanish Email",
+      "notes": "This awsSes node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.awsSes",
+      "typeVersion": 1,
+      "position": [
+        1270,
+        420
+      ],
+      "parameters": {
+        "body": "Hola,\n\n�Gracias por registrarte!",
+        "subject": "Bienvenido a bordo",
+        "fromEmail": "sample@uproc.io",
+        "toAddresses": [
+          "={{$node[\"Create IP and Email Item\"].json[\"email\"]}}"
+        ],
+        "additionalFields": {}
+      },
+      "credentials": {
+        "aws": {
+          "id": null,
+          "name": "ses"
+        }
+      }
+    },
+    {
+      "id": "error-8b968624",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

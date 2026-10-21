@@ -1,0 +1,131 @@
+{
+  "active": false,
+  "name": "N8N Espa�ol - BOT",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "1a90fee6-2e10-4e06-9a7a-8fc426babf09",
+      "name": "Saludos-IF",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        450,
+        450
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$node[\"Saludos-TelegramTrigger\"].json[\"message\"][\"new_chat_member\"][\"first_name\"]}}",
+              "operation": "isEmpty"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "78e1509d-06c4-4011-8d17-091681d48d2a",
+      "name": "Saludos-IF1",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        490,
+        630
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$node[\"Saludos-TelegramTrigger\"].json[\"message\"][\"left_chat_member\"][\"first_name\"]}}",
+              "operation": "isEmpty"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "01c4c691-48c0-48d5-aa00-14dc5a7783c0",
+      "name": "S-Telegram",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        700,
+        660
+      ],
+      "parameters": {
+        "text": "=?? {{$node[\"Saludos-TelegramTrigger\"].json[\"message\"][\"left_chat_member\"][\"first_name\"]}} DEP. ?? Que los Dioses te protejan.",
+        "chatId": "=@comunidadn8n",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": "N8N Espa�ol - BOT"
+      },
+      "webhookId": "3a495513-03fa-4a0f-aca0-97f0c7f57d3f"
+    },
+    {
+      "id": "c9bdf5cf-ef59-4c65-a3a5-333216484069",
+      "name": "Saludos-TelegramTrigger",
+      "webhookId": "4ef8c98e-e617-4d36-9c6d-04fae7e9298c",
+      "notes": "This telegramTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [
+        260,
+        560
+      ],
+      "parameters": {
+        "updates": [
+          "*"
+        ],
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": null,
+          "name": "N8N Espa�ol - BOT"
+        }
+      }
+    },
+    {
+      "id": "b04980d0-c3f5-4883-bdf8-e1ecaadde2c5",
+      "name": "S-Telegram2",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        730,
+        460
+      ],
+      "parameters": {
+        "text": "=?? {{$node[\"Saludos-TelegramTrigger\"].json[\"message\"][\"new_chat_member\"][\"first_name\"]}}, �bienvenid@ a N8N en Espa�oll!  ??",
+        "chatId": "=@comunidadn8n",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": null,
+          "name": "N8N Espa�ol - BOT"
+        }
+      },
+      "webhookId": "47e0f39f-9333-47fa-bd65-bf2d73559e07"
+    },
+    {
+      "id": "error-bd864e68",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,105 @@
+{
+  "active": false,
+  "name": "My workflow 4",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "9ae28c07-bb44-4e64-b38c-a74a9de81b2e",
+      "name": "Receive Feedback",
+      "webhookId": "89e8d5ec-d442-41ea-9ff1-93a9df0b2aa1",
+      "notes": "This webhook node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -440,
+        540
+      ],
+      "parameters": {
+        "path": "client-feedback",
+        "options": {},
+        "httpMethod": "POST"
+      }
+    },
+    {
+      "id": "770bc041-1846-4ac1-b8dc-61756686f906",
+      "name": "Prepare AI Prompt",
+      "notes": "This function node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        540
+      ],
+      "parameters": {
+        "functionCode": "\nconst feedback = $json.feedback || \"No feedback provided.\";\nreturn [{\n  json: {\n    prompt: `Analyze this client feedback: \"${feedback}\"\\n\\n1. Summarize the positive points.\\n2. Suggest improvements.\\n3. Generate a short social media post based on the positive elements.`\n  }\n}];\n"
+      }
+    },
+    {
+      "id": "0b3a469a-f6f4-4140-9c6f-fd7ba7689c5e",
+      "name": "Analyze with AI",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        -40,
+        540
+      ],
+      "parameters": {
+        "url": "{{ $env.API_BASE_URL }}",
+        "options": {},
+        "authentication": "{{ $credentials.predefinedCredentialType }}",
+        "jsonParameters": true
+      }
+    },
+    {
+      "id": "bdbf3a85-e68f-4fe3-b0b4-d44578d11c31",
+      "name": "Format AI Output",
+      "notes": "This function node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        160,
+        540
+      ],
+      "parameters": {
+        "functionCode": "\nconst output = $json.response || $json.choices?.[0]?.text || \"No AI output.\";\nconst splitIndex = output.indexOf(\"3.\");\nlet summary = output;\nlet post = \"No post generated.\";\n\nif (splitIndex !== -1) {\n  summary = output.substring(0, splitIndex).trim();\n  post = output.substring(splitIndex).replace(/^3\\./, \"\").trim();\n}\n\nreturn [{\n  json: {\n    report: summary,\n    post: post\n  }\n}];\n"
+      }
+    },
+    {
+      "id": "47093d4d-645b-4dc8-a5a4-1b35a649ac97",
+      "name": "Send Feedback Report",
+      "notes": "This emailSend node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [
+        380,
+        500
+      ],
+      "parameters": {
+        "text": "={{ $json[\"report\"] }}",
+        "options": {},
+        "subject": "Client Feedback Summary",
+        "toEmail": "team@email.com",
+        "fromEmail": "your@email.com"
+      }
+    },
+    {
+      "id": "e49a4898-00d9-4413-ac6d-87aafdfe6ff9",
+      "name": "Send Social Draft",
+      "webhookId": "07598764-aee9-41ea-82c1-0ded0ac08b57",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        380,
+        660
+      ],
+      "parameters": {
+        "text": "={{ $json[\"post\"] }}",
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "additionalFields": {}
+      }
+    }
+  ],
+  "connections": {}
+}

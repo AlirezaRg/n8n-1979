@@ -1,0 +1,46 @@
+{
+  "active": false,
+  "name": "Eventbritetrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "49f529bc-931f-4868-b486-bd966288866e",
+      "name": "Eventbrite Trigger",
+      "webhookId": "90ebf00a-536b-4553-b879-2e2c3e35bd60",
+      "notes": "This eventbriteTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.eventbriteTrigger",
+      "typeVersion": 1,
+      "position": [
+        880,
+        400
+      ],
+      "parameters": {
+        "event": "114095913950",
+        "actions": [
+          "order.placed",
+          "order.updated",
+          "order.refunded"
+        ],
+        "organization": "461207981776"
+      },
+      "credentials": {
+        "eventbriteApi": "eventbrite api"
+      }
+    },
+    {
+      "id": "error-bbb62f36",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,56 @@
+{
+  "active": false,
+  "name": "My workflow 6",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "dad32e79-af45-4255-90d9-845a5357395a",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -580,
+        920
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "1cadea33-7c6a-4282-be84-e127fc7437c2",
+      "name": "Extract Pages From PDF1",
+      "notes": "This ExtractPages node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -140,
+        920
+      ],
+      "parameters": {
+        "pageRange": "2-3",
+        "field_name": "=data"
+      },
+      "credentials": {
+        "customJsApi": {
+          "id": "h29wo2anYKdANAzm",
+          "name": "CustomJS account"
+        }
+      }
+    },
+    {
+      "id": "a8554e6b-6e2d-4a26-909c-25e74e618480",
+      "name": "HTTP Request",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -360,
+        920
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

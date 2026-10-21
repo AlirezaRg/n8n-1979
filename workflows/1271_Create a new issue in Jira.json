@@ -1,0 +1,54 @@
+{
+  "active": false,
+  "name": "Create a new issue in Jira",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "461db607-c45a-46fb-9ae5-d663dfe339a8",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        350,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "61010d47-e810-4182-b1da-6b7c28125ab3",
+      "name": "Jira",
+      "notes": "This jira node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        550,
+        300
+      ],
+      "parameters": {
+        "project": "",
+        "summary": "Firewall on fire",
+        "issueType": "10001",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "jiraSoftwareCloudApi": ""
+      }
+    },
+    {
+      "id": "error-f183c4af",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

@@ -1,0 +1,153 @@
+{
+  "active": false,
+  "name": "Create a table, and insert and update data in the table in Snowflake",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "5a1fbad9-ef25-4bbc-ad88-0e132590cc18",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "cac8336c-2f51-478f-9737-6b470ff88939",
+      "name": "Set",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "id",
+              "value": 1
+            }
+          ],
+          "string": [
+            {
+              "name": "name",
+              "value": "n8n"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "382ede54-30dd-4a89-be28-0ec7c40dfa40",
+      "name": "Snowflake",
+      "notes": "This snowflake node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.snowflake",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "query": "CREATE TABLE docs (id INT, name STRING);",
+        "operation": "executeQuery"
+      },
+      "credentials": {
+        "snowflake": "Snowflake n8n Credentials"
+      }
+    },
+    {
+      "id": "1fa84be2-9f9d-497e-b882-f2764b531cb0",
+      "name": "Snowflake1",
+      "notes": "This snowflake node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.snowflake",
+      "typeVersion": 1,
+      "position": [
+        850,
+        300
+      ],
+      "parameters": {
+        "table": "docs",
+        "columns": "id, name"
+      },
+      "credentials": {
+        "snowflake": {
+          "id": null,
+          "name": "Snowflake n8n Credentials"
+        }
+      }
+    },
+    {
+      "id": "c8a58c18-97ba-48a4-bfe9-808e1a88391a",
+      "name": "Set1",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        300
+      ],
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "id",
+              "value": 1
+            }
+          ],
+          "string": [
+            {
+              "name": "name",
+              "value": "nodemation"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "d74f9238-f9bf-46ff-88af-2090ec3ff8db",
+      "name": "Snowflake2",
+      "notes": "This snowflake node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.snowflake",
+      "typeVersion": 1,
+      "position": [
+        1250,
+        300
+      ],
+      "parameters": {
+        "table": "={{$node[\"Snowflake1\"].parameter[\"table\"]}}",
+        "columns": "name",
+        "operation": "update"
+      },
+      "credentials": {
+        "snowflake": {
+          "id": null,
+          "name": "Snowflake n8n Credentials"
+        }
+      }
+    },
+    {
+      "id": "error-1e5971c8",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

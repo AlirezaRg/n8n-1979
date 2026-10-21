@@ -1,0 +1,127 @@
+{
+  "active": false,
+  "name": "Errortrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "aa84d631-c14f-45c2-a659-454605e83c30",
+      "name": "On Error",
+      "notes": "This errorTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        880,
+        900
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "abffce17-cc93-4c6a-8955-de2d0f4cc885",
+      "name": "Set message",
+      "notes": "This set node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        900
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "message",
+              "value": "=?? Workflow `{{$json[\"workflow\"][\"name\"]}}` failed to run! [execution]({{ $json.execution.url }})"
+            }
+          ]
+        },
+        "options": {},
+        "keepOnlySet": true
+      }
+    },
+    {
+      "id": "1e5c4af6-30ae-45b8-bca7-048a656ce9bd",
+      "name": "Sticky Note3",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        800,
+        700
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 424.4907862645661,
+        "height": 154.7766688696994,
+        "content": "### ????? Setup\n1. Add Telegram creds\n2. Set chat id in **Telegram** node\n2. Add this error workflow to other workflows\n{{ $env.WEBHOOK_URL }}"
+      }
+    },
+    {
+      "id": "845ddf26-2d40-4cc6-843b-ccb3b365fbfb",
+      "name": "Telegram",
+      "notes": "This telegram node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        1360,
+        900
+      ],
+      "parameters": {
+        "text": "={{ $json.message }}",
+        "chatId": "1688282582",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "{{ $credentials.telegramApi.id }}",
+          "name": "mymontsbot token"
+        }
+      },
+      "webhookId": "3f38a503-649b-4753-893e-196a64fd44b3"
+    },
+    {
+      "id": "90db96b8-0e43-4977-b455-3e6813211640",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1380,
+        1080
+      ],
+      "parameters": {
+        "width": 241,
+        "height": 80,
+        "content": "### ???? Set chat id here"
+      }
+    },
+    {
+      "id": "error-28eefabc",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Telegram": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

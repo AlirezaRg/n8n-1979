@@ -1,0 +1,42 @@
+{
+  "active": false,
+  "name": "Receive updates when a customer is created in HelpScout",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "b464634d-dc2b-488a-a848-b962d0d66b57",
+      "name": "HelpScout Trigger",
+      "webhookId": "aaaf8b3f-8247-4d98-ae65-8c6626aade95",
+      "notes": "This helpScoutTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.helpScoutTrigger",
+      "typeVersion": 1,
+      "position": [
+        690,
+        260
+      ],
+      "parameters": {
+        "events": [
+          "customer.created"
+        ]
+      },
+      "credentials": {
+        "helpScoutOAuth2Api": "helpscout"
+      }
+    },
+    {
+      "id": "error-35642a3c",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

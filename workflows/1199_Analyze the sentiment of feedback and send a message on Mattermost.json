@@ -1,0 +1,110 @@
+{
+  "active": false,
+  "name": "Analyze the sentiment of feedback and send a message on Mattermost",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "6a9314f1-8239-455a-a506-629e8acee1be",
+      "name": "Typeform Trigger",
+      "webhookId": "ad8a87ef-d293-4e48-8d36-838d69ebce0f",
+      "notes": "This typeformTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.typeformTrigger",
+      "typeVersion": 1,
+      "position": [
+        510,
+        260
+      ],
+      "parameters": {
+        "formId": ""
+      },
+      "credentials": {
+        "typeformApi": "typeform"
+      }
+    },
+    {
+      "id": "7a9ee800-a826-4d6b-9ee6-5aaa58e04020",
+      "name": "Google Cloud Natural Language",
+      "notes": "This googleCloudNaturalLanguage node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleCloudNaturalLanguage",
+      "typeVersion": 1,
+      "position": [
+        710,
+        260
+      ],
+      "parameters": {
+        "content": "={{$node[\"Typeform Trigger\"].json[\"What did you think about the event?\"]}}",
+        "options": {}
+      },
+      "credentials": {
+        "googleCloudNaturalLanguageOAuth2Api": "cloud"
+      }
+    },
+    {
+      "id": "d9c0fefe-4717-4897-856f-d18783317eed",
+      "name": "If Node",
+      "notes": "This if node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        910,
+        260
+      ],
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$node[\"Google Cloud Natural Language\"].json[\"documentSentiment\"][\"score\"]}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "4583a66e-7689-4ab8-8589-d91323737b9f",
+      "name": "Mattermost",
+      "notes": "This mattermost node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.mattermost",
+      "typeVersion": 1,
+      "position": [
+        1110,
+        160
+      ],
+      "parameters": {
+        "message": "=You got a new feedback with a score of {{$node[\"Google Cloud Natural Language\"].json[\"documentSentiment\"][\"score\"]}}. Here is what it says:{{$node[\"Typeform Trigger\"].json[\"What did you think about the event?\"]}}",
+        "channelId": "4h1bz64cyifwxnzojkzh8hxh4a",
+        "attachments": [],
+        "otherOptions": {}
+      },
+      "credentials": {
+        "mattermostApi": "mattermost"
+      }
+    },
+    {
+      "id": "0dedd606-0b87-408a-a617-ea5c880261bf",
+      "name": "NoOp",
+      "notes": "This noOp node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1110,
+        360
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "error-c7151828",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

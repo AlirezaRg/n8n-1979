@@ -1,0 +1,40 @@
+{
+  "active": false,
+  "name": "Mailjettrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "c85fcf09-7e03-426d-90de-a90ade746904",
+      "name": "Mailjet Trigger",
+      "notes": "This mailjetTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.mailjetTrigger",
+      "typeVersion": 1,
+      "position": [
+        530,
+        400
+      ],
+      "parameters": {
+        "event": "sent"
+      },
+      "credentials": {
+        "mailjetEmailApi": "mailjet creds"
+      },
+      "webhookId": "4ccf531d-2b97-4db1-85d3-ec9624163504"
+    },
+    {
+      "id": "error-076b1690",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

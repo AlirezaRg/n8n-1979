@@ -1,0 +1,102 @@
+{
+  "active": false,
+  "name": "Production Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-03c5429d",
+      "name": "On clicking 'execute'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-bf82135b",
+      "name": "Split Up Binary Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        900,
+        300
+      ],
+      "parameters": {
+        "functionCode": "let results = [];\n\nfor (item of items) {\n    for (key of Object.keys(item.binary)) {\n        results.push({\n            json: {\n                fileName: item.binary[key].fileName\n            },\n            binary: {\n                data: item.binary[key],\n            }\n        });\n    }\n}\n\nreturn results;"
+      }
+    },
+    {
+      "id": "node-14a3d713",
+      "name": "Download Example Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ],
+      "parameters": {
+        "url": "{{ $env.BASE_URL }}",
+        "options": {},
+        "responseFormat": "file"
+      }
+    },
+    {
+      "id": "node-b0d13554",
+      "name": "Decompress Example Data",
+      "type": "n8n-nodes-base.compression",
+      "typeVersion": 1,
+      "position": [
+        680,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-bd1fc66c",
+      "name": "Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        420,
+        120
+      ],
+      "parameters": {
+        "width": 400,
+        "height": 360,
+        "content": "## Example Data\nThe first two nodes simply fetch some example data to work with.\n\nIn the real world, you'd probably process incoming emails, uploaded FTP files or something similar instead."
+      }
+    },
+    {
+      "id": "node-2d932800",
+      "name": "Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        860,
+        120
+      ],
+      "parameters": {
+        "width": 320,
+        "height": 360,
+        "content": "## Transformation\nThis is where the magic happens. Incoming files are split up into individual items, each with a single binary data object under the `data` key."
+      }
+    },
+    {
+      "id": "error-4e87a096",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

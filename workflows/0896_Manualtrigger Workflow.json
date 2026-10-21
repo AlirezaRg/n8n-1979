@@ -1,0 +1,149 @@
+{
+  "active": false,
+  "name": "Manualtrigger Workflow",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "228b7813-3598-4900-853c-49454ae9608f",
+      "name": "On clicking 'execute'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        450,
+        450
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "236d2645-5379-4d44-9800-892ffe24228c",
+      "name": "Wekan",
+      "notes": "This wekan node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.wekan",
+      "typeVersion": 1,
+      "position": [
+        650,
+        450
+      ],
+      "parameters": {
+        "owner": "c4nzTEvSwGPBxKTCc",
+        "title": "Documentation",
+        "resource": "board",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "wekanApi": "wekan-trial"
+      }
+    },
+    {
+      "id": "90418dda-2d12-4ce6-ae46-696caf51f74a",
+      "name": "Wekan1",
+      "notes": "This wekan node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.wekan",
+      "typeVersion": 1,
+      "position": [
+        850,
+        450
+      ],
+      "parameters": {
+        "title": "To Do",
+        "boardId": "={{$node[\"Wekan\"].json[\"_id\"]}}",
+        "resource": "list"
+      },
+      "credentials": {
+        "wekanApi": {
+          "id": null,
+          "name": "wekan-trial"
+        }
+      }
+    },
+    {
+      "id": "a671c5f1-7411-457d-9582-22422acddf10",
+      "name": "Wekan2",
+      "notes": "This wekan node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.wekan",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        450
+      ],
+      "parameters": {
+        "title": "Done",
+        "boardId": "={{$node[\"Wekan\"].json[\"_id\"]}}",
+        "resource": "list"
+      },
+      "credentials": {
+        "wekanApi": {
+          "id": null,
+          "name": "wekan-trial"
+        }
+      }
+    },
+    {
+      "id": "7e3dd190-c5b8-46f4-95d2-46d2d22ae145",
+      "name": "Wekan3",
+      "notes": "This wekan node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.wekan",
+      "typeVersion": 1,
+      "position": [
+        1250,
+        450
+      ],
+      "parameters": {
+        "title": "Document Wekan node",
+        "listId": "={{$node[\"Wekan1\"].json[\"_id\"]}}",
+        "boardId": "={{$node[\"Wekan\"].json[\"_id\"]}}",
+        "authorId": "c4nzTEvSwGPBxKTCc",
+        "swimlaneId": "LDTcBp9fvmjSsSB69",
+        "additionalFields": {}
+      },
+      "credentials": {
+        "wekanApi": {
+          "id": null,
+          "name": "wekan-trial"
+        }
+      }
+    },
+    {
+      "id": "65f7565c-c20c-41ae-ba5c-e8456f8422bb",
+      "name": "Wekan4",
+      "notes": "This wekan node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.wekan",
+      "typeVersion": 1,
+      "position": [
+        1450,
+        450
+      ],
+      "parameters": {
+        "cardId": "={{$node[\"Wekan3\"].json[\"_id\"]}}",
+        "listId": "={{$node[\"Wekan1\"].json[\"_id\"]}}",
+        "boardId": "={{$node[\"Wekan\"].json[\"_id\"]}}",
+        "operation": "update",
+        "updateFields": {
+          "listId": "={{$node[\"Wekan2\"].json[\"_id\"]}}"
+        }
+      },
+      "credentials": {
+        "wekanApi": {
+          "id": null,
+          "name": "wekan-trial"
+        }
+      }
+    },
+    {
+      "id": "error-c7ea9079",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}

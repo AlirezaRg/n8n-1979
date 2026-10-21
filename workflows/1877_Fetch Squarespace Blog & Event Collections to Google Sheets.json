@@ -1,0 +1,285 @@
+{
+  "active": false,
+  "name": "Fetch Squarespace Blog & Event Collections to Google Sheets  ",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "43bb2c50-a9a9-4647-a470-612ad502283f",
+      "name": "Schedule Trigger",
+      "notes": "This scheduleTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -240,
+        420
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      }
+    },
+    {
+      "id": "410fa5ad-a8b8-4cde-b9a9-1d16db0880c9",
+      "name": "When clicking 'Test workflow'",
+      "notes": "This manualTrigger node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        180
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "fa58fb9d-9292-4f25-8326-fad6e59a5513",
+      "name": "Fetch Squarespace blog",
+      "notes": "This httpRequest node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "alwaysOutputData": false,
+      "position": [
+        20,
+        300
+      ],
+      "parameters": {
+        "url": "{{ $env.WEBHOOK_URL }}",
+        "options": {
+          "pagination": {
+            "pagination": {
+              "parameters": {
+                "parameters": [
+                  {
+                    "name": "offset",
+                    "value": "={{ $response.body.pagination.nextPageOffset }}"
+                  },
+                  {
+                    "name": "format",
+                    "value": "json"
+                  }
+                ]
+              },
+              "requestInterval": 200,
+              "completeExpression": "={{ $response.body.pagination.nextPage !== true }}",
+              "paginationCompleteWhen": "other"
+            }
+          }
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "format",
+              "value": "json"
+            },
+            {
+              "name": "offset"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "4b558c29-3bea-4d5e-b88f-0433a81f4698",
+      "name": "Sticky Note",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        100
+      ],
+      "parameters": {
+        "content": "## Change this node\nEdit the HTTP Request URL to your Squarespace blog URL\n\neg: {{ $env.WEBHOOK_URL }}\n"
+      }
+    },
+    {
+      "id": "1886c997-6ba2-42be-8ea0-9047a4cae2e7",
+      "name": "Iterate the collection items",
+      "notes": "This splitOut node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        260,
+        300
+      ],
+      "parameters": {
+        "options": {},
+        "fieldToSplitOut": "items"
+      }
+    },
+    {
+      "id": "9382f7b6-e113-4e4c-ba04-e7cbd119b164",
+      "name": "Squarespace collection Spreadsheet",
+      "notes": "This googleSheets node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        520,
+        300
+      ],
+      "parameters": {
+        "columns": {
+          "value": {
+            "id": "={{ $json.id }}",
+            "tags": "={{ $json.tags.join(\", \") }}",
+            "title": "={{ $json.title }}",
+            "urlId": "{{ $env.BASE_URL }}",
+            "addedOn": "={{ new Date($json.addedOn).toISOString().split(\"T\")[0] }}",
+            "fullUrl": "{{ $env.BASE_URL }}",
+            "assetUrl": "{{ $env.BASE_URL }}",
+            "publishOn": "={{ new Date($json.publishOn).toISOString().split(\"T\")[0] }}",
+            "categories": "={{ $json.categories.join(\", \") }}"
+          },
+          "schema": [
+            {
+              "id": "id",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "id",
+              "defaultMatch": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "addedOn",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "addedOn",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tags",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "tags",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "categories",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "categories",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "publishOn",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "publishOn",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "urlId",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "urlId",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "title",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "title",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "body",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "body",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fullUrl",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "fullUrl",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "assetUrl",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "assetUrl",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "id"
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {},
+        "operation": "appendOrUpdate",
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Beyondspace blog"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1yf_RYZGFHpMyOvD3RKGSvIFY2vumvI4474Qm_1t4-jM",
+          "cachedResultUrl": "{{ $env.WEBHOOK_URL }}",
+          "cachedResultName": "Make.com template"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "LXIVLIr0wD38Xaty",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "id": "87081016-9daa-4985-afb8-eb1f259b23a0",
+      "name": "Sticky Note1",
+      "notes": "This stickyNote node performs automated tasks as part of the workflow.",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        480,
+        100
+      ],
+      "parameters": {
+        "content": "## Spreadsheet template\nClone this spreadsheet as reference\n{{ $env.WEBHOOK_URL }}"
+      }
+    }
+  ],
+  "connections": {}
+}

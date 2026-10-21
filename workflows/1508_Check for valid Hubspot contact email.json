@@ -1,0 +1,148 @@
+{
+  "active": false,
+  "name": "Check for valid Hubspot contact email",
+  "settings": {},
+  "nodes": [
+    {
+      "id": "node-542efb57",
+      "name": "When contact created",
+      "webhookId": "d24ffb14-1e00-4d4e-b3b8-a812690c40d5",
+      "type": "n8n-nodes-base.hubspotTrigger",
+      "typeVersion": 1,
+      "position": [
+        540,
+        480
+      ],
+      "parameters": {
+        "eventsUi": {
+          "eventValues": [
+            {}
+          ]
+        },
+        "additionalFields": {}
+      },
+      "credentials": {
+        "hubspotDeveloperApi": {
+          "id": "{{ $credentials.hubspotDeveloperApi.id }}",
+          "name": "Hubspot Developer account"
+        }
+      }
+    },
+    {
+      "id": "node-f300abf3",
+      "name": "Get contact email address",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 1,
+      "position": [
+        720,
+        480
+      ],
+      "parameters": {
+        "resource": "contact",
+        "contactId": "={{$json[\"contactId\"] ? 151 : 151}}",
+        "operation": "get",
+        "additionalFields": {
+          "properties": [
+            "email"
+          ],
+          "propertyMode": "valueOnly"
+        }
+      },
+      "credentials": {
+        "hubspotApi": {
+          "id": "{{ $credentials.hubspotApi.id }}",
+          "name": "Hubspot account"
+        }
+      }
+    },
+    {
+      "id": "node-4081bbb3",
+      "name": "validate the email",
+      "type": "n8n-nodes-base.oneSimpleApi",
+      "typeVersion": 1,
+      "position": [
+        900,
+        480
+      ],
+      "parameters": {
+        "resource": "utility",
+        "emailAddress": "={{$json[\"properties\"][\"email\"][\"value\"]}}"
+      },
+      "credentials": {
+        "oneSimpleApi": {
+          "id": "{{ $credentials.oneSimpleApi.id }}",
+          "name": "One Simple account"
+        }
+      }
+    },
+    {
+      "id": "node-73da7f61",
+      "name": "If email is suspicious",
+      "notes": "IF\ndeliverability is not good\nOR\nDomain is not valid\nOR\nEmail is Disposable",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        480
+      ],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"deliverability\"]}}",
+              "value2": "GOOD",
+              "operation": "notEqual"
+            }
+          ],
+          "boolean": [
+            {
+              "value1": "={{$json[\"is_domain_valid\"]}}"
+            },
+            {
+              "value1": "={{$json[\"is_email_disposable\"]}}",
+              "value2": true
+            }
+          ]
+        },
+        "combineOperation": "any"
+      }
+    },
+    {
+      "id": "node-b6a105a3",
+      "name": "Send to Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        460
+      ],
+      "parameters": {
+        "text": "=:warning: New Contact with Suspicious Email :warning:\n*Name: * {{$node[\"Item Lists\"].json[\"contact\"][\"fields\"][\"core\"][\"firstname\"][\"normalizedValue\"]}} {{$node[\"Item Lists\"].json[\"contact\"][\"fields\"][\"core\"][\"lastname\"][\"normalizedValue\"]}}\n*Email: * {{$node[\"Item Lists\"].json[\"contact\"][\"fields\"][\"core\"][\"email\"][\"normalizedValue\"]}}\n*Creator: * {{$node[\"Item Lists\"].json[\"contact\"][\"createdByUser\"]}}",
+        "channel": "#hubspot-alerts",
+        "attachments": [],
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": {
+          "id": "{{ $credentials.slackApi.id }}",
+          "name": "Slack Access Token"
+        }
+      }
+    },
+    {
+      "id": "error-456f6d07",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "message": "Workflow execution error",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {}
+}
